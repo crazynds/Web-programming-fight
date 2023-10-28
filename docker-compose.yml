@@ -24,6 +24,7 @@ services:
         depends_on:
             - mysql
             - redis
+            - minio
     mysql:
         image: 'mysql/mysql-server:8.0'
         ports:
@@ -50,8 +51,6 @@ services:
             timeout: 5s
     redis:
         image: 'redis:alpine'
-        ports:
-            - '${FORWARD_REDIS_PORT:-6379}:6379'
         volumes:
             - 'sail-redis:/data'
         networks:
@@ -63,6 +62,28 @@ services:
                 - ping
             retries: 3
             timeout: 5s
+    minio:
+        image: 'minio/minio:latest'
+        ports:
+            - '${FORWARD_MINIO_PORT:-9000}:9000'
+            - '${FORWARD_MINIO_CONSOLE_PORT:-8900}:8900'
+        environment:
+            MINIO_ROOT_USER: sail
+            MINIO_ROOT_PASSWORD: password
+        volumes:
+            - 'sail-minio:/data/minio'
+        networks:
+            - sail
+        entrypoint: sh
+        command: -c 'mkdir -p /data/minio/${AWS_BUCKET} && minio server /data/minio --console-address ":8900"'
+        healthcheck:
+            test:
+                - CMD
+                - curl
+                - '-f'
+                - 'http://localhost:9000/minio/health/live'
+            retries: 3
+            timeout: 5s
 networks:
     sail:
         driver: bridge
@@ -70,4 +91,6 @@ volumes:
     sail-mysql:
         driver: local
     sail-redis:
+        driver: local
+    sail-minio:
         driver: local

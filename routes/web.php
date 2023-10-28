@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SubmitRunController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::resource('run', SubmitRunController::class)
+    ->only(['index','store','create','show']);
+Route::get('/', function(){
+    return redirect()->route('run.create');
 });
