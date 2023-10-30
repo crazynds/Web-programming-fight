@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+if [ ! -z "$WWWUSER" ]; then
+    usermod -u $WWWUSER sail
+fi
+
+if [ ! -d /.composer ]; then
+    mkdir /.composer
+fi
+
+chmod -R ugo+rw /.composer
+
+if [ $# -gt 0 ]; then
+    exec gosu $WWWUSER "$@"
+else
+    exec php artisan queue:work --queue=rank,submit --tries=2 --max-jobs=200 --sleep=1
+fi

@@ -25,6 +25,24 @@ services:
             - mysql
             - redis
             - minio
+    worker:
+        build:
+            context: ./docker
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: '${WWWGROUP}'
+        privileged: true
+        restart: always
+        environment:
+            WWWUSER: '${WWWUSER}'
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
+        depends_on:
+            - mysql
+            - redis
+            - minio
     mysql:
         image: 'mysql/mysql-server:8.0'
         ports:
