@@ -27,6 +27,7 @@ return new class extends Migration
             # If this test case should be used to rank the time
             $table->boolean('rankeable')->default(false);
             $table->boolean('public')->default(false);
+            $table->boolean('validated')->default(false);
 
             $table->index(['problem_id','position']);
         });

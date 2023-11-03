@@ -10,7 +10,7 @@
         </div>
     </div>
 
-    <form method="post" enctype="multipart/form-data" action="{{route('problem.testcase.store',['problem'=>$problem->id])}}" id="form">
+    <form method="post" enctype="multipart/form-data" action="{{route('problem.testCase.store',['problem'=>$problem->id])}}" id="form">
         @csrf
         
         @if ($errors->any())

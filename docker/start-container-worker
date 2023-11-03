@@ -13,5 +13,5 @@ chmod -R ugo+rw /.composer
 if [ $# -gt 0 ]; then
     exec gosu $WWWUSER "$@"
 else
-    exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+    exec php artisan queue:work --queue=rank,submit --tries=2 --max-jobs=200 --sleep=1
 fi

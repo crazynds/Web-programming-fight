@@ -1,8 +1,9 @@
 services:
     laravel.test:
         build:
-            context: ./vendor/laravel/sail/runtimes/8.2
+            context: ./docker
             dockerfile: Dockerfile
+            target: php_base
             args:
                 WWWGROUP: '${WWWGROUP}'
         image: sail-8.2/app
@@ -29,6 +30,7 @@ services:
         build:
             context: ./docker
             dockerfile: Dockerfile
+            target: php_worker
             args:
                 WWWGROUP: '${WWWGROUP}'
         privileged: true

@@ -24,6 +24,8 @@ return new class extends Migration
             $table->text('input_description');
             $table->text('output_description');
 
+            $table->boolean('validated')->default(false);
+
             $table->timestamps();
         });
     }

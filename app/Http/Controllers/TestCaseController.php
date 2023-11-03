@@ -8,7 +8,9 @@ use App\Http\Requests\UpdateTestCaseRequest;
 use App\Models\File;
 use App\Models\Problem;
 use App\Models\TestCase;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use ZipArchive;
 
 class TestCaseController extends Controller
@@ -18,7 +20,7 @@ class TestCaseController extends Controller
      */
     public function index(Problem $problem)
     {
-        return view('pages.testcase.index',[
+        return view('pages.testCase.index',[
             'problem' => $problem,
             'testCases' => $problem->testCases
         ]);
@@ -29,11 +31,23 @@ class TestCaseController extends Controller
      */
     public function create(Problem $problem)
     {
-        return view('pages.testcase.create',[
+        return view('pages.testCase.create',[
             'problem' => $problem,
-            'testcase' => new TestCase(),
+            'testCase' => new TestCase(),
         ]);
     }
+    
+    public function downloadInput(Request $request, Problem $problem,TestCase $testCase)
+    {
+        dd($problem,$testCase);
+        return Storage::download($testCase->inputfile->path);
+    }
+    
+    public function downloadOutput(Problem $problem,TestCase $testCase)
+    {
+        return Storage::download($testCase->outputfile->path);
+    }
+    
 
     /**
      * Store a newly created resource in storage.
@@ -80,7 +94,7 @@ class TestCaseController extends Controller
                 $testCase->save();
             }
         });
-        return redirect()->route('problem.testcase.index',['problem'=>$problem->id]);
+        return redirect()->route('problem.testCase.index',['problem'=>$problem->id]);
     }
 
     /**
@@ -91,12 +105,12 @@ class TestCaseController extends Controller
         $testCase = $problem->testCases()->where('id','=',$testCase)->first();
         $testCase = TestCase::find($testCase->id);
         if(!$testCase)
-            return redirect()->route('problem.testcase.index',['problem'=>$problem->id]);
+            return redirect()->route('problem.testCase.index',['problem'=>$problem->id]);
 
         $testCase->delete();
         $problem->testCases()
             ->where('position','>',$testCase->position)
             ->decrement('position');
-        return redirect()->route('problem.testcase.index',['problem' => $problem->id]);
+        return redirect()->route('problem.testCase.index',['problem' => $problem->id]);
     }
 }

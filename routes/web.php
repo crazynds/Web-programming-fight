@@ -20,8 +20,12 @@ Route::resource('run', SubmitRunController::class)
     ->only(['index','store','create','show']);
 
 Route::resource('problem', ProblemController::class);
-Route::resource('problem.testcase', TestCaseController::class)
+Route::resource('problem.testCase', TestCaseController::class)
     ->except(['show','edit','update']);
+Route::get('/problem/{problem}/testCase/{testCase}/input',[TestCaseController::class,'downloadInput'])
+    ->name('problem.testcase.input');
+Route::get('/problem/{problem}/testCase/{testCase}/output',[TestCaseController::class,'downloadOutput'])
+    ->name('problem.testcase.output');
 
 
 Route::get('/', function(){

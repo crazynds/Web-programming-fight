@@ -61,7 +61,7 @@
                                 <i class="las la-edit"></i>
                             </a>
                             <div class="vr"></div>
-                            <a href="{{route('problem.testcase.index',['problem'=>$problem->id])}}" class="d-flex" style="text-decoration:none !important;">
+                            <a href="{{route('problem.testCase.index',['problem'=>$problem->id])}}" class="d-flex" style="text-decoration:none !important;">
                                 <i class="las la-folder-plus"></i>
                             </a>
                             <div class="vr"></div>

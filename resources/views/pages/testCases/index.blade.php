@@ -14,7 +14,7 @@
             </h1>
         </div>
         <div class="col">
-            <a style="float:right" href="{{ route('problem.testcase.create',['problem' => $problem->id ]) }}">
+            <a style="float:right" href="{{ route('problem.testCase.create',['problem' => $problem->id ]) }}">
                 <button>New +</button>
             </a>
         </div>
@@ -28,8 +28,10 @@
                 <th style="text-align: center;"><b>RuntimeError</b></th>
                 <th style="text-align: center;"><b>MemoryLimit</b></th>
                 <th style="text-align: center;"><b>TimeLimit</b></th>
+                <th style="text-align: center;"><b>WrongAnswer</b></th>
                 <th style="text-align: center;"><b>Accepts</b></th>
                 <th style="text-align: center;"><b>Public</b></th>
+                <th style="text-align: center;"><b>Validated</b></th>
                 <th style="text-align: end;"><b>Actions</b></th>
             </tr>
         </thead>
@@ -52,6 +54,9 @@
                         0
                     </td>
                     <td style="text-align: center;">
+                        0
+                    </td>
+                    <td style="text-align: center;">
                         0%
                     </td>
                     <td style="text-align: center;">
@@ -59,6 +64,13 @@
                             Yes
                         @else
                             No
+                        @endif
+                    </td>
+                    <td style="text-align: center;">
+                        @if($testCase->validated)
+                            <i class="las la-thumbs-up" style="color:green"></i>
+                        @else
+                            <i class="las la-thumbs-down" style="color:red"></i>
                         @endif
                     </td>
                     <td class="px-1">
@@ -83,15 +95,15 @@
                                 </div>
                             @endif
                             <div class="vr"></div>
-                            <a href="#" target="_blank" class="d-flex" style="text-decoration:none !important;">
+                            <a href="{{route('problem.testCase.input',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" target="_blank" class="d-flex" style="text-decoration:none !important;">
                                 <i class="las la-sign-in-alt"></i>
                             </a>
                             <div class="vr"></div>
-                            <a href="#" target="_blank" class="d-flex" style="text-decoration:none !important;">
+                            <a href="{{route('problem.testCase.output',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" target="_blank" class="d-flex" style="text-decoration:none !important;">
                                 <i class="las la-sign-out-alt"></i>
                             </a>
                             <div class="vr"></div>
-                            <form action="{{route('problem.testcase.destroy',['problem'=>$problem->id,'testcase'=> $testCase->id])}}" method="POST">
+                            <form action="{{route('problem.testCase.destroy',['problem'=>$problem->id,'testCase'=> $testCase->id])}}" method="POST">
                                 @method('DELETE')
                                 @csrf
                                 <button type="submit" class="d-flex bg-transparent" style="border:0; padding:0;">
