@@ -58,4 +58,8 @@ COPY start-container /usr/local/bin/start-container
 COPY php.ini /etc/php/8.2/cli/conf.d/99-sail.ini
 RUN chmod +x /usr/local/bin/start-container
 
+RUN mkdir /var/nsjail
+RUN chmod 0777 /var/nsjail
+COPY basic.conf /var/nsjail/basic.conf
+
 ENTRYPOINT ["start-container"]

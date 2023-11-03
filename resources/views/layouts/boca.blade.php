@@ -18,7 +18,8 @@
                 </td>
                 <td bgcolor="#ffa020" width="99%">
                     2023 |
-                    <a href="./submit">Submit</a> |
+                    <a href="{{route('problem.index')}}">Problems</a> |
+                    <a href="{{route('run.create')}}">Submit</a> |
                     <a href="./Runs.html">Runs</a> |
                     <a href="./Statistics.html">Ranking</a> |
                 </td>
@@ -32,5 +33,7 @@
         <br>
         @yield('content')
     </div>
+
+    @yield('script')
 </body>
 </html>

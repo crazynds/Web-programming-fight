@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\SubmitResult;
+use App\Enums\SubmitStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -20,8 +22,8 @@ return new class extends Migration
             $table->foreignIdFor(File::class)->nullable();
             $table->smallInteger('language');
 
-            $table->smallInteger('status')->default(0);
-            $table->smallInteger('result')->default(0);
+            $table->smallInteger('status')->default(SubmitResult::NoResult);
+            $table->smallInteger('result')->default(SubmitStatus::Submitted);
             $table->dateTime('created_at')->useCurrent();
         });
     }

@@ -35,6 +35,8 @@ services:
         restart: always
         environment:
             WWWUSER: '${WWWUSER}'
+        tmpfs:
+            - '/var/work'
         volumes:
             - '.:/var/www/html'
         networks:

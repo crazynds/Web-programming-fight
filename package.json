@@ -12,5 +12,11 @@
         "laravel-vite-plugin": "^0.8.0",
         "sass": "^1.56.1",
         "vite": "^4.0.0"
+    },
+    "dependencies": {
+        "easymde": "^2.18.0",
+        "fine-uploader": "^5.16.2",
+        "jquery": "^3.7.1",
+        "line-awesome": "^1.3.0"
     }
 }

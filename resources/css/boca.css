@@ -47,8 +47,8 @@ TABLE{
   border-collapse: unset;
 }
 
-TBODY{
-  border-color: unset;
-  border-style: unset;
-  border-width: unset;
+thead, tbody, tfoot, tr, td, th{
+  border-color: #2B2E21;
+  border-style: double;
+  border-width: 1px;
 }

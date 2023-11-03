@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\SubmitStatus;
 use App\Http\Requests\StoreSubmitRunRequest;
+use App\Jobs\ExecuteSubmitJob;
 use App\Models\SubmitRun;
 use App\Models\File;
 use App\Models\User;
@@ -32,11 +34,13 @@ class SubmitRunController extends Controller
     public function store(StoreSubmitRunRequest $request)
     {
         DB::transaction(function() use($request){
-            $user = User::query()->firstOrCreate([
-                'name' => "test",
-                'email' => "test@test.com",
-                'password' => 'test@test',
-            ]);
+            $user = User::first();
+            if(!$user)
+                $user = User::query()->create([
+                    'name' => "test",
+                    'email' => "test@test.com",
+                    'password' => 'test@test',
+                ]);
             $originalFile = $request->file('code');
 
             $file = new File();
@@ -45,13 +49,19 @@ class SubmitRunController extends Controller
             $file->size = $originalFile->getSize();
             $file->type = $originalFile->getClientOriginalExtension();
             $file->hash = hash_file("sha256",$originalFile->getPathname());
+
+            
+
             $file->save();
 
             $run = new SubmitRun();
             $run->language = $request->input('lang');
             $run->file()->associate($file);
             $run->user()->associate($user);
+            $run->status = SubmitStatus::WaitingInLine;
             $run->save();
+
+            ExecuteSubmitJob::dispatch($run)->onQueue('submit')->afterCommit();
         });
         return redirect()->route('run.index');
     }
