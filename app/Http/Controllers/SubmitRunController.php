@@ -7,6 +7,7 @@ use App\Http\Requests\StoreSubmitRunRequest;
 use App\Jobs\ExecuteSubmitJob;
 use App\Models\SubmitRun;
 use App\Models\File;
+use App\Models\Problem;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -17,7 +18,9 @@ class SubmitRunController extends Controller
      */
     public function index()
     {
-        return SubmitRun::all();
+        return view('pages.run.index',[
+            'submitRuns' => SubmitRun::all()
+        ]);
     }
 
     /**
@@ -25,7 +28,7 @@ class SubmitRunController extends Controller
      */
     public function create()
     {
-        return view('pages.submit');
+        return view('pages.run.create');
     }
 
     /**
@@ -56,6 +59,7 @@ class SubmitRunController extends Controller
 
             $run = new SubmitRun();
             $run->language = $request->input('lang');
+            $run->problem()->associate(Problem::find($request->problem));
             $run->file()->associate($file);
             $run->user()->associate($user);
             $run->status = SubmitStatus::WaitingInLine;

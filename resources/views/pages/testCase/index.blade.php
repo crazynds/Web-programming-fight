@@ -25,6 +25,7 @@
             <tr>
                 <th><b>#</b></th>
                 <th style="text-align: center;"><b>Id</b></th>
+                <th style="text-align: center;"><b></b></th>
                 <th style="text-align: center;"><b>RuntimeError</b></th>
                 <th style="text-align: center;"><b>MemoryLimit</b></th>
                 <th style="text-align: center;"><b>TimeLimit</b></th>
@@ -38,16 +39,39 @@
         <tbody>
             @foreach ($testCases as $testCase)
                 <tr>
-                    <td class="px-1">
+                    <td class="pr-2">
                         #{{ $testCase->position }}
                     </td>
-                    <td class="px-1">
+                    <td class="px-2">
                         {{ $testCase->id }} 
                     </td>
-                    <td class="px-1" style="text-align: center;">
+                    <td class="px-2">
+                        <div class="hstack gap-1">
+                            @if($testCase->position>1)
+                                <a href="{{route('problem.testCase.down',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" class="d-flex" style="text-decoration:none !important;">
+                                    <i class="las la-angle-up"></i>
+                                </a>
+                            @else
+                                <div class="d-flex">
+                                    <i class="las la-angle-up"></i>
+                                </div>
+                            @endif
+                            <div class="vr"></div>
+                            @if(!$loop->last)
+                                <a href="{{route('problem.testCase.up',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" class="d-flex" style="text-decoration:none !important;">
+                                    <i class="las la-angle-down"></i>
+                                </a>
+                            @else
+                                <div class="d-flex">
+                                    <i class="las la-angle-down"></i>
+                                </div>
+                            @endif
+                        </div>
+                    </td>
+                    <td class="px-2" style="text-align: center;">
                         0
                     </td>
-                    <td class="px-1" style="text-align: center;">
+                    <td class="px-2" style="text-align: center;">
                         0
                     </td>
                     <td style="text-align: center;">
@@ -73,27 +97,11 @@
                             <i class="las la-thumbs-down" style="color:red"></i>
                         @endif
                     </td>
-                    <td class="px-1">
+                    <td class="px-2">
                         <div class="hstack gap-1">
-                            @if($testCase->position>1)
-                                <a href="#" class="d-flex" style="text-decoration:none !important;">
-                                    <i class="las la-angle-up"></i>
-                                </a>
-                            @else
-                                <div class="d-flex">
-                                    <i class="las la-angle-up"></i>
-                                </div>
-                            @endif
-                            <div class="vr"></div>
-                            @if(!$loop->last)
-                                <a href="#" class="d-flex" style="text-decoration:none !important;">
-                                    <i class="las la-angle-down"></i>
-                                </a>
-                            @else
-                                <div class="d-flex">
-                                    <i class="las la-angle-down"></i>
-                                </div>
-                            @endif
+                            <a href="{{route('problem.testCase.show',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" class="d-flex" style="text-decoration:none !important;">
+                                <i class="las la-eye"></i>
+                            </a>
                             <div class="vr"></div>
                             <a href="{{route('problem.testCase.input',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" target="_blank" class="d-flex" style="text-decoration:none !important;">
                                 <i class="las la-sign-in-alt"></i>

@@ -8,6 +8,9 @@
                 Submit a Problem:
             </b>
         </div>
+        <div class="col text-end">
+            <a href="{{route('problem.index')}}">Go Back</a>
+        </div>
     </div>
 
     <form method="post" action="@if(isset($problem->id)){{ route('problem.update',['problem'=>$problem->id])}}@else{{route('problem.store')}}@endif" id="form">

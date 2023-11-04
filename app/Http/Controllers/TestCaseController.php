@@ -11,6 +11,7 @@ use App\Models\TestCase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use ZipArchive;
 
 class TestCaseController extends Controller
@@ -22,7 +23,7 @@ class TestCaseController extends Controller
     {
         return view('pages.testCase.index',[
             'problem' => $problem,
-            'testCases' => $problem->testCases
+            'testCases' => $problem->testCases()->orderBy('position')->get()
         ]);
     }
 
@@ -36,16 +37,50 @@ class TestCaseController extends Controller
             'testCase' => new TestCase(),
         ]);
     }
-    
-    public function downloadInput(Request $request, Problem $problem,TestCase $testCase)
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function show(Problem $problem,TestCase $testCase)
     {
-        dd($problem,$testCase);
-        return Storage::download($testCase->inputfile->path);
+        return view('pages.testCase.show',[
+            'problem' => $problem,
+            'testCase' => $testCase,
+            'input' => Storage::get($testCase->inputfile->path),
+            'output' => Storage::get($testCase->outputfile->path)
+        ]);
+    }
+    
+    public function downloadInput(Problem $problem,TestCase $testCase)
+    {
+        return Storage::download($testCase->inputfile->path,Str::slug($problem->title).'_input_'.$testCase->position);
     }
     
     public function downloadOutput(Problem $problem,TestCase $testCase)
     {
-        return Storage::download($testCase->outputfile->path);
+        return Storage::download($testCase->outputfile->path,Str::slug($problem->title).'_output_'.$testCase->position);
+    }
+
+    public function up(Problem $problem,TestCase $testCase)
+    {
+        if($testCase->position < $problem->testCases()->count()){
+            $testCase->position += 1;
+            $problem->testCases()
+                ->where('position','=',$testCase->position)
+                ->decrement('position');
+            $testCase->save();
+        }
+        return redirect()->route('problem.testCase.index',['problem' => $problem->id]);
+    }
+    public function down(Problem $problem,TestCase $testCase)
+    {
+        if($testCase->position > 1){
+            $testCase->position -= 1;
+            $problem->testCases()
+                ->where('position','=',$testCase->position)
+                ->increment('position');
+            $testCase->save();
+        }
+        return redirect()->route('problem.testCase.index',['problem' => $problem->id]);
     }
     
 
@@ -100,13 +135,8 @@ class TestCaseController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Problem $problem,$testCase)
+    public function destroy(Problem $problem,TestCase $testCase)
     {
-        $testCase = $problem->testCases()->where('id','=',$testCase)->first();
-        $testCase = TestCase::find($testCase->id);
-        if(!$testCase)
-            return redirect()->route('problem.testCase.index',['problem'=>$problem->id]);
-
         $testCase->delete();
         $problem->testCases()
             ->where('position','>',$testCase->position)

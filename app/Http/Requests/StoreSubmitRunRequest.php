@@ -24,6 +24,7 @@ class StoreSubmitRunRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'problem' => 'required|integer|exists:problems,id',
             'lang' => [
                 'required',
                 new EnumValue(LanguagesType::class,false)

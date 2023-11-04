@@ -20,7 +20,7 @@
                     2023 |
                     <a href="{{route('problem.index')}}">Problems</a> |
                     <a href="{{route('run.create')}}">Submit</a> |
-                    <a href="./Runs.html">Runs</a> |
+                    <a href="{{route('run.index')}}">Runs</a> |
                     <a href="./Statistics.html">Ranking</a> |
                 </td>
                 <td bgcolor="#ffa020" align="center" nowrap="">

@@ -11,11 +11,15 @@
     </div>
 
     <form method="post" enctype="multipart/form-data" action="/run">
-        <!-- upload of a single file -->
+        @csrf
         <div class="row">
             <div class="col">
-                <label for="code" class="form-label">Select code: </label><br />
-                <input type="file" class="form-control" name="code" required />
+                <label for="problem" class="form-label">Problem: </label><br />
+                <select name="problem" class="form-select" required>
+                    @foreach (App\Models\Problem::all() as $problem)
+                        <option value="{{ $problem->id }}" @if(isset($selected) && $problem->id==$selected) selected @endif >#{{ $problem->id }} - {{ $problem->title }}</option>
+                    @endforeach
+                </select>
             </div>
             <div class="col">
                 <label for="lang" class="form-label">Language: </label><br />
@@ -25,7 +29,13 @@
                     @endforeach
                 </select>
             </div>
-            {{ csrf_field() }}
+        </div>
+        <!-- upload of a single file -->
+        <div class="row">
+            <div class="col">
+                <label for="code" class="form-label">Select code: </label><br />
+                <input type="file" class="form-control" name="code" required />
+            </div>
         </div>
         @if ($errors->any())
             <div class="row p-3">

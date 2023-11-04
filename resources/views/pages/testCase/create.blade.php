@@ -8,6 +8,9 @@
                 Submit a Test Case:
             </b>
         </div>
+        <div class="col text-end">
+            <a href="{{route('problem.testCase.index',['problem' => $problem->id ])}}">Go Back</a>
+        </div>
     </div>
 
     <form method="post" enctype="multipart/form-data" action="{{route('problem.testCase.store',['problem'=>$problem->id])}}" id="form">

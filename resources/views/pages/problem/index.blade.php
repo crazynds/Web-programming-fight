@@ -30,18 +30,18 @@
         <tbody>
             @foreach ($problems as $problem)
                 <tr>
-                    <td class="px-1">
+                    <td class="pr-2">
                         #{{ $problem->id }}
                     </td>
-                    <td class="px-1">
+                    <td class="px-2">
                         <a href="{{ route('problem.show', ['problem' => $problem->id]) }}">
                             {{ Str::limit($problem->title, 30) }}
                         </a>
                     </td>
-                    <td class="px-1" style="text-align: center;">
+                    <td class="px-2" style="text-align: center;">
                         {{ $problem->memory_limit }}MB
                     </td>
-                    <td class="px-1" style="text-align: center;">
+                    <td class="px-2" style="text-align: center;">
                         {{ $problem->time_limit / 1000 }}s
                     </td>
                     <td style="text-align: center;">
@@ -50,7 +50,7 @@
                     <td style="text-align: center;">
                         0
                     </td>
-                    <td class="px-1">
+                    <td class="px-2">
                         <div class="hstack gap-1">
                             <a href="{{route('problem.show',['problem'=>$problem->id])}}" class="d-flex" style="text-decoration:none !important;">
                                 <i class="las la-eye"></i>

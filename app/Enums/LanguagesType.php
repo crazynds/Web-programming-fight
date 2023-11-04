@@ -18,6 +18,13 @@ final class LanguagesType extends Enum
         ];
     }
 
+    public static function name(int $langCode){
+        foreach(self::list() as $key=>$code){
+            if($code==$langCode)
+                return $key;
+        }
+    }
+
     public static function validation(int $langCode){
         switch($langCode){
             case self::CPlusPlus:

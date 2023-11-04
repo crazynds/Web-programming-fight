@@ -21,11 +21,15 @@ Route::resource('run', SubmitRunController::class)
 
 Route::resource('problem', ProblemController::class);
 Route::resource('problem.testCase', TestCaseController::class)
-    ->except(['show','edit','update']);
+    ->except(['edit','update']);
 Route::get('/problem/{problem}/testCase/{testCase}/input',[TestCaseController::class,'downloadInput'])
-    ->name('problem.testcase.input');
+    ->name('problem.testCase.input');
 Route::get('/problem/{problem}/testCase/{testCase}/output',[TestCaseController::class,'downloadOutput'])
-    ->name('problem.testcase.output');
+    ->name('problem.testCase.output');
+Route::get('/problem/{problem}/testCase/{testCase}/up',[TestCaseController::class,'up'])
+    ->name('problem.testCase.up');
+Route::get('/problem/{problem}/testCase/{testCase}/down',[TestCaseController::class,'down'])
+    ->name('problem.testCase.down');
 
 
 Route::get('/', function(){
