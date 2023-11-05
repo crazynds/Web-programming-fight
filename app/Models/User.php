@@ -17,7 +17,7 @@ class User extends Authenticatable
         return 'users/'.$this->id;
     }
 
-    public function submitions(){
+    public function submissions(){
         return $this->hasMany(SubmitRun::class);
     }
 

@@ -118,12 +118,13 @@ class ExecuteSubmitJob implements ShouldQueue
             $retval = null;
             exec("g++ -O2 /var/work/'$program' -o /var/nsjail/a.bin",$output,$retval);
             if($retval==0){
-                $accept = True;
                 $num = 0;
 
                 $testCasesRel = [];
+                $testCases = $this->submit->problem->testCases()->where('validated','=',true)->with(['inputfile','outputfile'])->get();
 
-                foreach($this->submit->problem->testCases()->where('validated','=',true)->with(['inputfile','outputfile'])->get() as $testCase){
+
+                foreach($testCases as $testCase){
                     $result = $this->executeTestCase($testCase);
                     $testCasesRel[$testCase->id] = [
                         'result' => $result
@@ -136,7 +137,7 @@ class ExecuteSubmitJob implements ShouldQueue
                     }
                 }
                 // Número de test cases que passou
-                if($this->submit->result=='Accepted'){
+                if($this->submit->result=='Accepted' || $testCases->count() == 0){
 
                     // Valida os casos de testes não validados até então...
                     foreach($this->submit->problem->testCases()->where('validated','=',false)->with(['inputfile','outputfile'])->get() as $testCase){
@@ -150,8 +151,10 @@ class ExecuteSubmitJob implements ShouldQueue
                             $testCase->save();
                         }
                     }
-
-                    $this->submit->result = SubmitResult::Accepted;
+                    if($num > 0)
+                        $this->submit->result = SubmitResult::Accepted;
+                    else
+                        $this->submit->result = SubmitResult::WrongAnswer;
                     $this->submit->output = null;
                 }
                 $this->submit->testCases()->sync($testCasesRel);

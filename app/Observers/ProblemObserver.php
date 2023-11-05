@@ -42,7 +42,7 @@ class ProblemObserver
      */
     public function forceDeleting(Problem $problem): void
     {
-        foreach($problem->submitions()->lazy() as $submit){
+        foreach($problem->submissions()->lazy() as $submit){
             $submit->delete();
         }
         foreach($problem->testCases()->lazy() as $testCase){

@@ -13,13 +13,13 @@ class UserController extends Controller
         /** @var User */
         $user = Auth::user();
 
-        $problensCount = $user->submitions()->where('result','=',SubmitResult::Accepted)
+        $problensCount = $user->submissions()->where('result','=',SubmitResult::Accepted)
             ->select('problem_id')->distinct()->count();
 
-        $acceptedCount = $user->submitions()->where('result','=',SubmitResult::Accepted)
+        $acceptedCount = $user->submissions()->where('result','=',SubmitResult::Accepted)
             ->select('problem_id','language')->distinct()->count();
 
-        $attemptsCount = $user->submitions()->count();
+        $attemptsCount = $user->submissions()->count();
 
         return view('pages.user.profile',[
             'user' => $user,

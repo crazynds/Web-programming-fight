@@ -15,7 +15,7 @@ class Problem extends Model
     public function testCases(){
         return $this->hasMany(TestCase::class);
     }
-    public function submitions(){
+    public function submissions(){
         return $this->hasMany(SubmitRun::class);
     }
 }

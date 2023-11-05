@@ -19,30 +19,55 @@ use Illuminate\Support\Facades\Route;
 */
 
  
+Route::get('/home',function(){
+    return view('pages.home');
+})->name('home');
 
+
+// auth routes
 Route::get('/auth/{provider}/redirect', [AuthController::class,'redirect'])->name('auth.login');
 Route::get('/auth/{provider}/callback',[AuthController::class,'callback'])->name('auth.callback');
+Route::get('/auth/logout',[AuthController::class,'logout'])->middleware('auth')->name('auth.logout');
 
-Route::resource('run', SubmitRunController::class)
-    ->only(['index','store','create','show']);
-Route::get('/run/{submitRun}/rejudge',[SubmitRunController::class,'rejudge'])
-    ->name('run.rejudge');
 
-Route::resource('problem', ProblemController::class);
-Route::resource('problem.testCase', TestCaseController::class)
-    ->except(['edit','update']);
-Route::get('/problem/{problem}/testCase/{testCase}/input',[TestCaseController::class,'downloadInput'])
-    ->name('problem.testCase.input');
-Route::get('/problem/{problem}/testCase/{testCase}/output',[TestCaseController::class,'downloadOutput'])
-    ->name('problem.testCase.output');
-Route::get('/problem/{problem}/testCase/{testCase}/up',[TestCaseController::class,'up'])
-    ->name('problem.testCase.up');
-Route::get('/problem/{problem}/testCase/{testCase}/down',[TestCaseController::class,'down'])
-    ->name('problem.testCase.down');
 
-Route::get('/user/profile',[UserController::class,'profile'])->name('user.profile')->middleware('auth');
+Route::middleware('auth')->group(function(){
+    // problem routes
+    // TODO: fazer o problema estar vinculado a um usuario
+    // TODO: somente os donos podem editar seus problemas e etc..
+    Route::resource('problem', ProblemController::class);
+    Route::resource('problem.testCase', TestCaseController::class)
+        ->except(['edit','update']);
+    Route::controller(TestCaseController::class)
+        ->name('problem.')->prefix('problem')
+        ->group(function(){
+        Route::get('/problem/{problem}/testCase/{testCase}/input','downloadInput')
+            ->name('testCase.input');
+        Route::get('/problem/{problem}/testCase/{testCase}/output','downloadOutput')
+            ->name('testCase.output');
+        Route::get('/problem/{problem}/testCase/{testCase}/up','up')
+            ->name('testCase.up');
+        Route::get('/problem/{problem}/testCase/{testCase}/down','down')
+            ->name('testCase.down');
+    });
+
+    // Todo fazer polices para submissions, somente o dono pode gerenciar
+    // run routes
+    Route::resource('run', SubmitRunController::class)
+        ->only(['index','store','create','show']);
+    Route::get('/run/{submitRun}/rejudge',[SubmitRunController::class,'rejudge'])
+        ->name('run.rejudge');
+    Route::get('/run/{submitRun}/output',[SubmitRunController::class,'output'])
+        ->name('run.output');
+
+    // user routes
+    Route::get('/user/profile',[UserController::class,'profile'])
+        ->name('user.profile');
+
+});
+
 
 
 Route::get('/', function(){
-    return redirect()->route('run.create');
+    return redirect()->route('home');
 });

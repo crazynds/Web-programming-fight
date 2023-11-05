@@ -35,6 +35,11 @@ class AuthController extends Controller
         
         Auth::login($user,true);
         
-        return redirect().route('user.profile');
+        return redirect()->route('user.profile');
+    }
+
+    public function logout(){
+        Auth::logout();
+        return redirect()->route('problem.index');
     }
 }

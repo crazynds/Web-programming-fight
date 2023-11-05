@@ -14,13 +14,19 @@ use Illuminate\Support\Facades\DB;
 
 class SubmitRunController extends Controller
 {
+    
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
+
         return view('pages.run.index',[
-            'submitRuns' => SubmitRun::orderBy('id','desc')->get()
+            'submitRuns' => $this->user()->submissions()->orderBy('id','desc')->get()
         ]);
     }
 
@@ -89,6 +95,14 @@ class SubmitRunController extends Controller
         $submitRun->save();
         ExecuteSubmitJob::dispatch($submitRun)->onQueue('submit')->afterCommit();
         return redirect()->route('run.index');
+    }
+
+    public function output(SubmitRun $submitRun)
+    {
+        return view('pages.run.output',[
+            'submitRun' => $submitRun,
+            'output' => $submitRun->output
+        ]);
     }
 
 }

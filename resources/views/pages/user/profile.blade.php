@@ -33,7 +33,7 @@
                         </div>
                         <div>
                             <p class="mb-2 h5">{{ $attempts_count }}</p>
-                            <p class="text-muted mb-0">Attempts</p>
+                            <p class="text-muted mb-0">Submissions</p>
                         </div>
                     </div>
                 </div>

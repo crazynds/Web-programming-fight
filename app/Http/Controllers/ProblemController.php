@@ -15,8 +15,8 @@ class ProblemController extends Controller
     public function index()
     {
         $problems = Problem::withCount([
-                'submitions',
-                'submitions as accepted_submitions' => function($query){
+                'submissions',
+                'submissions as accepted_submissions' => function($query){
                     $query->where('submit_runs.result','=',SubmitResult::Accepted);
                 },
             ])

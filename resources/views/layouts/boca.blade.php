@@ -35,12 +35,12 @@
                     <x-ballon/>
                     <font color="#000000">{{ config('app.name') }}</font>
                 </td>
-                <td bgcolor="#ffa020" width="99%">
+                <td bgcolor="#ffa020" width="99%" style="padding-left:6px;">
                     2023 |
                     <a href="{{route('problem.index')}}">Problems</a> |
                     <a href="{{route('run.create')}}">Submit</a> |
                     <a href="{{route('run.index')}}">Runs</a> |
-                    <a href="./Statistics.html">Ranking</a> |
+                    {{-- <a href="./Statistics.html">Ranking</a> | --}}
                 </td>
                 <td bgcolor="#ffa020" align="center" class="px-2" nowrap="">
                     @auth
@@ -53,6 +53,11 @@
                     </span>
                     @endauth
                 </td>
+                @auth
+                <td bgcolor="#ffa020" align="center" class="px-2" nowrap="">
+                    <a href="{{route('auth.logout')}}">Logout</a>
+                </td>
+                @endauth
             </tr>
         </tbody>
     </table>

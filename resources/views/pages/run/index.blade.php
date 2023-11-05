@@ -26,6 +26,7 @@
                 <th style="text-align: center;"><b>Lang</b></th>
                 <th style="text-align: center;"><b>Status</b></th>
                 <th style="text-align: center;"><b>Result</b></th>
+                <th style="text-align: center;"><b>Cases</b></th>
                 <th style="text-align: end;"><b>Actions</b></th>
             </tr>
         </thead>
@@ -65,7 +66,7 @@
                             {{ $submitRun->status }} 
                         </strong>
                     </td>
-                    <td class="px-2" s>
+                    <td class="px-2">
                         <span
                         @switch($submitRun->result)
                             @case('Accepted')
@@ -91,6 +92,31 @@
                             {{ $submitRun->result }} 
                         </span>
                     </td>
+                    <td class="px-2 text-center">
+                        @switch($submitRun->result)
+                            @case('Accepted')
+                            <span style="color:#0a0">
+                                All
+                            </span>
+                                @break
+                            @case('Wrong answer')
+                            <span style="color:#a00">
+                                {{$submitRun->num_test_cases + 1}}
+                            </span>
+                                @break
+                            @case('Runtime error')
+                            @case('Time limit')
+                            @case('Memory limit')
+                            <span style="color:#00a">
+                                {{$submitRun->num_test_cases + 1}}
+                            </span>
+                                @break
+                            @case('Error')
+                            @case('Compilation error')
+                            @default
+                                ---
+                        @endswitch
+                    </td>
                     <td class="px-2">
                         <div class="hstack gap-1">
                             @if($submitRun->status == 'Judged' || $submitRun->status=='Error')
@@ -98,7 +124,7 @@
                                     <i class="las la-redo-alt"></i>
                                 </a>
                                 @if(isset($submitRun->output))
-                                    <a href="#" class="d-flex" style="text-decoration:none !important;">
+                                    <a href="{{route('run.output',['submitRun'=>$submitRun->id])}}" class="d-flex" style="text-decoration:none !important;">
                                         <i class="las la-poll-h"></i>
                                     </a>
                                 @endif
