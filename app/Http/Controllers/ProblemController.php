@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\SubmitResult;
 use App\Http\Requests\StoreProblemRequest;
 use App\Http\Requests\UpdateProblemRequest;
 use App\Models\Problem;
@@ -13,8 +14,15 @@ class ProblemController extends Controller
      */
     public function index()
     {
+        $problems = Problem::withCount([
+                'submitions',
+                'submitions as accepted_submitions' => function($query){
+                    $query->where('submit_runs.result','=',SubmitResult::Accepted);
+                },
+            ])
+            ->orderBy('id')->get();
         return view('pages.problem.index',[
-            'problems' => Problem::all(),
+            'problems' => $problems,
         ]);
     }
 

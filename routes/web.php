@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::resource('run', SubmitRunController::class)
     ->only(['index','store','create','show']);
+Route::get('/run/{submitRun}/rejudge',[SubmitRunController::class,'rejudge'])
+    ->name('run.rejudge');
 
 Route::resource('problem', ProblemController::class);
 Route::resource('problem.testCase', TestCaseController::class)

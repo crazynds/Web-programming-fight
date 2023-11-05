@@ -12,6 +12,9 @@ use Illuminate\Database\Eloquent\Model;
 class SubmitRun extends Model
 {
     public $timestamps = false;
+    protected $casts = [
+        'created_at' => 'datetime',
+    ];
 
     protected function language(): Attribute
     {
@@ -42,6 +45,10 @@ class SubmitRun extends Model
 
     public function user(){
         return $this->belongsTo(User::class);
+    }
+
+    public function testCases(){
+        return $this->belongsToMany(TestCase::class);
     }
 
 }

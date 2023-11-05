@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
 use App\Http\Requests\StoreSubmitRunRequest;
 use App\Jobs\ExecuteSubmitJob;
@@ -19,7 +20,7 @@ class SubmitRunController extends Controller
     public function index()
     {
         return view('pages.run.index',[
-            'submitRuns' => SubmitRun::all()
+            'submitRuns' => SubmitRun::orderBy('id','desc')->get()
         ]);
     }
 
@@ -46,36 +47,48 @@ class SubmitRunController extends Controller
                 ]);
             $originalFile = $request->file('code');
 
-            $file = new File();
-            $file->path = $originalFile->store('attempts/code');
-            $file->type = $originalFile->getType();
-            $file->size = $originalFile->getSize();
-            $file->type = $originalFile->getClientOriginalExtension();
-            $file->hash = hash_file("sha256",$originalFile->getPathname());
-
-            
-
-            $file->save();
-
-            $run = new SubmitRun();
-            $run->language = $request->input('lang');
-            $run->problem()->associate(Problem::find($request->problem));
-            $run->file()->associate($file);
-            $run->user()->associate($user);
-            $run->status = SubmitStatus::WaitingInLine;
-            $run->save();
-
-            ExecuteSubmitJob::dispatch($run)->onQueue('submit')->afterCommit();
+            // 16 MB
+            if($originalFile->getSize()>1024*1024*16){
+                $run = new SubmitRun();
+                $run->language = $request->input('lang');
+                $run->problem()->associate(Problem::find($request->problem));
+                $run->user()->associate($user);
+                $run->status = SubmitStatus::Judged;
+                $run->result = SubmitResult::FileTooLarge;
+                $run->save();
+            }else{
+                $file = new File();
+                $file->path = $originalFile->store('attempts/code');
+                $file->type = $originalFile->getType();
+                $file->size = $originalFile->getSize();
+                $file->type = $originalFile->getClientOriginalExtension();
+                $file->hash = hash_file("sha256",$originalFile->getPathname());
+    
+                
+    
+                $file->save();
+    
+                $run = new SubmitRun();
+                $run->language = $request->input('lang');
+                $run->problem()->associate(Problem::find($request->problem));
+                $run->file()->associate($file);
+                $run->user()->associate($user);
+                $run->status = SubmitStatus::WaitingInLine;
+                $run->save();
+    
+                ExecuteSubmitJob::dispatch($run)->onQueue('submit')->afterCommit();
+            }
         });
         return redirect()->route('run.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(SubmitRun $submitRun)
+    public function rejudge(SubmitRun $submitRun)
     {
-        //
+        $submitRun->status = SubmitStatus::WaitingInLine;
+        $submitRun->result = SubmitResult::NoResult;
+        $submitRun->save();
+        ExecuteSubmitJob::dispatch($submitRun)->onQueue('submit')->afterCommit();
+        return redirect()->route('run.index');
     }
 
 }

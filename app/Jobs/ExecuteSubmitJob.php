@@ -6,6 +6,7 @@ use App\Enums\LanguagesType;
 use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
 use App\Models\SubmitRun;
+use App\Models\TestCase;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -27,6 +28,54 @@ class ExecuteSubmitJob implements ShouldQueue
     )
     {
         //
+    }
+
+    private function executeTestCase(TestCase $testCase){
+        $root = '/var/work/';
+        $dir = 'problems/'.$this->submit->problem->id;
+
+        $input_file = $dir.'/in_'.$testCase->id;
+        $output_file = $dir.'/out_'.$testCase->id;
+
+        if(!Storage::disk('nsjail')->exists($input_file))
+            Storage::disk('nsjail')->writeStream($input_file, Storage::readStream($testCase->inputfile->path));
+        if(!Storage::disk('nsjail')->exists($output_file))
+            Storage::disk('nsjail')->writeStream($output_file, Storage::readStream($testCase->outputfile->path));
+        
+        $finput = $root.$input_file;
+        $foutput = $root.$output_file;
+        
+        // TODO: configurar o programa para rodar dentro dos limit
+        // TODO: fazer o catch do programa nos limit e tratar corretamente
+
+        // Limit to 134217728 chars, so the file can't be bigger than 128 MB. (1024 * 1024 * 128)
+        $output = null;
+        $retval = null;
+        $seconds = round((1500 + $this->submit->problem->time_limit)/1000);
+        $command = 'time --output=/var/work/time -p nsjail --conf /var/nsjail/basic.conf --time_limit='.$seconds.' < '.$finput.' 2>/dev/null | head -c 134217728 > /var/work/out_cpp';
+        exec($command,$output,$retval);
+        if($retval!=0){
+            return SubmitResult::RuntimeError;
+        }else{
+            $str = Storage::disk('nsjail')->get('time');
+            $str = explode(PHP_EOL,$str);
+            $arr = explode(' ',$str[1]);
+            $time = intval(floatval($arr[1])*1000);
+            if($time > $this->submit->time_limit){
+                dump($str);
+                return SubmitResult::TimeLimit;
+            }
+            // a => compare text mode
+            // b => ignore multiples blank lines (\n\r == \r\n == \n)
+            // c => layout bonitinho
+            // i => não case sensitive
+            exec('diff -abci --suppress-common-lines --ignore-trailing-space /var/work/out_cpp '.$foutput,$output,$retval);
+            if($retval!=0){
+                $this->submit->output = implode(PHP_EOL,$output);
+                return SubmitResult::WrongAnswer;
+            }
+        }
+        return SubmitResult::Accepted;
     }
 
     /**
@@ -55,37 +104,64 @@ class ExecuteSubmitJob implements ShouldQueue
         $this->submit->status = SubmitStatus::Judging;
         $this->submit->result = SubmitResult::NoResult;
         $this->submit->save();
-
         switch($this->submit->language){
-            case LanguagesType::CPlusPlus:
-                //$type = substr($file->type,0,3);
-                //$program = '/work/prog.'.$type;
-                $program = '/var/work/prog.cpp';
-                $output = '/var/work/prog.cpp';
-                file_put_contents($program,Storage::get($file->path));    
-                $output = null;
-                $retval = null;
-                exec("g++ -O2 '$program' -o /var/work/a.bin",$output,$retval);
-                if($retval==0){
-                    $output = null;
-                    $retval = null;
-                    
-                    // TODO: aqui deve ser feito os testes para os casos de accept.
-                    // Limit to 134217728 chars, so the file can't be bigger than 128 MB. (1024 * 1024 * 128)
-                    exec('nsjail --conf /var/nsjail/basic.conf | head -c 134217728 > /var/work/out_cpp',$output,$retval);
-                    if($retval!=0){
-                        $this->submit->result = SubmitResult::RuntimeError;
+        case "C++":
+            //$type = substr($file->type,0,3);
+            //$program = '/work/prog.'.$type;
+            $program = 'prog.cpp';
+            Storage::disk('nsjail')->writeStream($program, Storage::readStream($file->path));
+            $output = null;
+            $retval = null;
+            exec("g++ -O2 /var/work/'$program' -o /var/nsjail/a.bin",$output,$retval);
+            if($retval==0){
+                $accept = True;
+                $num = 0;
+
+                $testCasesRel = [];
+
+                foreach($this->submit->problem->testCases()->where('validated','=',true)->with(['inputfile','outputfile'])->get() as $testCase){
+                    $result = $this->executeTestCase($testCase);
+                    $testCasesRel[$testCase->id] = [
+                        'result' => $result
+                    ];
+                    $this->submit->result = $result;
+                    if($result == SubmitResult::Accepted){
+                        $num += 1;
                     }else{
-                        dump($output);
-                        dump($retval);
-                        $this->submit->result = SubmitResult::Accepted;
+                        break;
                     }
-                }else{
-                    $this->submit->result = SubmitResult::CompilationError;
                 }
-                break;
-            case LanguagesType::Python:
-                break;
+                // Número de test cases que passou
+                if($this->submit->result=='Accepted'){
+
+                    // Valida os casos de testes não validados até então...
+                    foreach($this->submit->problem->testCases()->where('validated','=',false)->with(['inputfile','outputfile'])->get() as $testCase){
+                        $result = $this->executeTestCase($testCase);
+                        $testCasesRel[$testCase->id] = [
+                            'result' => $result
+                        ];
+                        if($result == SubmitResult::Accepted){
+                            $num += 1;
+                            $testCase->validated = true;
+                            $testCase->save();
+                        }
+                    }
+
+                    $this->submit->result = SubmitResult::Accepted;
+                    $this->submit->output = null;
+                }
+                $this->submit->testCases()->sync($testCasesRel);
+                $this->submit->num_test_cases = $num;
+            }else{
+                $this->submit->output = implode(PHP_EOL,$output);
+                $this->submit->result = SubmitResult::CompilationError;
+            }
+            break;
+        case "Python":
+            $this->submit->result = SubmitResult::Error;
+            break;
+        default:        
+            $this->submit->result = SubmitResult::Error;
         }
         $this->submit->status = SubmitStatus::Judged;
         $this->submit->save();

@@ -45,10 +45,14 @@
                         {{ $problem->time_limit / 1000 }}s
                     </td>
                     <td style="text-align: center;">
-                        0%
+                        @if($problem->submitions_count==0)
+                            --%
+                        @else
+                            {{round($problem->accepted_submitions / $problem->submitions_count * 100,2)}}%
+                        @endif
                     </td>
                     <td style="text-align: center;">
-                        0
+                        {{$problem->submitions_count}}
                     </td>
                     <td class="px-2">
                         <div class="hstack gap-1">

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignIdFor(Problem::class);
             $table->smallInteger("position");
 
-            $table->smallInteger("type")->default(TestCaseType::FileDiff);
+            $table->tinyInteger("type")->default(TestCaseType::FileDiff);
 
             $table->foreignIdFor(File::class,'input_file');
             $table->foreignIdFor(File::class,'output_file');

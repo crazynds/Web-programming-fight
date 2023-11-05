@@ -17,4 +17,5 @@ final class SubmitResult extends Enum
     const MemoryLimit = 6;
 
     const Error = 7;
+    const FileTooLarge = 8;
 }

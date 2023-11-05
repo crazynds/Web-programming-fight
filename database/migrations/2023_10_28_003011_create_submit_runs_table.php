@@ -6,6 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Models\File;
+use App\Models\Problem;
 use App\Models\User;
 
 return new class extends Migration
@@ -19,11 +20,12 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(User::class);
 
+            $table->foreignIdFor(Problem::class);
             $table->foreignIdFor(File::class)->nullable();
             $table->smallInteger('language');
 
-            $table->smallInteger('status')->default(SubmitResult::NoResult);
-            $table->smallInteger('result')->default(SubmitStatus::Submitted);
+            $table->tinyInteger('status')->default(SubmitResult::NoResult);
+            $table->tinyInteger('result')->default(SubmitStatus::Submitted);
             $table->dateTime('created_at')->useCurrent();
         });
     }

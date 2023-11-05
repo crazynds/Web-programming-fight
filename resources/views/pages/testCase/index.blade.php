@@ -69,19 +69,23 @@
                         </div>
                     </td>
                     <td class="px-2" style="text-align: center;">
-                        0
+                        {{$testCase->runtime_error_runs}}
                     </td>
                     <td class="px-2" style="text-align: center;">
-                        0
+                        {{$testCase->memory_limit_runs}}
                     </td>
                     <td style="text-align: center;">
-                        0
+                        {{$testCase->time_limit_runs}}
                     </td>
                     <td style="text-align: center;">
-                        0
+                        {{$testCase->wrong_answer_runs}}
                     </td>
                     <td style="text-align: center;">
-                        0%
+                        @if($testCase->submit_runs_count==0)
+                            --%
+                        @else
+                            {{round($testCase->accepted_runs / $testCase->submit_runs_count * 100,2)}}%
+                        @endif
                     </td>
                     <td style="text-align: center;">
                         @if($testCase->public)

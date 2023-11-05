@@ -36,6 +36,12 @@ return [
             'throw' => false,
         ],
 
+        'nsjail' => [
+            'driver' => 'local',
+            'root' => '/var/work',
+            'throw' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

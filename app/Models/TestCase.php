@@ -19,4 +19,8 @@ class TestCase extends Model
     public function outputfile(){
         return $this->belongsTo(File::class,'output_file');
     }
+
+    public function submitRuns(){
+        return $this->belongsToMany(SubmitRun::class);
+    }
 }

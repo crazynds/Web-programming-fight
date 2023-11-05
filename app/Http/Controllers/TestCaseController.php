@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\SubmitResult;
 use App\Enums\TestCaseType;
 use App\Http\Requests\StoreTestCaseRequest;
 use App\Http\Requests\UpdateTestCaseRequest;
@@ -21,9 +22,29 @@ class TestCaseController extends Controller
      */
     public function index(Problem $problem)
     {
+        $testCases = $problem->testCases()
+            ->withCount([
+                'submitRuns',
+                'submitRuns as accepted_runs' => function($query){
+                    $query->where('submit_run_test_case.result','=',SubmitResult::Accepted);
+                },
+                'submitRuns as runtime_error_runs' => function($query){
+                    $query->where('submit_run_test_case.result','=',SubmitResult::RuntimeError);
+                },
+                'submitRuns as memory_limit_runs' => function($query){
+                    $query->where('submit_run_test_case.result','=',SubmitResult::MemoryLimit);
+                },
+                'submitRuns as time_limit_runs' => function($query){
+                    $query->where('submit_run_test_case.result','=',SubmitResult::TimeLimit);
+                },
+                'submitRuns as wrong_answer_runs' => function($query){
+                    $query->where('submit_run_test_case.result','=',SubmitResult::WrongAnswer);
+                }
+            ])
+            ->orderBy('position')->get();
         return view('pages.testCase.index',[
             'problem' => $problem,
-            'testCases' => $problem->testCases()->orderBy('position')->get()
+            'testCases' => $testCases,
         ]);
     }
 

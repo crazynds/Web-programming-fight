@@ -37,12 +37,12 @@
                     </td>
                     <td class="px-2">
                         <small>
-                        {{ \Carbon\Carbon::parse($submitRun->create_at)->format('d/m/Y') }} 
+                        {{ $submitRun->created_at->format('d/m/Y') }} 
                         </small>
                     </td>
                     <td class="px-2">
                         <small>
-                        {{  \Carbon\Carbon::parse($submitRun->create_at)->format('h:i:s') }} 
+                        {{ $submitRun->created_at->format('h:i:s') }} 
                         </small>
                     </td>
                     <td class="px-2">
@@ -93,6 +93,16 @@
                     </td>
                     <td class="px-2">
                         <div class="hstack gap-1">
+                            @if($submitRun->status == 'Judged' || $submitRun->status=='Error')
+                                <a href="{{route('run.rejudge',['submitRun'=>$submitRun->id])}}" class="d-flex" style="text-decoration:none !important;">
+                                    <i class="las la-redo-alt"></i>
+                                </a>
+                                @if(isset($submitRun->output))
+                                    <a href="#" class="d-flex" style="text-decoration:none !important;">
+                                        <i class="las la-poll-h"></i>
+                                    </a>
+                                @endif
+                            @endif
                         </div>
                     </td>
                 </tr>

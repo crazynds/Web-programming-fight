@@ -3,7 +3,7 @@ services:
         build:
             context: ./docker
             dockerfile: Dockerfile
-            target: php_base
+            target: php_supervisor
             args:
                 WWWGROUP: '${WWWGROUP}'
         image: sail-8.2/app
