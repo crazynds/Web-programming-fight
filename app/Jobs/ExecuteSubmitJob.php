@@ -44,27 +44,46 @@ class ExecuteSubmitJob implements ShouldQueue
         
         $finput = $root.$input_file;
         $foutput = $root.$output_file;
-        
-        // TODO: configurar o programa para rodar dentro dos limit
-        // TODO: fazer o catch do programa nos limit e tratar corretamente
 
         // Limit to 134217728 chars, so the file can't be bigger than 128 MB. (1024 * 1024 * 128)
         $output = null;
         $retval = null;
-        $seconds = round((1500 + $this->submit->problem->time_limit)/1000);
-        $command = 'time --output=/var/work/time -p nsjail --conf /var/nsjail/basic.conf --time_limit='.$seconds.' < '.$finput.' 2>/dev/null | head -c 134217728 > /var/work/out_cpp';
+        $time_limit = round((1500 + $this->submit->problem->time_limit)/1000);
+        $memory_limit = $this->submit->problem->memory_limit + 256;
+        $command = 'time -v --output=/var/work/time -p nsjail --conf /var/nsjail/basic.conf --time_limit='.$time_limit.' --rlimit_as='.$memory_limit.' < '.$finput.' 2>/dev/null | head -c 134217728 > /var/work/out_cpp';
         exec($command,$output,$retval);
+        dump($command);
+
+        $time = 0;
+        $memoryPeak = 0;
+        foreach(explode(PHP_EOL,Storage::disk('nsjail')->get('time')) as $line){
+            $arr = explode(': ',trim($line));
+            switch($arr[0]){
+                case 'User time (seconds)':
+                    $time = intval(floatval($arr[1])*1000);
+                    break;
+                case 'Maximum resident set size (kbytes)':
+                    $memoryPeak = floatval($arr[1])/1024;
+                    break;
+                case 'Exit status':
+                    $retval = intval($arr[1]);
+                    break;
+                default:
+            }
+        }
+        dump($time,$memoryPeak,$retval);
+        dump('------');
+        // 9 MB is the margin to work
+        if($memoryPeak>$this->submit->problem->memory_limit + 9){
+            return SubmitResult::MemoryLimit;
+        }
+        if($time > $this->submit->problem->time_limit){
+            return SubmitResult::TimeLimit;
+        }
+        // TODO: Memory limit ainda não tem como verificar
         if($retval!=0){
             return SubmitResult::RuntimeError;
         }else{
-            $str = Storage::disk('nsjail')->get('time');
-            $str = explode(PHP_EOL,$str);
-            $arr = explode(' ',$str[1]);
-            $time = intval(floatval($arr[1])*1000);
-            if($time > $this->submit->time_limit){
-                dump($str);
-                return SubmitResult::TimeLimit;
-            }
             // a => compare text mode
             // b => ignore multiples blank lines (\n\r == \r\n == \n)
             // c => layout bonitinho
@@ -83,26 +102,11 @@ class ExecuteSubmitJob implements ShouldQueue
      */
     public function handle(): void
     {
-        //
-        // command
-        /**
-         *   nsjail -Ml --port 3001 
-         *      --user 99999 
-         *      --group 99999 
-         *      --disable_proc 
-         *      --chroot /task 
-         *      --time_limit 15 
-         *      -R /lib/ 
-         *      -R /lib64/ 
-         *      -R /usr/bin/ 
-         *      /task_exec
-         *  
-         *  nsjail -Mo --user 99999 --group 99999 --disable_proc -R /lib64/ -R /lib/ --time_limit 15 --max_cpus 2 --disable_clone_newuser /task/run.bin
-         */
 
         $file = $this->submit->file;
         $this->submit->status = SubmitStatus::Judging;
         $this->submit->result = SubmitResult::NoResult;
+        $this->submit->output = null;
         $this->submit->save();
         switch($this->submit->language){
         case "C++":
@@ -171,6 +175,7 @@ class ExecuteSubmitJob implements ShouldQueue
     {
         $this->submit->status = SubmitStatus::Error;
         $this->submit->result = SubmitResult::Error;
+        $this->submit->output = $exception->__toString();
         $this->submit->save();
     }
 }
