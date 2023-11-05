@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProblemController;
 use App\Http\Controllers\SubmitRunController;
 use App\Http\Controllers\TestCaseController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,6 +17,11 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+ 
+
+Route::get('/auth/{provider}/redirect', [AuthController::class,'redirect'])->name('auth.login');
+Route::get('/auth/{provider}/callback',[AuthController::class,'callback'])->name('auth.callback');
 
 Route::resource('run', SubmitRunController::class)
     ->only(['index','store','create','show']);
@@ -32,6 +39,8 @@ Route::get('/problem/{problem}/testCase/{testCase}/up',[TestCaseController::clas
     ->name('problem.testCase.up');
 Route::get('/problem/{problem}/testCase/{testCase}/down',[TestCaseController::class,'down'])
     ->name('problem.testCase.down');
+
+Route::get('/user/profile',[UserController::class,'profile'])->name('user.profile')->middleware('auth');
 
 
 Route::get('/', function(){
