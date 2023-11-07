@@ -4,7 +4,7 @@ ENV WWWGROUP=nginx
 WORKDIR /usr/share/nginx/html
 
 RUN apt update
-RUN apt install -y ca-certificates curl gnupg
+RUN apt install -y ca-certificates curl gnupg dos2unix
 
 RUN curl -sLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
 
