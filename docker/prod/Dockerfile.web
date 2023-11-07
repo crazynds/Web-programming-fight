@@ -23,7 +23,7 @@ RUN curl -qL https://www.npmjs.com/install.sh | sh
 RUN composer install --no-interaction --optimize-autoloader --no-scripts
 
 RUN npm install
-RUN npm build
+RUN npm run build
 RUN rm -rf node_modules
 
 RUN git config --global --add safe.directory /var/www/html
