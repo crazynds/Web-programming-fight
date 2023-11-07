@@ -37,11 +37,11 @@ RUN dos2unix /etc/supervisor/conf.d/supervisord.conf
 RUN dos2unix /start.sh
 RUN chmod +x /start.sh
 
-RUN apt-get purge -y nodejs &&\
-    rm -r /etc/apt/sources.list.d/nodesource.list &&\
-    rm -r /etc/apt/keyrings/nodesource.gpg \
+RUN apt-get purge -y nodejs \
+    && rm -r /etc/apt/sources.list.d/nodesource.list \
+    && rm -r /etc/apt/keyrings/nodesource.gpg \
     && apt-get -y autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-    
+

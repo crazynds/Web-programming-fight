@@ -30,8 +30,5 @@ class AppServiceProvider extends ServiceProvider
                 $query->bindings
             );
         });
-        if(config('app.env') === 'production') {
-            \Url::forceScheme('https');
-        }
     }
 }
