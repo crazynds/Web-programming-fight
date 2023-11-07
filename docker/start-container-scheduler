@@ -1,0 +1,14 @@
+#!/bin/bash
+
+cd /var/www/html
+
+# Startup default
+
+php artisan cache:clear
+php artisan clear-compiled
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan migrate --force
+
+php /var/www/html/artisan schedule:work

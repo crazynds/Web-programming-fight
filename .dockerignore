@@ -1,0 +1,7 @@
+/node_modules
+/docker
+!/docker/start-container-scheduler
+!/docker/start-container
+!/docker/supervisord.conf
+!/docker/php.ini
+!/docker/basic.conf

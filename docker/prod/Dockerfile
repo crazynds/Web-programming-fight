@@ -1,4 +1,4 @@
-FROM ubuntu:22.04 as php_base
+FROM ubuntu:22.04 as php_prod
 
 ARG WWWGROUP
 
@@ -21,37 +21,28 @@ RUN apt-get update \
        php8.2-curl \
        php8.2-imap php8.2-mysql php8.2-mbstring \
        php8.2-zip \
-       php8.2-intl php8.2-readline php8.2-fpm \
+       php8.2-intl php8.2-readline \
        php8.2-ldap \
        php8.2-redis php8.2-swoole \
     && curl -sLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
 
-RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.2
+RUN apt-get update
+RUN apt-get install nodejs dos2unix -y
 
-RUN apt-get install -y dos2unix
+
+RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.2
 
 RUN groupadd --force -g $WWWGROUP sail
 RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
 
+COPY . /var/www/html/
+
+RUN composer install --no-interaction --optimize-autoloader --no-scripts
+
 RUN git config --global --add safe.directory /var/www/html
 
-FROM php_base AS php_supervisor
 
-RUN apt-get install -y supervisor \
-    && apt-get -y autoremove \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-COPY docker/start-container /usr/local/bin/start-container
-COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY docker/php.ini /etc/php/8.2/cli/conf.d/99-sail.ini
-RUN dos2unix /usr/local/bin/start-container
-RUN chmod +x /usr/local/bin/start-container
-
-ENTRYPOINT ["start-container"]
-
-
-FROM php_base as php_schedule 
+FROM php_prod as php_schedule 
 
 #Copy Starter
 COPY ./docker/start-container-scheduler /usr/local/bin/start-container
@@ -63,7 +54,7 @@ RUN chmod +x /usr/local/bin/start-container
 ENTRYPOINT [ "start-container" ]
 
 
-FROM php_base AS php_worker
+FROM php_prod AS php_worker
 
 RUN apt-get install -y \
     nano time \
