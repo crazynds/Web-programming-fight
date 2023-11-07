@@ -25,9 +25,11 @@ RUN apt-get purge -y nodejs &&\
     rm -r /etc/apt/keyrings/nodesource.gpg
 
 COPY ./docker/start-container /usr/local/bin/start-container
+COPY ./docker/prod/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Set permissions in folders
 RUN dos2unix /usr/local/bin/start-container
+RUN dos2unix /etc/supervisor/conf.d/supervisord.conf
 RUN chmod +x /usr/local/bin/start-container
 
 ENTRYPOINT [ "start-container" ]

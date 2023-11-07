@@ -89,7 +89,7 @@ RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN mkdir /var/nsjail
 RUN chmod 0777 /var/nsjail
-COPY docker/basic.conf /var/nsjail/basic.conf
+COPY ./docker/basic.conf /var/nsjail/basic.conf
 
 ENTRYPOINT ["php", "/var/www/html/artisan", "queue:work", "--queue=rank,submit","--sleep=2","--tries=2","--backoff=15,30,60","--max-jobs=300"]
 
