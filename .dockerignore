@@ -1,7 +1,17 @@
 /node_modules
 /docker
+/vendor
 !/docker/start-container-scheduler
 !/docker/start-container
 !/docker/supervisord.conf
 !/docker/php.ini
 !/docker/basic.conf
+/stubs
+/.git
+/.github
+.*
+!.env
+Dockerfile
+docker-compose.yml
+docker-production.yml
+README.md
