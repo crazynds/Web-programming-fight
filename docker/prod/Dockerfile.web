@@ -16,7 +16,7 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesourc
 COPY . /usr/share/nginx/html
 RUN chown -Rf nginx:nginx /usr/share/nginx/html
 
-RUN apt-get install nodejs -y
+RUN apt-get install nodejs npm -y
 
 RUN composer install --no-interaction --optimize-autoloader --no-scripts
 
