@@ -25,6 +25,7 @@ services:
       args:
           WWWGROUP: '${WWWGROUP}'
     restart: unless-stopped
+    privileged: true
     networks:
       - app_network
     volumes_from:
