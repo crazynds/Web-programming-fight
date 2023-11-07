@@ -14,7 +14,7 @@ ENV NODE_MAJOR=20
 RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
 
 COPY . /usr/share/nginx/html
-RUN chmod -Rf nginx:nginx /usr/share/nginx/html
+RUN chown -Rf nginx:nginx /usr/share/nginx/html
 
 RUN composer install --no-interaction --optimize-autoloader --no-scripts
 
