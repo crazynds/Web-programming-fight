@@ -1,5 +1,6 @@
 FROM wyveo/nginx-php-fpm:php82
 
+ENV WWWGROUP=nginx
 WORKDIR /usr/share/nginx/html
 
 RUN apt update
@@ -13,6 +14,7 @@ ENV NODE_MAJOR=20
 RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
 
 COPY . /usr/share/nginx/html
+RUN chmod -Rf nginx:nginx /usr/share/nginx/html
 
 RUN composer install --no-interaction --optimize-autoloader --no-scripts
 
@@ -21,3 +23,11 @@ RUN git config --global --add safe.directory /var/www/html
 RUN apt-get purge -y nodejs &&\
     rm -r /etc/apt/sources.list.d/nodesource.list &&\
     rm -r /etc/apt/keyrings/nodesource.gpg
+
+COPY ./docker/start-container /usr/local/bin/start-container
+
+# Set permissions in folders
+RUN dos2unix /usr/local/bin/start-container
+RUN chmod +x /usr/local/bin/start-container
+
+ENTRYPOINT [ "start-container" ]
