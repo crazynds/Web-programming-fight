@@ -6,6 +6,7 @@
 !/docker/supervisord.conf
 !/docker/php.ini
 !/docker/basic.conf
+!/docker/prod/supervisord.conf
 /stubs
 /.git
 /.github
