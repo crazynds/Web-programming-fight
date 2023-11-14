@@ -38,9 +38,9 @@ class ExecuteSubmitJob implements ShouldQueue
         $output_file = $dir.'/out_'.$testCase->id;
 
         if(!Storage::disk('nsjail')->exists($input_file))
-            Storage::disk('nsjail')->writeStream($input_file, Storage::readStream($testCase->inputfile->path));
+            Storage::disk('nsjail')->writeStream($input_file, $testCase->inputfile->readStream());
         if(!Storage::disk('nsjail')->exists($output_file))
-            Storage::disk('nsjail')->writeStream($output_file, Storage::readStream($testCase->outputfile->path));
+            Storage::disk('nsjail')->writeStream($output_file, $testCase->outputfile->readStream());
         
         $finput = $root.$input_file;
         $foutput = $root.$output_file;
@@ -113,7 +113,7 @@ class ExecuteSubmitJob implements ShouldQueue
             //$type = substr($file->type,0,3);
             //$program = '/work/prog.'.$type;
             $program = 'prog.cpp';
-            Storage::disk('nsjail')->writeStream($program, Storage::readStream($file->path));
+            Storage::disk('nsjail')->writeStream($program, $file->readStream());
             $output = null;
             $retval = null;
             exec("g++ -O2 /var/work/'$program' -o /var/nsjail/a.bin",$output,$retval);

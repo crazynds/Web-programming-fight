@@ -66,19 +66,19 @@ class TestCaseController extends Controller
         return view('pages.testCase.show',[
             'problem' => $problem,
             'testCase' => $testCase,
-            'input' => Storage::get($testCase->inputfile->path),
-            'output' => Storage::get($testCase->outputfile->path)
+            'input' => $testCase->inputfile->get(),
+            'output' => $testCase->outputfile->get()
         ]);
     }
     
     public function downloadInput(Problem $problem,TestCase $testCase)
     {
-        return Storage::download($testCase->inputfile->path,Str::slug($problem->title).'_input_'.$testCase->position);
+        return $testCase->inputFile->download(Str::slug($problem->title).'_input_'.$testCase->position);
     }
     
     public function downloadOutput(Problem $problem,TestCase $testCase)
     {
-        return Storage::download($testCase->outputfile->path,Str::slug($problem->title).'_output_'.$testCase->position);
+        return $testCase->outputfile->download(Str::slug($problem->title).'_output_'.$testCase->position);
     }
 
     public function up(Problem $problem,TestCase $testCase)
@@ -124,21 +124,9 @@ class TestCaseController extends Controller
             foreach($files as $file){
                 $position++;
                 
-                $inputFile = new File();
-                $inputFile->path = $inputs[$file]->store("problems/{$problem->id}/input");
-                $inputFile->type = $inputs[$file]->getType();
-                $inputFile->size = $inputs[$file]->getSize();
-                $inputFile->type = $inputs[$file]->getClientOriginalExtension();
-                $inputFile->hash = hash_file("sha256",$inputs[$file]->getPathname());
-                $inputFile->save();
+                $inputFile = File::createFile($outputs[$file],"problems/{$problem->id}/input");
                 
-                $outputFile = new File();
-                $outputFile->path = $outputs[$file]->store("problems/{$problem->id}/output");
-                $outputFile->type = $outputs[$file]->getType();
-                $outputFile->size = $outputs[$file]->getSize();
-                $outputFile->type = $outputs[$file]->getClientOriginalExtension();
-                $outputFile->hash = hash_file("sha256",$outputs[$file]->getPathname());
-                $outputFile->save();
+                $outputFile = File::createFile($outputs[$file],"problems/{$problem->id}/output");
 
                 $testCase = new TestCase();
                 $testCase->position = $position;

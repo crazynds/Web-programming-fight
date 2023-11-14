@@ -28,7 +28,8 @@ class FileObserver
      */
     public function deleted(File $file): void
     {
-        Storage::delete($file->path);
+        if(Storage::exists($file->path))
+            Storage::delete($file->path);
     }
 
 }

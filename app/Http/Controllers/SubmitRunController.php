@@ -65,16 +65,7 @@ class SubmitRunController extends Controller
                 $run->result = SubmitResult::FileTooLarge;
                 $run->save();
             }else{
-                $file = new File();
-                $file->path = $originalFile->store('attempts/code');
-                $file->type = $originalFile->getType();
-                $file->size = $originalFile->getSize();
-                $file->type = $originalFile->getClientOriginalExtension();
-                $file->hash = hash_file("sha256",$originalFile->getPathname());
-    
-                
-    
-                $file->save();
+                $file = File::createFile($originalFile,'users/'.$user->id."/attempts".'/'.$request->problem);    
     
                 $run = new SubmitRun();
                 $run->language = $request->input('lang');
@@ -92,12 +83,12 @@ class SubmitRunController extends Controller
     
     public function download(SubmitRun $submitRun)
     {
-        return Storage::download($submitRun->file->path,'#'.$submitRun->id.'_'.Str::slug($submitRun->problem->title).'.'.$submitRun->file->type);
+        return $submitRun->file->download('#'.$submitRun->id.'_'.Str::slug($submitRun->problem->title).'.'.$submitRun->file->type);
     }
 
     public function getCode(SubmitRun $submitRun){
         return response()->json([
-            'code' => Storage::get($submitRun->file->path)
+            'code' => $submitRun->file->get()
         ]);
     }
 
