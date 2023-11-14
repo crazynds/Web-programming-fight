@@ -18,4 +18,7 @@ class Problem extends Model
     public function submissions(){
         return $this->hasMany(SubmitRun::class);
     }
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }

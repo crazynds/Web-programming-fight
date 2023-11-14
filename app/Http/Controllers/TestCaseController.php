@@ -53,6 +53,7 @@ class TestCaseController extends Controller
      */
     public function create(Problem $problem)
     {
+        $this->authorize('update', $problem);
         return view('pages.testCase.create',[
             'problem' => $problem,
             'testCase' => new TestCase(),
@@ -63,6 +64,7 @@ class TestCaseController extends Controller
      */
     public function show(Problem $problem,TestCase $testCase)
     {
+        $this->authorize('update', $problem);
         return view('pages.testCase.show',[
             'problem' => $problem,
             'testCase' => $testCase,
@@ -73,16 +75,19 @@ class TestCaseController extends Controller
     
     public function downloadInput(Problem $problem,TestCase $testCase)
     {
+        $this->authorize('update', $problem);
         return Storage::download($testCase->inputfile->path,Str::slug($problem->title).'_input_'.$testCase->position);
     }
     
     public function downloadOutput(Problem $problem,TestCase $testCase)
     {
+        $this->authorize('update', $problem);
         return Storage::download($testCase->outputfile->path,Str::slug($problem->title).'_output_'.$testCase->position);
     }
 
     public function up(Problem $problem,TestCase $testCase)
     {
+        $this->authorize('update', $problem);
         if($testCase->position < $problem->testCases()->count()){
             $testCase->position += 1;
             $problem->testCases()
@@ -94,6 +99,7 @@ class TestCaseController extends Controller
     }
     public function down(Problem $problem,TestCase $testCase)
     {
+        $this->authorize('update', $problem);
         if($testCase->position > 1){
             $testCase->position -= 1;
             $problem->testCases()
@@ -103,6 +109,13 @@ class TestCaseController extends Controller
         }
         return redirect()->route('problem.testCase.index',['problem' => $problem->id]);
     }
+
+    public function publicChange(Problem $problem,TestCase $testCase){
+        $this->authorize('update', $problem);
+        $testCase->public = !$testCase->public;
+        $testCase->save();
+        return redirect()->route('problem.testCase.index',['problem' => $problem->id]);
+    }
     
 
     /**
@@ -110,6 +123,7 @@ class TestCaseController extends Controller
      */
     public function store(StoreTestCaseRequest $request,Problem $problem)
     {
+        $this->authorize('update', $problem);
         $inputs = [];
         foreach($request->file('inputs') as $file){
             $inputs[$file->getClientOriginalName()] = $file;
@@ -158,6 +172,7 @@ class TestCaseController extends Controller
      */
     public function destroy(Problem $problem,TestCase $testCase)
     {
+        $this->authorize('update', $problem);
         $testCase->delete();
         $problem->testCases()
             ->where('position','>',$testCase->position)

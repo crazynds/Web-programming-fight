@@ -25,7 +25,9 @@
             <tr>
                 <th><b>#</b></th>
                 <th style="text-align: center;"><b>Id</b></th>
+                @can('update',$problem)
                 <th style="text-align: center;"><b></b></th>
+                @endcan
                 <th style="text-align: center;"><b>RuntimeError</b></th>
                 <th style="text-align: center;"><b>MemoryLimit</b></th>
                 <th style="text-align: center;"><b>TimeLimit</b></th>
@@ -42,9 +44,11 @@
                     <td class="pr-2">
                         #{{ $testCase->position }}
                     </td>
+                    @can('update',$problem)
                     <td class="px-2">
                         {{ $testCase->id }} 
                     </td>
+                    @endcan
                     <td class="px-2">
                         <div class="hstack gap-1">
                             @if($testCase->position>1)
@@ -90,8 +94,14 @@
                     <td style="text-align: center;">
                         @if($testCase->public)
                             Yes
+                            <a href="{{route('problem.testCase.edit.public',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" class="d-flex" style="text-decoration:none !important;">
+                                <i class="las la-lock"></i>
+                            </a>
                         @else
                             No
+                            <a href="{{route('problem.testCase.edit.public',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" class="d-flex" style="text-decoration:none !important;">
+                                <i class="las la-unlock"></i>
+                            </a>
                         @endif
                     </td>
                     <td style="text-align: center;">
@@ -103,6 +113,7 @@
                     </td>
                     <td class="px-2">
                         <div class="hstack gap-1">
+                            @can('update',$problem)
                             <a href="{{route('problem.testCase.show',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" class="d-flex" style="text-decoration:none !important;">
                                 <i class="las la-eye"></i>
                             </a>
@@ -122,6 +133,7 @@
                                     <i class="las la-trash"></i>
                                 </button>
                             </form>
+                            @endcan
                         </div>
                     </td>
                 </tr>

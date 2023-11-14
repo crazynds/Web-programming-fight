@@ -16,13 +16,13 @@ return new class extends Migration
     {
         Schema::create('test_cases', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Problem::class);
+            $table->foreignIdFor(Problem::class)->constrained();
             $table->smallInteger("position");
 
             $table->tinyInteger("type")->default(TestCaseType::FileDiff);
 
-            $table->foreignIdFor(File::class,'input_file');
-            $table->foreignIdFor(File::class,'output_file');
+            $table->foreignIdFor(File::class,'input_file')->constrained('files');
+            $table->foreignIdFor(File::class,'output_file')->constrained('files');
 
             # If this test case should be used to rank the time
             $table->boolean('rankeable')->default(false);

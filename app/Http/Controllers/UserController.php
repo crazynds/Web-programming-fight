@@ -12,7 +12,10 @@ class UserController extends Controller
     public function profile(){
         /** @var User */
         $user = Auth::user();
+        return $this->profileUser($user);
+    }
 
+    public function profileUser(User $user){
         $problensCount = $user->submissions()->where('result','=',SubmitResult::Accepted)
             ->select('problem_id')->distinct()->count();
 
@@ -28,4 +31,6 @@ class UserController extends Controller
             'attempts_count' => $attemptsCount,
         ]);
     }
+
+    
 }

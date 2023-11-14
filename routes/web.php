@@ -39,16 +39,18 @@ Route::middleware('auth')->group(function(){
     Route::resource('problem.testCase', TestCaseController::class)
         ->except(['edit','update']);
     Route::controller(TestCaseController::class)
-        ->name('problem.')->prefix('problem')
+        ->name('problem.')->prefix('problem/{problem}')
         ->group(function(){
-        Route::get('/problem/{problem}/testCase/{testCase}/input','downloadInput')
+        Route::get('testCase/{testCase}/input','downloadInput')
             ->name('testCase.input');
-        Route::get('/problem/{problem}/testCase/{testCase}/output','downloadOutput')
+        Route::get('testCase/{testCase}/output','downloadOutput')
             ->name('testCase.output');
-        Route::get('/problem/{problem}/testCase/{testCase}/up','up')
+        Route::get('testCase/{testCase}/up','up')
             ->name('testCase.up');
-        Route::get('/problem/{problem}/testCase/{testCase}/down','down')
+        Route::get('testCase/{testCase}/down','down')
             ->name('testCase.down');
+        Route::get('testCase/{testCase}/public','publicChange')
+            ->name('problem.testCase.edit.public');
     });
 
     // Todo fazer polices para submissions, somente o dono pode gerenciar
@@ -57,11 +59,13 @@ Route::middleware('auth')->group(function(){
         ->only(['index','store','create','show']);
     Route::get('/run/{submitRun}/rejudge',[SubmitRunController::class,'rejudge'])
         ->name('run.rejudge');
-    Route::get('/run/{submitRun}/output',[SubmitRunController::class,'output'])
-        ->name('run.output');
+    Route::get('/run/global/live',[SubmitRunController::class,'global'])
+        ->name('run.global');
 
     // user routes
     Route::get('/user/profile',[UserController::class,'profile'])
+        ->name('user.me');
+    Route::get('/user/profile/{user}',[UserController::class,'profileUser'])
         ->name('user.profile');
 
 });

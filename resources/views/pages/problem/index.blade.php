@@ -24,6 +24,7 @@
                 <th style="text-align: center;"><b>Time</b></th>
                 <th style="text-align: center;"><b>Accepts</b></th>
                 <th style="text-align: center;"><b>Attempts</b></th>
+                <th style="text-align: center;"><b>Writer</b></th>
                 <th style="text-align: end;"><b>Actions</b></th>
             </tr>
         </thead>
@@ -54,28 +55,38 @@
                     <td style="text-align: center;">
                         {{$problem->submissions_count}}
                     </td>
+                    <td style="text-align: center;" class="px-2">
+                        <a href="{{route('user.profile',['user'=>$problem->user->id])}}">
+                            {{$problem->user->name}}
+                        </a>
+                    </td>
                     <td class="px-2">
                         <div class="hstack gap-1">
-                            <a href="{{route('problem.show',['problem'=>$problem->id])}}" class="d-flex" style="text-decoration:none !important;">
-                                <i class="las la-eye"></i>
-                            </a>
-                            <div class="vr"></div>
-                            
-                            <a href="{{route('problem.edit',['problem'=>$problem->id])}}" class="d-flex" style="text-decoration:none !important;">
-                                <i class="las la-edit"></i>
-                            </a>
-                            <div class="vr"></div>
-                            <a href="{{route('problem.testCase.index',['problem'=>$problem->id])}}" class="d-flex" style="text-decoration:none !important;">
-                                <i class="las la-folder-plus"></i>
-                            </a>
-                            <div class="vr"></div>
-                            <form action="{{route('problem.destroy',['problem'=>$problem->id])}}" method="POST">
-                                @method('DELETE')
-                                @csrf
-                                <button type="submit" class="d-flex bg-transparent" style="border:0; padding:0;">
-                                    <i class="las la-trash"></i>
-                                </button>
-                            </form>
+                            @can('view', $problem)
+                                <a href="{{route('problem.show',['problem'=>$problem->id])}}" class="d-flex" style="text-decoration:none !important;">
+                                    <i class="las la-eye"></i>
+                                </a>
+                                <div class="vr"></div>
+                                <a href="{{route('problem.edit',['problem'=>$problem->id])}}" class="d-flex" style="text-decoration:none !important;">
+                                    <i class="las la-edit"></i>
+                                </a>
+                            @endcan
+                            @can('update', $problem)
+                                <div class="vr"></div>
+                                <a href="{{route('problem.testCase.index',['problem'=>$problem->id])}}" class="d-flex" style="text-decoration:none !important;">
+                                    <i class="las la-folder-plus"></i>
+                                </a>
+                            @endcan
+                            @can('delete', $problem)
+                                <div class="vr"></div>
+                                <form action="{{route('problem.destroy',['problem'=>$problem->id])}}" method="POST">
+                                    @method('DELETE')
+                                    @csrf
+                                    <button type="submit" class="d-flex bg-transparent" style="border:0; padding:0;">
+                                        <i class="las la-trash"></i>
+                                    </button>
+                                </form>
+                            @endcan
                         </div>
                     </td>
                 </tr>

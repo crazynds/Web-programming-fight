@@ -4,11 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Enums\SubmitResult;
 use App\Http\Requests\StoreProblemRequest;
-use App\Http\Requests\UpdateProblemRequest;
 use App\Models\Problem;
+use Illuminate\Support\Facades\Auth;
 
 class ProblemController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(Problem::class, 'problem');
+    }
+
+
     /**
      * Display a listing of the resource.
      */
@@ -39,9 +46,12 @@ class ProblemController extends Controller
      */
     public function store(StoreProblemRequest $request)
     {
-        $problem = Problem::create($request->safe([
+        /** @var User $user */
+        $user = Auth::user();
+        $data =$request->safe([
             'title','author','time_limit','memory_limit','description','input_description','output_description'
-        ]));
+        ]);
+        $problem = $user->problems()->create($data);
 
         return redirect()->route('problem.show',['problem' => $problem->id]);
     }

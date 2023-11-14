@@ -10,7 +10,10 @@ use App\Models\SubmitRun;
 use App\Models\File;
 use App\Models\Problem;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Redirect;
 
 class SubmitRunController extends Controller
 {
@@ -18,13 +21,21 @@ class SubmitRunController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->authorizeResource(SubmitRun::class, 'submitRun');
     }
+
+    public function global()
+    {
+        return view('pages.run.index',[
+            'submitRuns' => SubmitRun::orderByDesc('id')->limit(100)->get()
+        ]);
+    }
+    
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-
         return view('pages.run.index',[
             'submitRuns' => $this->user()->submissions()->orderBy('id','desc')->get()
         ]);
@@ -43,6 +54,10 @@ class SubmitRunController extends Controller
      */
     public function store(StoreSubmitRunRequest $request)
     {
+        $user = Auth::user();
+        if (RateLimiter::tooManyAttempts('submission:'.$user->id, $perMinute = 4)) {
+            return Redirect::back()->withErrors(['msg' => 'Too many attempts! Wait a moment and try again!']);
+        }
         DB::transaction(function() use($request){
             $user = User::first();
             if(!$user)
@@ -97,9 +112,9 @@ class SubmitRunController extends Controller
         return redirect()->route('run.index');
     }
 
-    public function output(SubmitRun $submitRun)
+    public function show(SubmitRun $submitRun)
     {
-        return view('pages.run.output',[
+        return view('pages.run.show',[
             'submitRun' => $submitRun,
             'output' => $submitRun->output
         ]);
