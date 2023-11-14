@@ -56,16 +56,16 @@
                     </td>
                     <td class="px-2">
                         <div class="hstack gap-1">
-                            <a href="{{route('problem.show',['problem'=>$problem->id])}}" class="d-flex" style="text-decoration:none !important;">
+                            <a href="{{route('problem.show',['problem'=>$problem->id])}}" class="d-flex action-btn">
                                 <i class="las la-eye"></i>
                             </a>
                             <div class="vr"></div>
                             
-                            <a href="{{route('problem.edit',['problem'=>$problem->id])}}" class="d-flex" style="text-decoration:none !important;">
+                            <a href="{{route('problem.edit',['problem'=>$problem->id])}}" class="d-flex action-btn">
                                 <i class="las la-edit"></i>
                             </a>
                             <div class="vr"></div>
-                            <a href="{{route('problem.testCase.index',['problem'=>$problem->id])}}" class="d-flex" style="text-decoration:none !important;">
+                            <a href="{{route('problem.testCase.index',['problem'=>$problem->id])}}" class="d-flex action-btn">
                                 <i class="las la-folder-plus"></i>
                             </a>
                             <div class="vr"></div>

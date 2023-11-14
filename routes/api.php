@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SubmitRunController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,3 +18,10 @@ use Illuminate\Support\Facades\Route;
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
+
+
+
+Route::middleware('auth:web')->group(function(){
+    Route::get('/run/{submitRun}/code',[SubmitRunController::class,'getCode'])
+        ->name('run.code');
+});

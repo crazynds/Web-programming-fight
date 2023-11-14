@@ -48,7 +48,7 @@
                     <td class="px-2">
                         <div class="hstack gap-1">
                             @if($testCase->position>1)
-                                <a href="{{route('problem.testCase.down',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" class="d-flex" style="text-decoration:none !important;">
+                                <a href="{{route('problem.testCase.down',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" class="d-flex action-btn">
                                     <i class="las la-angle-up"></i>
                                 </a>
                             @else
@@ -58,7 +58,7 @@
                             @endif
                             <div class="vr"></div>
                             @if(!$loop->last)
-                                <a href="{{route('problem.testCase.up',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" class="d-flex" style="text-decoration:none !important;">
+                                <a href="{{route('problem.testCase.up',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" class="d-flex action-btn">
                                     <i class="las la-angle-down"></i>
                                 </a>
                             @else
@@ -103,15 +103,15 @@
                     </td>
                     <td class="px-2">
                         <div class="hstack gap-1">
-                            <a href="{{route('problem.testCase.show',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" class="d-flex" style="text-decoration:none !important;">
+                            <a href="{{route('problem.testCase.show',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" class="d-flex action-btn">
                                 <i class="las la-eye"></i>
                             </a>
                             <div class="vr"></div>
-                            <a href="{{route('problem.testCase.input',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" target="_blank" class="d-flex" style="text-decoration:none !important;">
+                            <a href="{{route('problem.testCase.input',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" target="_blank" class="d-flex action-btn">
                                 <i class="las la-sign-in-alt"></i>
                             </a>
                             <div class="vr"></div>
-                            <a href="{{route('problem.testCase.output',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" target="_blank" class="d-flex" style="text-decoration:none !important;">
+                            <a href="{{route('problem.testCase.output',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" target="_blank" class="d-flex action-btn">
                                 <i class="las la-sign-out-alt"></i>
                             </a>
                             <div class="vr"></div>

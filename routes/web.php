@@ -59,6 +59,8 @@ Route::middleware('auth')->group(function(){
         ->name('run.rejudge');
     Route::get('/run/{submitRun}/output',[SubmitRunController::class,'output'])
         ->name('run.output');
+    Route::get('/run/{submitRun}/download',[SubmitRunController::class,'download'])
+        ->name('run.download');
 
     // user routes
     Route::get('/user/profile',[UserController::class,'profile'])
