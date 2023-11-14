@@ -52,3 +52,7 @@ thead, tbody, tfoot, tr, td, th{
   border-style: double;
   border-width: 1px;
 }
+
+.action-btn{
+  text-decoration:none !important;
+}

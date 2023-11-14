@@ -34,16 +34,18 @@
             @foreach ($submitRuns as $submitRun)
                 <tr>
                     <td class="pr-2">
-                        #{{ $submitRun->id }}
+                        <a href="#" onclick="openModal({{$submitRun->id}})">
+                            #{{ $submitRun->id }}
+                        </a>
                     </td>
                     <td class="px-2">
                         <small>
-                        {{ $submitRun->created_at->format('d/m/Y') }} 
+                            {{ $submitRun->created_at->format('d/m/Y') }}
                         </small>
                     </td>
                     <td class="px-2">
                         <small>
-                        {{ $submitRun->created_at->format('h:i:s') }} 
+                            {{ $submitRun->created_at->format('h:i:s') }}
                         </small>
                     </td>
                     <td class="px-2">
@@ -52,23 +54,23 @@
                         </small>
                     </td>
                     <td class="px-2">
-                        <a href="{{route('problem.show',['problem'=>$submitRun->problem->id])}}">
-                            {{ $submitRun->problem->title }} 
+                        <a href="{{ route('problem.show', ['problem' => $submitRun->problem->id]) }}">
+                            {{ $submitRun->problem->title }}
                         </a>
                     </td>
                     <td class="px-2">
                         <small>
-                            {{ $submitRun->language }} 
+                            {{ $submitRun->language }}
                         </small>
                     </td>
                     <td class="px-2">
                         <strong>
-                            {{ $submitRun->status }} 
+                            {{ $submitRun->status }}
                         </strong>
                     </td>
                     <td class="px-2">
                         <span
-                        @switch($submitRun->result)
+                            @switch($submitRun->result)
                             @case('Accepted')
                                 style="color:#0a0"
                                 @break
@@ -89,41 +91,53 @@
                             @default
                                 style="color:grey"
                         @endswitch>
-                            {{ $submitRun->result }} 
+                            {{ $submitRun->result }}
                         </span>
                     </td>
                     <td class="px-2 text-center">
                         @switch($submitRun->result)
-                            @case('Accepted')
+                        @case('Accepted')
                             <span style="color:#0a0">
                                 All
                             </span>
-                                @break
-                            @case('Wrong answer')
+                        @break
+
+                        @case('Wrong answer')
                             <span style="color:#a00">
-                                {{$submitRun->num_test_cases + 1}}
+                                {{ $submitRun->num_test_cases + 1 }}
                             </span>
-                                @break
-                            @case('Runtime error')
-                            @case('Time limit')
-                            @case('Memory limit')
+                        @break
+
+                        @case('Runtime error')
+                        @case('Time limit')
+
+                        @case('Memory limit')
                             <span style="color:#00a">
-                                {{$submitRun->num_test_cases + 1}}
+                                {{ $submitRun->num_test_cases + 1 }}
                             </span>
-                                @break
-                            @case('Error')
-                            @case('Compilation error')
+                        @break
+
+                        @case('Error')
+                        @case('Compilation error')
+
                             @default
                                 ---
                         @endswitch
                     </td>
                     <td class="px-2">
                         <div class="hstack gap-1">
-                            @if($submitRun->status == 'Judged' || $submitRun->status=='Error')
+                            @if ($submitRun->status == 'Judged' || $submitRun->status == 'Error')
                                 @can('update',$submitRun)
-                                    <a href="{{route('run.rejudge',['submitRun'=>$submitRun->id])}}" class="d-flex" style="text-decoration:none !important;">
+                                    <a href="{{ route('run.rejudge', ['submitRun' => $submitRun->id]) }}"
+                                        class="d-flex action-btn">
                                         <i class="las la-redo-alt"></i>
                                     </a>
+                                    @if (isset($submitRun->output))
+                                    <a href="{{ route('run.output', ['submitRun' => $submitRun->id]) }}"
+                                        class="d-flex action-btn">
+                                        <i class="las la-poll-h"></i>
+                                    </a>
+                                    @endif
                                 @endcan
                                 @can('view')
                                     @if(isset($submitRun->output))
@@ -133,10 +147,58 @@
                                     @endif
                                 @endcan
                             @endif
+                            @if ($submitRun->file()->exists())
+                                <a target="_blank" href="{{ route('run.download', ['submitRun' => $submitRun->id]) }}"
+                                    class="d-flex action-btn">
+                                    <i class="las la-file-download"></i>
+                                </a>
+                            @endif
                         </div>
                     </td>
                 </tr>
             @endforeach
         </tbody>
     </table>
+
+    <div class="modal fade codeModal" id="codeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width:80%">
+            <div class="modal-content" style="padding: 10px;">
+                <pre id="code" style="border: 1px black solid">Código na linguagem</pre>
+            </div>
+        </div>
+    </div>
+@endsection
+@section('script')
+    <script>
+        var openModal = function(){}
+        window.addEventListener("load",function(){
+            var timeout = null
+
+            timeout = setTimeout(function(){
+                window.location.reload(1);
+            }, 5000);
+            $('.codeModal').on('hide.bs.modal', function () {
+                timeout = setTimeout(function(){
+                    window.location.reload(1);
+                }, 5000);
+            })
+            openModal = function(id){
+                var url = '{{route('api.run.code',['submitRun'=>-1])}}'.replace('-1',id)
+                $('.codeModal').modal("show")
+                clearTimeout(timeout);
+                $('.codeModal').find('#code').html(`
+                    <div class="d-flex justify-content-center">
+                        <div class="spinner-grow" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                `)
+                $.get(url,function(data){
+                    if(data.code)
+                        $('.codeModal').find('#code').text(data.code) 
+                });
+            }
+        })
+    </script>
 @endsection

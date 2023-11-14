@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class SubmitRunController extends Controller
 {
@@ -68,8 +70,8 @@ class SubmitRunController extends Controller
                 ]);
             $originalFile = $request->file('code');
 
-            // 16 MB
-            if($originalFile->getSize()>1024*1024*16){
+            // 4 MB
+            if($originalFile->getSize()>1024*1024*4){
                 $run = new SubmitRun();
                 $run->language = $request->input('lang');
                 $run->problem()->associate(Problem::find($request->problem));
@@ -101,6 +103,17 @@ class SubmitRunController extends Controller
             }
         });
         return redirect()->route('run.index');
+    }
+    
+    public function download(SubmitRun $submitRun)
+    {
+        return Storage::download($submitRun->file->path,'#'.$submitRun->id.'_'.Str::slug($submitRun->problem->title).'.'.$submitRun->file->type);
+    }
+
+    public function getCode(SubmitRun $submitRun){
+        return response()->json([
+            'code' => Storage::get($submitRun->file->path)
+        ]);
     }
 
     public function rejudge(SubmitRun $submitRun)
