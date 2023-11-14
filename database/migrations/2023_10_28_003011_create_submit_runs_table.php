@@ -18,10 +18,10 @@ return new class extends Migration
     {
         Schema::create('submit_runs', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class);
+            $table->foreignIdFor(User::class)->constrained();
 
-            $table->foreignIdFor(Problem::class);
-            $table->foreignIdFor(File::class)->nullable();
+            $table->foreignIdFor(Problem::class)->constrained();
+            $table->foreignIdFor(File::class)->nullable()->constrained();
             $table->smallInteger('language');
 
             $table->tinyInteger('status')->default(SubmitResult::NoResult);

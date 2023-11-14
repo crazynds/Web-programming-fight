@@ -127,16 +127,25 @@
                     <td class="px-2">
                         <div class="hstack gap-1">
                             @if ($submitRun->status == 'Judged' || $submitRun->status == 'Error')
-                                <a href="{{ route('run.rejudge', ['submitRun' => $submitRun->id]) }}"
-                                    class="d-flex action-btn">
-                                    <i class="las la-redo-alt"></i>
-                                </a>
-                                @if (isset($submitRun->output))
+                                @can('update',$submitRun)
+                                    <a href="{{ route('run.rejudge', ['submitRun' => $submitRun->id]) }}"
+                                        class="d-flex action-btn">
+                                        <i class="las la-redo-alt"></i>
+                                    </a>
+                                    @if (isset($submitRun->output))
                                     <a href="{{ route('run.output', ['submitRun' => $submitRun->id]) }}"
                                         class="d-flex action-btn">
                                         <i class="las la-poll-h"></i>
                                     </a>
-                                @endif
+                                    @endif
+                                @endcan
+                                @can('view')
+                                    @if(isset($submitRun->output))
+                                            <a href="{{route('run.show',['submitRun'=>$submitRun->id])}}" class="d-flex" style="text-decoration:none !important;">
+                                                <i class="las la-poll-h"></i>
+                                            </a>
+                                    @endif
+                                @endcan
                             @endif
                             @if ($submitRun->file()->exists())
                                 <a target="_blank" href="{{ route('run.download', ['submitRun' => $submitRun->id]) }}"

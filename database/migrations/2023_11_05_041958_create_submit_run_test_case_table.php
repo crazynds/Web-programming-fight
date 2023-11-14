@@ -14,8 +14,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('submit_run_test_case', function (Blueprint $table) {
-            $table->foreignIdFor(SubmitRun::class);
-            $table->foreignIdFor(TestCase::class);
+            $table->foreignIdFor(SubmitRun::class)->constrained();
+            $table->foreignIdFor(TestCase::class)->constrained();
             $table->tinyInteger('result');
             $table->primary(['test_case_id','submit_run_id']);
             $table->index(['test_case_id','result']);

@@ -21,4 +21,13 @@ class User extends Authenticatable
         return $this->hasMany(SubmitRun::class);
     }
 
+    public function isAdmin(){
+        return false;
+        //return $this->id==1;
+    }
+
+    public function problems(){
+        return $this->hasMany(Problem::class);
+    }
+
 }

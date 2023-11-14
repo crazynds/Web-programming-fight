@@ -41,11 +41,12 @@
                     <a href="{{route('problem.index')}}">Problems</a> |
                     <a href="{{route('run.create')}}">Submit</a> |
                     <a href="{{route('run.index')}}">Runs</a> |
+                    <a href="{{route('run.global')}}">Global</a> |
                     {{-- <a href="./Statistics.html">Ranking</a> | --}}
                 </td>
                 <td bgcolor="#ffa020" align="center" class="px-2" nowrap="">
                     @auth
-                        <a href="{{route('user.profile')}}">{{Auth()->user()->name}}</a>
+                        <a href="{{route('user.me')}}">{{Auth()->user()->name}}</a>
                         <img src="{{Auth()->user()->avatar}}" class="rounded-circle" style="width: 33px;height:33px;"
                             alt="Avatar" />
                     @else

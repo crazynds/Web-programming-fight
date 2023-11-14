@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class TestCase extends Model
 {
     public $guarded = [];
+    public $casts = [
+        'public' => 'boolean',
+        'rankeable' => 'boolean',
+        'validated' => 'boolean',
+    ];
     public $timestamps = false;
 
     public function problem(){
