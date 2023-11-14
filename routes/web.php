@@ -50,7 +50,7 @@ Route::middleware('auth')->group(function(){
         Route::get('testCase/{testCase}/down','down')
             ->name('testCase.down');
         Route::get('testCase/{testCase}/public','publicChange')
-            ->name('problem.testCase.edit.public');
+            ->name('testCase.edit.public');
     });
 
     // Todo fazer polices para submissions, somente o dono pode gerenciar

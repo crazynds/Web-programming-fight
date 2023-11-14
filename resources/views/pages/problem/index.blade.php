@@ -56,9 +56,13 @@
                         {{$problem->submissions_count}}
                     </td>
                     <td style="text-align: center;" class="px-2">
+                        @if($problem->user)
                         <a href="{{route('user.profile',['user'=>$problem->user->id])}}">
                             {{$problem->user->name}}
                         </a>
+                        @else
+                        ------
+                        @endif
                     </td>
                     <td class="px-2">
                         <div class="hstack gap-1">
@@ -67,15 +71,16 @@
                                     <i class="las la-eye"></i>
                                 </a>
                                 <div class="vr"></div>
-                                
-                                <a href="{{route('problem.edit',['problem'=>$problem->id])}}" class="d-flex action-btn">
-                                    <i class="las la-edit"></i>
+                                <a href="{{route('problem.testCase.index',['problem'=>$problem->id])}}" class="d-flex action-btn">
+                                    <i class="las la-folder-plus"></i>
                                 </a>
+                                
                             @endcan
                             @can('update', $problem)
                                 <div class="vr"></div>
-                                <a href="{{route('problem.testCase.index',['problem'=>$problem->id])}}" class="d-flex action-btn">
-                                    <i class="las la-folder-plus"></i>
+                                
+                                <a href="{{route('problem.edit',['problem'=>$problem->id])}}" class="d-flex action-btn">
+                                    <i class="las la-edit"></i>
                                 </a>
                             @endcan
                             @can('delete', $problem)

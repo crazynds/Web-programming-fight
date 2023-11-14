@@ -44,11 +44,10 @@
                     <td class="pr-2">
                         #{{ $testCase->position }}
                     </td>
-                    @can('update',$problem)
                     <td class="px-2">
                         {{ $testCase->id }} 
                     </td>
-                    @endcan
+                    @can('update',$problem)
                     <td class="px-2">
                         <div class="hstack gap-1">
                             @if($testCase->position>1)
@@ -72,6 +71,7 @@
                             @endif
                         </div>
                     </td>
+                    @endcan
                     <td class="px-2" style="text-align: center;">
                         {{$testCase->runtime_error_runs}}
                     </td>
@@ -94,12 +94,12 @@
                     <td style="text-align: center;">
                         @if($testCase->public)
                             Yes
-                            <a href="{{route('problem.testCase.edit.public',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" class="d-flex" style="text-decoration:none !important;">
+                            <a href="{{route('problem.testCase.edit.public',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" style="text-decoration:none !important;">
                                 <i class="las la-lock"></i>
                             </a>
                         @else
                             No
-                            <a href="{{route('problem.testCase.edit.public',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" class="d-flex" style="text-decoration:none !important;">
+                            <a href="{{route('problem.testCase.edit.public',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" style="text-decoration:none !important;">
                                 <i class="las la-unlock"></i>
                             </a>
                         @endif

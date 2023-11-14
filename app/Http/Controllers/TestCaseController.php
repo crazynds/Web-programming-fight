@@ -138,7 +138,7 @@ class TestCaseController extends Controller
             foreach($files as $file){
                 $position++;
                 
-                $inputFile = File::createFile($outputs[$file],"problems/{$problem->id}/input");
+                $inputFile = File::createFile($inputs[$file],"problems/{$problem->id}/input");
                 
                 $outputFile = File::createFile($outputs[$file],"problems/{$problem->id}/output");
 

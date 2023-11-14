@@ -11,11 +11,11 @@ class TestCaseObserver
     /**
      * Handle the File "deleting" event.
      */
-    public function deleting(TestCase $testCase): void
+    public function deleted(TestCase $testCase): void
     {
         if($testCase->type == TestCaseType::FileDiff){
-            $testCase->inputfile->delete();
-            $testCase->outputfile->delete();
+            $testCase->inputfile?->delete();
+            $testCase->outputfile?->delete();
         }
     }
 }

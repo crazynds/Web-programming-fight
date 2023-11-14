@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('problems', function (Blueprint $table) {
-            $table->foreignIdFor(User::class)->nullable()->constrained();
+        Schema::table('files', function (Blueprint $table) {
+            $table->string('content',1024*4 + 1)->nullable();
         });
     }
 
@@ -22,9 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('problems', function (Blueprint $table) {
-            $table->dropForeignIdFor(User::class);
-            $table->dropColumn('user_id');
+        Schema::table('files', function (Blueprint $table) {
+            $table->dropColumn('content');
         });
     }
 };
