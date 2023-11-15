@@ -43,6 +43,28 @@
         <div class="row">
             {{Illuminate\Mail\Markdown::parse($problem->output_description)}}
         </div>
+        @if($testCases)
+            <hr>
+            <div class="row justify-content-center mt-2">
+                <div class="col-3 text-center" style="border: solid;border-width:1px 0;margin-right: 7%;">
+                    Input Example
+                </div>
+                <div class="col-3 text-center" style="border: solid;border-width:1px 0;">
+                    Output Example
+                </div>
+            </div>
 
+            @foreach ($testCases as $testCase)
+                <div class="row justify-content-center mt-2">
+                    <div class="col-4" style="background: #efefef;border: 1px gray solid;">
+                        <pre>{{$testCase->inputFile->get()}}</pre>
+                    </div>
+                    <div class="col-4" style="background: #efefef;border: 1px gray solid;border-left:0;">
+                        <pre>{{$testCase->outputFile->get()}}</pre>
+                    </div>
+                </div>
+                
+            @endforeach
+        @endif
     </div>
 @endsection

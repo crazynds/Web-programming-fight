@@ -22,7 +22,20 @@ class StoreTestCaseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'input' =>[
+                'array'
+            ],
+            'output' =>[
+                'array'
+            ],
+            'input[]' => [
+                'file',
+                'size:10240',
+            ],
+            'output[]' => [
+                'file',
+                'size:10240',
+            ]
         ];
     }
 }

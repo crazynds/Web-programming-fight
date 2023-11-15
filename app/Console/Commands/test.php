@@ -33,6 +33,8 @@ class test extends Command
         $this->line('new: '.Cache::get('bar'));
         $this->newLine();
 
+        Cache::clear();
+
         
         $this->info('Testing FileSystem:');
         $this->line(Storage::get('test.txt') ?? 'não encontrado');

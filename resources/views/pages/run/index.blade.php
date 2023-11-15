@@ -14,6 +14,17 @@
             </a>
         </div>
     </div>
+    @if ($errors->any())
+        <div class="row p-3">
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
 
     <table border="1">
         <thead>
@@ -133,7 +144,7 @@
                                         <i class="las la-redo-alt"></i>
                                     </a>
                                     @if (isset($submitRun->output))
-                                    <a href="{{ route('run.output', ['submitRun' => $submitRun->id]) }}"
+                                    <a href="{{ route('run.show', ['submitRun' => $submitRun->id]) }}"
                                         class="d-flex action-btn">
                                         <i class="las la-poll-h"></i>
                                     </a>

@@ -61,7 +61,10 @@ class ProblemController extends Controller
      */
     public function show(Problem $problem)
     {
-        return view('pages.problem.show')->with('problem',$problem);
+        return view('pages.problem.show',[
+            'problem' => $problem,
+            'testCases' => $problem->testCases()->orderBy('position')->where('public',true)->where('validated',true)->get()
+        ]);
     }
 
     /**

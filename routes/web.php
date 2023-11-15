@@ -61,8 +61,8 @@ Route::middleware('auth')->group(function(){
         ->name('run.rejudge');
     Route::get('/run/global/live',[SubmitRunController::class,'global'])
         ->name('run.global');
-    Route::get('/run/{submitRun}/output',[SubmitRunController::class,'output'])
-        ->name('run.output');
+    Route::get('/run/{submitRun}/show',[SubmitRunController::class,'show'])
+        ->name('run.show');
     Route::get('/run/{submitRun}/download',[SubmitRunController::class,'download'])
         ->name('run.download');
 

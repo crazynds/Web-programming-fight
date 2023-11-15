@@ -109,6 +109,10 @@ class SubmitRunController extends Controller
 
     public function rejudge(SubmitRun $submitRun)
     {
+        $user = Auth::user();
+        if (RateLimiter::tooManyAttempts('resubmission:'.$user->id, $perMinute = 4)) {
+            return Redirect::back()->withErrors(['msg' => 'Too many attempts! Wait a moment and try again!']);
+        }
         $submitRun->status = SubmitStatus::WaitingInLine;
         $submitRun->result = SubmitResult::NoResult;
         $submitRun->save();

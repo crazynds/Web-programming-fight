@@ -13,6 +13,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
 
@@ -30,29 +31,35 @@ class ExecuteSubmitJob implements ShouldQueue
         //
     }
 
-    private function executeTestCase(TestCase $testCase){
-        $root = '/var/work/';
-        $dir = 'problems/'.$this->submit->problem->id;
+    private function executeTestCase(TestCase $testCase,string $config){
+        $input_file = 'problems/input';
+        $output_file = 'problems/output';
 
-        $input_file = $dir.'/in_'.$testCase->id;
-        $output_file = $dir.'/out_'.$testCase->id;
+        // Carrega o arquivo input para a pasta tmpfs
 
-        if(!Storage::disk('nsjail')->exists($input_file))
-            Storage::disk('nsjail')->writeStream($input_file, $testCase->inputfile->readStream());
-        if(!Storage::disk('nsjail')->exists($output_file))
-            Storage::disk('nsjail')->writeStream($output_file, $testCase->outputfile->readStream());
-        
-        $finput = $root.$input_file;
-        $foutput = $root.$output_file;
+        // 5 minutes
+        $time = 60 * 5;
+        $fileData = Cache::remember('input_'.$testCase->id, $time, function () use($testCase){
+            return $testCase->inputfile->get();
+        });
+        Storage::disk('nsjail')->put($input_file, $fileData);
+        $fileData = null;   // free memory
+
+        $finput = '/var/work/'.$input_file;
+        $foutput = '/var/work/'.$output_file;
 
         // Limit to 134217728 chars, so the file can't be bigger than 128 MB. (1024 * 1024 * 128)
-        $output = null;
-        $retval = null;
-        $time_limit = round((1500 + $this->submit->problem->time_limit)/1000);
+        $limitOutput = 134217728;
+        
+        // Configure time limit and memory limit with a small margin
+        $time_limit = round((1500 + $this->submit->problem->time_limit)/1000) ;
         $memory_limit = $this->submit->problem->memory_limit + 256;
-        $command = 'time -v --output=/var/work/time -p nsjail --conf /var/nsjail/basic.conf --time_limit='.$time_limit.' --rlimit_as='.$memory_limit.' < '.$finput.' 2>/dev/null | head -c 134217728 > /var/work/out_cpp';
+
+        $command = 'time -v --output=/var/work/time -p nsjail --conf '.$config.' --time_limit='.$time_limit.' --rlimit_as='.$memory_limit.' < '.$finput.' 2>/dev/null | head -c '.$limitOutput.' > /var/work/out_cpp';
+
+        $output = null;$retval = null;
         exec($command,$output,$retval);
-        dump($command);
+        //dump($command);
 
         $time = 0;
         $memoryPeak = 0;
@@ -80,14 +87,22 @@ class ExecuteSubmitJob implements ShouldQueue
         if($time > $this->submit->problem->time_limit){
             return SubmitResult::TimeLimit;
         }
-        // TODO: Memory limit ainda não tem como verificar
         if($retval!=0){
+            // TODO: Um RuntimeError pode ser causado por memory limit, mas não tem como saber nesses casos
+            // Buscar solução alternativa
             return SubmitResult::RuntimeError;
         }else{
+            // Carrega o arquivo output para a pasta tmpfs
+            $fileData = Cache::remember('output_'.$testCase->id, $time, function () use($testCase){
+                return $testCase->outputfile->get();
+            });
+            Storage::disk('nsjail')->put($output_file, $fileData);
+            $fileData = null;   // free memory
+
             // a => compare text mode
             // b => ignore multiples blank lines (\n\r == \r\n == \n)
             // c => layout bonitinho
-            // i => não case sensitive
+            // i => not case sensitive
             exec('diff -abci --suppress-common-lines --ignore-trailing-space /var/work/out_cpp '.$foutput,$output,$retval);
             if($retval!=0){
                 $this->submit->output = implode(PHP_EOL,$output);
@@ -95,6 +110,47 @@ class ExecuteSubmitJob implements ShouldQueue
             }
         }
         return SubmitResult::Accepted;
+    }
+
+    private function executeAllTestCases(string $config){
+        $num = 0;
+        $testCasesRel = [];
+        $testCases = $this->submit->problem->testCases()->where('validated','=',true)->with(['inputfile','outputfile'])->get();
+
+        foreach($testCases as $testCase){
+            $result = $this->executeTestCase($testCase,$config);
+            $testCasesRel[$testCase->id] = [
+                'result' => $result
+            ];
+            $this->submit->result = $result;
+            if($result == SubmitResult::Accepted){
+                $num += 1;
+            }else{
+                break;
+            }
+        }
+        if($this->submit->result=='Accepted' || $testCases->count() == 0){
+
+            // Tenta validar os casos de testes não validados até então...
+            foreach($this->submit->problem->testCases()->where('validated','=',false)->with(['inputfile','outputfile'])->get() as $testCase){
+                $result = $this->executeTestCase($testCase,$config);
+                $testCasesRel[$testCase->id] = [
+                    'result' => $result
+                ];
+                if($result == SubmitResult::Accepted){
+                    $num += 1;
+                    $testCase->validated = true;
+                    $testCase->save();
+                }
+            }
+            if($num > 0)
+                $this->submit->result = SubmitResult::Accepted;
+            else
+                $this->submit->result = SubmitResult::WrongAnswer;
+            $this->submit->output = null;
+        }
+        $this->submit->testCases()->sync($testCasesRel);
+        $this->submit->num_test_cases = $num;
     }
 
     /**
@@ -108,6 +164,7 @@ class ExecuteSubmitJob implements ShouldQueue
         $this->submit->result = SubmitResult::NoResult;
         $this->submit->output = null;
         $this->submit->save();
+        $confFile = '/var/nsjail/basic.conf';
         switch($this->submit->language){
         case "C++":
             //$type = substr($file->type,0,3);
@@ -116,53 +173,12 @@ class ExecuteSubmitJob implements ShouldQueue
             Storage::disk('nsjail')->writeStream($program, $file->readStream());
             $output = null;
             $retval = null;
-            exec("g++ -O2 /var/work/'$program' -o /var/nsjail/a.bin",$output,$retval);
-            if($retval==0){
-                $num = 0;
-
-                $testCasesRel = [];
-                $testCases = $this->submit->problem->testCases()->where('validated','=',true)->with(['inputfile','outputfile'])->get();
-
-
-                foreach($testCases as $testCase){
-                    $result = $this->executeTestCase($testCase);
-                    $testCasesRel[$testCase->id] = [
-                        'result' => $result
-                    ];
-                    $this->submit->result = $result;
-                    if($result == SubmitResult::Accepted){
-                        $num += 1;
-                    }else{
-                        break;
-                    }
-                }
-                // Número de test cases que passou
-                if($this->submit->result=='Accepted' || $testCases->count() == 0){
-
-                    // Valida os casos de testes não validados até então...
-                    foreach($this->submit->problem->testCases()->where('validated','=',false)->with(['inputfile','outputfile'])->get() as $testCase){
-                        $result = $this->executeTestCase($testCase);
-                        $testCasesRel[$testCase->id] = [
-                            'result' => $result
-                        ];
-                        if($result == SubmitResult::Accepted){
-                            $num += 1;
-                            $testCase->validated = true;
-                            $testCase->save();
-                        }
-                    }
-                    if($num > 0)
-                        $this->submit->result = SubmitResult::Accepted;
-                    else
-                        $this->submit->result = SubmitResult::WrongAnswer;
-                    $this->submit->output = null;
-                }
-                $this->submit->testCases()->sync($testCasesRel);
-                $this->submit->num_test_cases = $num;
-            }else{
+            exec("g++ -O2 /var/work/'$program' -o /var/nsjail/a.bin 2>&1",$output,$retval);
+            if($retval!=0){
                 $this->submit->output = implode(PHP_EOL,$output);
                 $this->submit->result = SubmitResult::CompilationError;
-            }
+            }else
+                $this->executeAllTestCases('/var/nsjail/basic.conf');
             break;
         case "Python":
             $this->submit->result = SubmitResult::Error;
