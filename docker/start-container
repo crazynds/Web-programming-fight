@@ -11,7 +11,7 @@ fi
 chmod -R ugo+rw /.composer
 
 cd /var/www/html
-composer install
+cp /var/www/vendor/* /var/www/html/vendor -R
 
 if [ $# -gt 0 ]; then
     exec gosu $WWWUSER "$@"
