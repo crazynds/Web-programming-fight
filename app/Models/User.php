@@ -30,4 +30,8 @@ class User extends Authenticatable
         return $this->hasMany(Problem::class);
     }
 
+    public function lastRun(){
+        return $this->hasOne(SubmitRun::class)->latestOfMany();
+    }
+
 }

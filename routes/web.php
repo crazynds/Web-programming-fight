@@ -68,7 +68,9 @@ Route::middleware('auth')->group(function(){
 
     // user routes
     Route::get('/user/profile',[UserController::class,'profile'])
-        ->name('user.me');
+    ->name('user.me');
+    Route::get('/users',[UserController::class,'index'])
+        ->name('user.index');
     Route::get('/user/profile/{user}',[UserController::class,'profileUser'])
         ->name('user.profile');
 

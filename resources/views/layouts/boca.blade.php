@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <title>{{ config('app.name') }}</title>
     <meta charset="utf-8">
@@ -10,12 +11,13 @@
     @vite(['resources/css/boca.css'])
     <style>
         .sm-github {
-            background-image: url({{asset("img/socialmediasHorizontal.webp")}});
+            background-image: url({{ asset('img/socialmediasHorizontal.webp') }});
             background-position: -66px 0;
             height: 33px;
             display: block;
         }
-        .social-media-menu{
+
+        .social-media-menu {
             background-repeat: no-repeat;
             display: inline-block;
             border-radius: 3px;
@@ -28,37 +30,54 @@
         }
     </style>
 </head>
+
 <body>
     <table border="1" width="100%">
         <tbody>
             <tr>
                 <td nowrap="" bgcolor="#ffa020" align="center">
-                    <x-ballon/>
+                    <x-ballon />
                     <font color="#000000">{{ config('app.name') }}</font>
                 </td>
                 <td bgcolor="#ffa020" width="99%" style="padding-left:6px;">
                     2023 |
-                    <a href="{{route('problem.index')}}">Problems</a> |
-                    <a href="{{route('run.create')}}">Submit</a> |
-                    <a href="{{route('run.index')}}">Runs</a> |
-                    <a href="{{route('run.global')}}">Global</a> |
+                    <a href="{{ route('problem.index') }}">Problems</a> |
+                    <a href="{{ route('run.create') }}">Submit</a> |
+                    <a href="{{ route('run.index') }}">Runs</a> |
                     {{-- <a href="./Statistics.html">Ranking</a> | --}}
+                    <div class="dropdown me-2" style="float:right">
+                        <a class="dropdown-toggle" type="button" id="dropdown-headbar"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Options
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdown-headbar">
+                            <li><a class="dropdown-item" href="{{ route('user.index') }}">Users</a></li>
+                            <li><a class="dropdown-item" href="#">Teams</a></li>
+                            <li><a class="dropdown-item" href="#">Contests</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ route('run.global') }}">Global Runs</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">FAQ</a></li>
+                            <li><a class="dropdown-item" href="#">About</a></li>
+
+                        </ul>
+                    </div>
                 </td>
                 <td bgcolor="#ffa020" align="center" class="px-2" nowrap="">
                     @auth
-                        <a href="{{route('user.me')}}">{{Auth()->user()->name}}</a>
-                        <img src="{{Auth()->user()->avatar}}" class="rounded-circle" style="width: 33px;height:33px;"
+                        <a href="{{ route('user.me') }}">{{ Auth()->user()->name }}</a>
+                        <img src="{{ Auth()->user()->avatar }}" class="rounded-circle" style="width: 33px;height:33px;"
                             alt="Avatar" />
                     @else
-                    <span class="social-media-menu">
-                        <a href="{{route('auth.login',['provider' => 'github'])}}" class="sm-github"></a>
-                    </span>
+                        <span class="social-media-menu">
+                            <a href="{{ route('auth.login', ['provider' => 'github']) }}" class="sm-github"></a>
+                        </span>
                     @endauth
                 </td>
                 @auth
-                <td bgcolor="#ffa020" align="center" class="px-2" nowrap="">
-                    <a href="{{route('auth.logout')}}">Logout</a>
-                </td>
+                    <td bgcolor="#ffa020" align="center" class="px-2" nowrap="">
+                        <a href="{{ route('auth.logout') }}">Logout</a>
+                    </td>
                 @endauth
             </tr>
         </tbody>
@@ -70,4 +89,5 @@
 
     @yield('script')
 </body>
+
 </html>
