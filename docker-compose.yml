@@ -21,6 +21,7 @@ services:
         tmpfs:
             - /var/www/html/vendor
         volumes:
+            - './vendor:/var/www/vendor'
             - '.:/var/www/html'
         networks:
             - sail

@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SubmitRun extends Model
 {
-    public $timestamps = false;
+    public $timestamps = true;
     protected $casts = [
         'created_at' => 'datetime',
     ];
