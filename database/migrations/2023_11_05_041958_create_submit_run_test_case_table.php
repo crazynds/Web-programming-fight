@@ -18,7 +18,10 @@ return new class extends Migration
             $table->foreignIdFor(TestCase::class)->constrained()->onDelete('cascade');
             $table->tinyInteger('result');
             $table->primary(['test_case_id','submit_run_id']);
+            // Estatisticas do test case
             $table->index(['test_case_id','result']);
+            // Job para buscar as runs com results especificos
+            $table->index(['submit_run_id','result']);
         });
     }
 

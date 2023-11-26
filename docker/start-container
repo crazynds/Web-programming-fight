@@ -10,6 +10,8 @@ fi
 
 chmod -R ugo+rw /.composer
 
+
+git config --global --add safe.directory /var/www/html
 cd /var/www/html
 composer install
 

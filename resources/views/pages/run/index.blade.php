@@ -139,10 +139,12 @@
                         <div class="hstack gap-1">
                             @if ($submitRun->status == 'Judged' || $submitRun->status == 'Error')
                                 @can('update',$submitRun)
-                                    <a href="{{ route('run.rejudge', ['submitRun' => $submitRun->id]) }}"
-                                        class="d-flex action-btn">
-                                        <i class="las la-redo-alt"></i>
-                                    </a>
+                                    @if(\Illuminate\Support\Facades\RateLimiter::remaining('resubmission:'.Auth::user()->id, 5))
+                                        <a href="{{ route('run.rejudge', ['submitRun' => $submitRun->id]) }}"
+                                            class="d-flex action-btn">
+                                            <i class="las la-redo-alt"></i>
+                                        </a>
+                                    @endif
                                     @if (isset($submitRun->output))
                                     <a href="{{ route('run.show', ['submitRun' => $submitRun->id]) }}"
                                         class="d-flex action-btn">

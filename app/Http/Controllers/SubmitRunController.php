@@ -57,9 +57,11 @@ class SubmitRunController extends Controller
     public function store(StoreSubmitRunRequest $request)
     {
         $user = Auth::user();
-        if (RateLimiter::tooManyAttempts('submission:'.$user->id, $perMinute = 4)) {
+        if (RateLimiter::tooManyAttempts('submission:'.$user->id, 30)) {
             return Redirect::back()->withErrors(['msg' => 'Too many attempts! Wait a moment and try again!']);
         }
+        // 1 Hour
+        RateLimiter::hit('submission:'.$user->id, 60*60);
         DB::transaction(function() use($request){
             $user = User::first();
             if(!$user)
@@ -89,7 +91,7 @@ class SubmitRunController extends Controller
                 $run->user()->associate($user);
                 $run->status = SubmitStatus::WaitingInLine;
                 $run->save();
-    
+                
                 ExecuteSubmitJob::dispatch($run)->onQueue('submit')->afterCommit();
             }
         });
@@ -110,14 +112,16 @@ class SubmitRunController extends Controller
     public function rejudge(SubmitRun $submitRun)
     {
         $user = Auth::user();
-        if (RateLimiter::tooManyAttempts('resubmission:'.$user->id, $perMinute = 4)) {
+        if (RateLimiter::tooManyAttempts('resubmission:'.$user->id, 5)) {
             return Redirect::back()->withErrors(['msg' => 'Too many attempts! Wait a moment and try again!']);
         }
+        // 10 minutes
+        RateLimiter::hit('resubmission:'.$user->id,60*10);
         $submitRun->status = SubmitStatus::WaitingInLine;
         $submitRun->result = SubmitResult::NoResult;
         $submitRun->save();
         ExecuteSubmitJob::dispatch($submitRun)->onQueue('submit')->afterCommit();
-        return redirect()->route('run.index');
+        return redirect()->back();
     }
 
     public function show(SubmitRun $submitRun)
