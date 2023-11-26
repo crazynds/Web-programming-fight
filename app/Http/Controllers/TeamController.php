@@ -82,11 +82,16 @@ class TeamController extends Controller
             ]);
             if($members){
                 $members = json_decode($members);
+                $cont = 0;
                 foreach($members as $member){
                     $user = User::where('name',\Str::lower($member->value))->first();
 
                     if($user){
-                        $team->invited()->attach($user);
+                        $team->related()->attach($user);
+                        $cont += 1;
+                    }
+                    if($cont >= 5){
+                        break;
                     }
                 }
             }
@@ -130,12 +135,17 @@ class TeamController extends Controller
             $idsAdded = [];
             if($members){
                 $members = json_decode($members);
+                $cont = 0;
                 foreach($members as $member){
                     $user = User::where('name',\Str::lower($member->value))->first();
 
                     if($user){
                         $idsAdded[] = $user->id;
                         $team->related()->attach($user);
+                        $cont += 1;
+                    }
+                    if($cont >= 5){
+                        break;
                     }
                 }
             }
