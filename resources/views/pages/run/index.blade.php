@@ -30,14 +30,14 @@
         <thead>
             <tr>
                 <th><b>#</b></th>
-                <th style="text-align: center;"><b>Date</b></th>
-                <th style="text-align: center;"><b>Time</b></th>
-                <th style="text-align: center;"><b>Who</b></th>
-                <th style="text-align: center;"><b>Problem</b></th>
-                <th style="text-align: center;"><b>Lang</b></th>
-                <th style="text-align: center;"><b>Status</b></th>
-                <th style="text-align: center;"><b>Result</b></th>
-                <th style="text-align: center;"><b>Cases</b></th>
+                <th class="text-center"><b>Date</b></th>
+                <th class="text-center"><b>Time</b></th>
+                <th class="text-center"><b>Who</b></th>
+                <th class="text-center"><b>Problem</b></th>
+                <th class="text-center"><b>Lang</b></th>
+                <th class="text-center"><b>Status</b></th>
+                <th class="text-center"><b>Result</b></th>
+                <th class="text-center"><b>Cases</b></th>
                 <th style="text-align: end;"><b>Actions</b></th>
             </tr>
         </thead>

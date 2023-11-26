@@ -20,6 +20,7 @@ return new class extends Migration
 
             $table->index(['provider_id']);
             
+            $table->unique(['name','email']);
             $table->rememberToken();
             $table->timestamps();
         });

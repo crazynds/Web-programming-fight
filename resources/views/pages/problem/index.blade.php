@@ -19,12 +19,12 @@
         <thead>
             <tr>
                 <th><b>#</b></th>
-                <th style="text-align: center;"><b>Title</b></th>
-                <th style="text-align: center;"><b>Mem</b></th>
-                <th style="text-align: center;"><b>Time</b></th>
-                <th style="text-align: center;"><b>Accepts</b></th>
-                <th style="text-align: center;"><b>Attempts</b></th>
-                <th style="text-align: center;"><b>Writer</b></th>
+                <th class="text-center"><b>Title</b></th>
+                <th class="text-center"><b>Mem</b></th>
+                <th class="text-center"><b>Time</b></th>
+                <th class="text-center"><b>Accepts</b></th>
+                <th class="text-center"><b>Attempts</b></th>
+                <th class="text-center"><b>Writer</b></th>
                 <th style="text-align: end;"><b>Actions</b></th>
             </tr>
         </thead>
@@ -39,23 +39,23 @@
                             {{ Str::limit($problem->title, 30) }}
                         </a>
                     </td>
-                    <td class="px-2" style="text-align: center;">
+                    <td class="px-2 text-center">
                         {{ $problem->memory_limit }}MB
                     </td>
-                    <td class="px-2" style="text-align: center;">
+                    <td class="px-2 text-center">
                         {{ $problem->time_limit / 1000 }}s
                     </td>
-                    <td style="text-align: center;">
+                    <td class="text-center">
                         @if($problem->submissions_count==0)
                             --%
                         @else
                             {{round($problem->accepted_submissions / $problem->submissions_count * 100,2)}}%
                         @endif
                     </td>
-                    <td style="text-align: center;">
+                    <td class="text-center">
                         {{$problem->submissions_count}}
                     </td>
-                    <td style="text-align: center;" class="px-2">
+                    <td class="text-center" class="px-2">
                         @if($problem->user)
                         <a href="{{route('user.profile',['user'=>$problem->user->id])}}">
                             {{$problem->user->name}}

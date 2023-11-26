@@ -16,6 +16,7 @@
     },
     "dependencies": {
         "@types/jquery": "^3.5.27",
+        "@yaireo/tagify": "^4.17.9",
         "easymde": "^2.18.0",
         "fine-uploader": "^5.16.2",
         "jquery": "^3.7.1",

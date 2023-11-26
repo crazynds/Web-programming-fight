@@ -29,6 +29,7 @@
             margin-bottom: -10px;
         }
     </style>
+    @yield('head')
 </head>
 
 <body>
@@ -52,7 +53,7 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="dropdown-headbar">
                             <li><a class="dropdown-item" href="{{ route('user.index') }}">Users</a></li>
-                            <li><a class="dropdown-item" href="#">Teams</a></li>
+                            <li><a class="dropdown-item" href="{{ route('team.index') }}">Teams</a></li>
                             <li><a class="dropdown-item" href="#">Contests</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ route('run.global') }}">Global Runs</a></li>

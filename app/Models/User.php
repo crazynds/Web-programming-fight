@@ -34,4 +34,15 @@ class User extends Authenticatable
         return $this->hasOne(SubmitRun::class)->latestOfMany();
     }
 
+    public function teams(){
+        return $this->belongsToMany(Team::class);
+    }
+    
+    public function myTeams(){
+        return $this->belongsToMany(Team::class)->where('owner',true);
+    }
+    
+    public function teamsInvited(){
+        return $this->belongsToMany(Team::class)->where('accepted',false);
+    }
 }

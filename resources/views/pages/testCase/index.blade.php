@@ -24,17 +24,17 @@
         <thead>
             <tr>
                 <th><b>#</b></th>
-                <th style="text-align: center;"><b>Id</b></th>
+                <th class="text-center"><b>Id</b></th>
                 @can('update',$problem)
-                <th style="text-align: center;"><b></b></th>
+                <th class="text-center"><b></b></th>
                 @endcan
-                <th style="text-align: center;"><b>RuntimeError</b></th>
-                <th style="text-align: center;"><b>MemoryLimit</b></th>
-                <th style="text-align: center;"><b>TimeLimit</b></th>
-                <th style="text-align: center;"><b>WrongAnswer</b></th>
-                <th style="text-align: center;"><b>Accepts</b></th>
-                <th style="text-align: center;"><b>Public</b></th>
-                <th style="text-align: center;"><b>Validated</b></th>
+                <th class="text-center"><b>RuntimeError</b></th>
+                <th class="text-center"><b>MemoryLimit</b></th>
+                <th class="text-center"><b>TimeLimit</b></th>
+                <th class="text-center"><b>WrongAnswer</b></th>
+                <th class="text-center"><b>Accepts</b></th>
+                <th class="text-center"><b>Public</b></th>
+                <th class="text-center"><b>Validated</b></th>
                 <th style="text-align: end;"><b>Actions</b></th>
             </tr>
         </thead>
@@ -72,26 +72,26 @@
                         </div>
                     </td>
                     @endcan
-                    <td class="px-2" style="text-align: center;">
+                    <td class="px-2 text-center">
                         {{$testCase->runtime_error_runs}}
                     </td>
-                    <td class="px-2" style="text-align: center;">
+                    <td class="px-2 text-center">
                         {{$testCase->memory_limit_runs}}
                     </td>
-                    <td style="text-align: center;">
+                    <td class="text-center">
                         {{$testCase->time_limit_runs}}
                     </td>
-                    <td style="text-align: center;">
+                    <td class="text-center">
                         {{$testCase->wrong_answer_runs}}
                     </td>
-                    <td style="text-align: center;">
+                    <td class="text-center">
                         @if($testCase->submit_runs_count==0)
                             --%
                         @else
                             {{round($testCase->accepted_runs / $testCase->submit_runs_count * 100,2)}}%
                         @endif
                     </td>
-                    <td style="text-align: center;">
+                    <td class="text-center">
                         @if($testCase->public)
                             Yes
                             <a href="{{route('problem.testCase.edit.public',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" style="text-decoration:none !important;">
@@ -104,7 +104,7 @@
                             </a>
                         @endif
                     </td>
-                    <td style="text-align: center;">
+                    <td class="text-center">
                         @if($testCase->validated)
                             <i class="las la-thumbs-up" style="color:green"></i>
                         @else

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProblemController;
 use App\Http\Controllers\SubmitRunController;
+use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TestCaseController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -73,6 +74,16 @@ Route::middleware('auth')->group(function(){
         ->name('user.index');
     Route::get('/user/profile/{user}',[UserController::class,'profileUser'])
         ->name('user.profile');
+
+
+        
+    Route::resource('team', TeamController::class);
+    Route::get('/team/{team}/accept',[TeamController::class,'accept'])
+        ->name('team.accept');
+    Route::get('/team/{team}/deny',[TeamController::class,'deny'])
+        ->name('team.deny');
+    Route::get('/team/{team}/leave',[TeamController::class,'leave'])
+        ->name('team.leave');
 
 });
 

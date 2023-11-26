@@ -56,3 +56,15 @@ thead, tbody, tfoot, tr, td, th{
 .action-btn{
   text-decoration:none !important;
 }
+
+
+/**
+ * Tagfy adjust css
+ */
+
+ 
+.tagify{
+  border-radius: var(--bs-border-radius);
+  background-color: var(--bs-body-bg);
+  width: 100%;
+}
