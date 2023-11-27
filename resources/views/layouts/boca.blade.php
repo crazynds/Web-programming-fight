@@ -9,6 +9,7 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     @vite(['resources/css/boca.css'])
+
     <style>
         .sm-github {
             background-image: url({{ asset('img/socialmediasHorizontal.webp') }});
@@ -32,7 +33,7 @@
     @yield('head')
 </head>
 
-<body>
+<body class="no-mathjax">
     <table border="1" width="100%">
         <tbody>
             <tr>

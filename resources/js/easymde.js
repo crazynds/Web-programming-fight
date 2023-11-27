@@ -16,12 +16,21 @@ window.onload = function(){
                     format: 'hour:minute:second'
                 },
                 binded: true,
+            },
+            previewClass: ['mathjax','editor-preview'],
+            renderingConfig:{
+                sanitizerFunction:(val)=>{
+                    setTimeout(()=>{
+                        MathJax.typesetPromise()
+                    },50)
+                    return val;
+                }
             }
         });
         const value = markdowns[i].value.trim();
         if(value.length>0)
             easyMDE.value(markdowns[i].value)
-        console.log(markdowns[i].value,value.length)
+        
     }
 }
 

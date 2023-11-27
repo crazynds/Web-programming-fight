@@ -1,5 +1,13 @@
 @extends('layouts.boca')
 
+@section('head')
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+@endsection
+
+
 @section('content')
 
     <div style="border: #bbb solid 1px;border-radius: 3px;padding: 10px;background-color: whitesmoke;" class="shadow-lg">
@@ -28,19 +36,19 @@
             </div>
         </div>
         <hr/>
-        <div class="row">
+        <div class="row mathjax">
             {{Illuminate\Mail\Markdown::parse($problem->description)}}
         </div>
         <div class="row mt-2">
             <h2><strong>Input</strong></h2>
         </div>
-        <div class="row">
+        <div class="row mathjax">
             {{Illuminate\Mail\Markdown::parse($problem->input_description)}}
         </div>
         <div class="row mt-2">
             <h2><strong>Output</strong></h2>
         </div>
-        <div class="row">
+        <div class="row mathjax">
             {{Illuminate\Mail\Markdown::parse($problem->output_description)}}
         </div>
         @if($testCases)
