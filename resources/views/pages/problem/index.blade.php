@@ -30,7 +30,12 @@
         </thead>
         <tbody>
             @foreach ($problems as $problem)
-                <tr>
+                <tr
+                @if($problem->visible==false)
+                class="bg-black"
+                style="--bs-bg-opacity: 0.125;"
+                @endif
+                >
                     <td class="pr-2">
                         #{{ $problem->id }}
                     </td>
@@ -68,19 +73,27 @@
                         <div class="hstack gap-1">
                             @can('view', $problem)
                                 <a href="{{route('problem.show',['problem'=>$problem->id])}}" class="d-flex action-btn">
-                                    <i class="las la-eye"></i>
+                                    <i class="las la-search"></i>
                                 </a>
                                 <div class="vr"></div>
                                 <a href="{{route('problem.testCase.index',['problem'=>$problem->id])}}" class="d-flex action-btn">
                                     <i class="las la-folder-plus"></i>
                                 </a>
-                                
                             @endcan
                             @can('update', $problem)
                                 <div class="vr"></div>
                                 
                                 <a href="{{route('problem.edit',['problem'=>$problem->id])}}" class="d-flex action-btn">
                                     <i class="las la-edit"></i>
+                                </a>
+
+                                <div class="vr"></div>
+                                <a href="{{route('problem.public',['problem'=>$problem->id])}}" class="d-flex action-btn">
+                                    @if($problem->visible==false)
+                                        <i class="las la-eye"></i>
+                                    @else
+                                        <i class="las la-eye-slash"></i>
+                                    @endif
                                 </a>
                             @endcan
                             @can('delete', $problem)

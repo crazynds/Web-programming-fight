@@ -15,6 +15,13 @@ class ProblemController extends Controller
         $this->authorizeResource(Problem::class, 'problem');
     }
 
+    public function publicChange(Problem $problem){
+        $this->authorize('update', $problem);
+        $problem->visible = !$problem->visible;
+        $problem->save();
+        return redirect()->route('problem.index');
+    }
+
 
     /**
      * Display a listing of the resource.
@@ -27,6 +34,10 @@ class ProblemController extends Controller
                     $query->where('submit_runs.result','=',SubmitResult::Accepted);
                 },
             ])
+            ->where(function($query){
+                $query->where('user_id',Auth::user()->id)
+                    ->orWhere('visible',true);
+            })
             ->orderBy('id')->get();
         return view('pages.problem.index',[
             'problems' => $problems,

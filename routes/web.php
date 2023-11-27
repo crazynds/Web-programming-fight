@@ -39,6 +39,8 @@ Route::middleware('auth')->group(function(){
     Route::resource('problem', ProblemController::class);
     Route::resource('problem.testCase', TestCaseController::class)
         ->except(['edit','update']);
+    Route::get('/problem/{problem}/public',[ProblemController::class,'publicChange'])
+        ->name('problem.public');
     Route::controller(TestCaseController::class)
         ->name('problem.')->prefix('problem/{problem}')
         ->group(function(){

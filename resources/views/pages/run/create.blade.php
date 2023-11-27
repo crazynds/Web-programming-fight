@@ -5,7 +5,7 @@
         <div class="col">
             <x-ballon />
             <b>
-                Creating a Problem:
+                Submit Code:
             </b>
         </div>
     </div>
@@ -16,7 +16,7 @@
             <div class="col">
                 <label for="problem" class="form-label">Problem: </label><br />
                 <select name="problem" class="form-select" required>
-                    @foreach (App\Models\Problem::all() as $problem)
+                    @foreach (App\Models\Problem::visible() as $problem)
                         <option value="{{ $problem->id }}" @if(isset($selected) && $problem->id==$selected) selected @endif >#{{ $problem->id }} - {{ $problem->title }}</option>
                     @endforeach
                 </select>
