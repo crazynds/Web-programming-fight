@@ -8,13 +8,13 @@ use Illuminate\Validation\Rules\File;
 final class LanguagesType extends Enum
 {
     const CPlusPlus = 0;
-    const Python = 1;
+    //const Python = 1;
 
 
     public static function list(){
         return [
             'C++' => LanguagesType::CPlusPlus,
-            'Python' => LanguagesType::Python,
+            //'Python' => LanguagesType::Python,
         ];
     }
 
@@ -32,11 +32,11 @@ final class LanguagesType extends Enum
                     File::defaults()
                         ->max('1mb'), // 1 MB
                 ];
-            case self::Python:
-                return [
-                    File::default()
-                        ->max('1mb'), // 1 MB
-                ];
+            // case self::Python:
+            //     return [
+            //         File::default()
+            //             ->max('1mb'), // 1 MB
+            //     ];
         }
         return [];
     }
