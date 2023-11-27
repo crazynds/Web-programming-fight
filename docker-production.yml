@@ -69,8 +69,8 @@ services:
       timeout: 5s
   redis:
     image: "redis:alpine"
-    volumes:
-      - "redis_v:/data"
+    tmpfs:
+      - /data
     networks:
       - app_network
     healthcheck:
@@ -80,6 +80,8 @@ services:
         - ping
       retries: 3
       timeout: 5s
+    command: 'redis-server --save "" --appendonly no'
+
   minio:
     image: "minio/minio:latest"
     environment:
@@ -108,8 +110,6 @@ volumes:
   logs_v:
     driver: local
   db_v:
-    driver: local
-  redis_v:
     driver: local
   minio_v:
     driver: local

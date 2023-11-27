@@ -76,8 +76,8 @@ services:
             timeout: 5s
     redis:
         image: 'redis:alpine'
-        volumes:
-            - 'sail-redis:/data'
+        tmpfs:
+            - /data
         networks:
             - sail
         healthcheck:
@@ -87,6 +87,7 @@ services:
                 - ping
             retries: 3
             timeout: 5s
+        command: 'redis-server --save "" --appendonly no'
     minio:
         image: 'minio/minio:latest'
         ports:
@@ -114,8 +115,6 @@ networks:
         driver: bridge
 volumes:
     sail-mysql:
-        driver: local
-    sail-redis:
         driver: local
     sail-minio:
         driver: local
