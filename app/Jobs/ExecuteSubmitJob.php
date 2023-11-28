@@ -37,7 +37,7 @@ class ExecuteSubmitJob implements ShouldQueue
 
         // Carrega o arquivo input para a pasta tmpfs
 
-        $size = $testCase->inputfile()->select('size')->get();
+        $size = $testCase->inputfile()->select('size')->first()->size;
         if($size < 4*1024){
             // 60 minutes
             $time = 60 * 15;
@@ -102,7 +102,7 @@ class ExecuteSubmitJob implements ShouldQueue
             return SubmitResult::RuntimeError;
         }else{
             // Carrega o arquivo output para a pasta tmpfs
-            $size = $testCase->outputfile()->select('size')->get()->size;
+            $size = $testCase->outputfile()->select('size')->first()->size;
             if($size < 4*1024){
                 // 60 minutes
                 $time = 60 * 15;
