@@ -37,8 +37,17 @@ class ExecuteSubmitJob implements ShouldQueue
 
         // Carrega o arquivo input para a pasta tmpfs
 
-        // 5 minutes
-        $time = 60 * 5;
+        $size = $testCase->inputfile()->select('size')->get();
+        if($size < 4*1024){
+            // 60 minutes
+            $time = 60 * 15;
+        }else if($size < 1024 * 1024){
+            // 15 minutes
+            $time = 60 * 15;
+        }else{
+            // 5 minutes
+            $time = 60 * 5;
+        }
         $fileData = Cache::remember('input_'.$testCase->id, $time, function () use($testCase){
             return $testCase->inputfile->get();
         });
@@ -93,6 +102,17 @@ class ExecuteSubmitJob implements ShouldQueue
             return SubmitResult::RuntimeError;
         }else{
             // Carrega o arquivo output para a pasta tmpfs
+            $size = $testCase->outputfile()->select('size')->get()->size;
+            if($size < 4*1024){
+                // 60 minutes
+                $time = 60 * 15;
+            }else if($size < 1024 * 1024){
+                // 15 minutes
+                $time = 60 * 15;
+            }else{
+                // 5 minutes
+                $time = 60 * 5;
+            }
             $fileData = Cache::remember('output_'.$testCase->id, $time, function () use($testCase){
                 return $testCase->outputfile->get();
             });
