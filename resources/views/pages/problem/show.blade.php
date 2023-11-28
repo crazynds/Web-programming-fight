@@ -64,11 +64,11 @@
 
             @foreach ($testCases as $testCase)
                 <div class="row justify-content-center mt-2">
-                    <div class="col-4" style="background: #efefef;border: 1px gray solid;">
-                        <pre>{{$testCase->inputFile->get()}}</pre>
+                    <div class="col-5 px-1" style="background: #efefef;border: 1px gray solid;">
+                        <pre style="margin:0">{{$testCase->inputFile->get()}}</pre>
                     </div>
-                    <div class="col-4" style="background: #efefef;border: 1px gray solid;border-left:0;">
-                        <pre>{{$testCase->outputFile->get()}}</pre>
+                    <div class="col-5 px-1" style="background: #efefef;border: 1px gray solid;border-left:0;">
+                        <pre style="margin:0">{{$testCase->outputFile->get()}}</pre>
                     </div>
                 </div>
                 
