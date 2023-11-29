@@ -82,5 +82,5 @@ RUN mkdir /var/nsjail
 RUN chmod 0777 /var/nsjail
 COPY ./docker/basic.conf /var/nsjail/basic.conf
 
-ENTRYPOINT ["php", "/var/www/html/artisan", "queue:work", "--queue=rank,submit","--sleep=2","--tries=2","--backoff=15,30,60","--max-jobs=300"]
+ENTRYPOINT ["php", "/var/www/html/artisan", "queue:work", "--queue=contest,submit,rank","--sleep=2","--tries=1","--max-jobs=1000"]
 
