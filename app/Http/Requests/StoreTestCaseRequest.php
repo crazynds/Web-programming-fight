@@ -30,13 +30,13 @@ class StoreTestCaseRequest extends FormRequest
             ],
             'input[]' => [
                 'file',
-                // 50 MB
-                'size:51200',
+                // 100 MB
+                'size:102400',
             ],
             'output[]' => [
                 'file',
-                // 50 MB
-                'size:51200',
+                // 100 MB
+                'size:102400',
             ]
         ];
     }

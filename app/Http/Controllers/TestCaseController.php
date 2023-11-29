@@ -148,6 +148,7 @@ class TestCaseController extends Controller
                 $testCase->inputfile()->associate($inputFile);
                 $testCase->outputfile()->associate($outputFile);
                 $testCase->problem()->associate($problem);
+                $testCase->name = $file;
                 $testCase->rankeable = false;
                 $testCase->save();
             }

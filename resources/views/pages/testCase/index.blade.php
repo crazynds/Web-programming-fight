@@ -24,7 +24,7 @@
         <thead>
             <tr>
                 <th><b>#</b></th>
-                <th class="text-center"><b>Id</b></th>
+                <th class="text-center"><b>Name</b></th>
                 @can('update',$problem)
                 <th class="text-center"><b></b></th>
                 @endcan
@@ -45,7 +45,7 @@
                         #{{ $testCase->position }}
                     </td>
                     <td class="px-2">
-                        {{ $testCase->id }} 
+                        {{ $testCase->name }} 
                     </td>
                     @can('update',$problem)
                     <td class="px-2">

@@ -26,10 +26,11 @@ class AppServiceProvider extends ServiceProvider
             if (config('app.env') === 'production' && $query->time < 20) {
                 return;
             }
-            Log::channel('database')->info(
-                sprintf('%6.2fms -- %s', $query->time, $query->sql),
-                $query->bindings
-            );
+            if(!str_contains($query->sql,'select * from `jobs`'))
+                Log::channel('database')->info(
+                    sprintf('%6.2fms -- %s', $query->time, $query->sql),
+                    $query->bindings
+                );
         });
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
