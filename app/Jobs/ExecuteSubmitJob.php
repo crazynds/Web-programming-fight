@@ -87,7 +87,9 @@ class ExecuteSubmitJob implements ShouldQueue
                 default:
             }
         }
-        dump($time,$memoryPeak,$retval);
+        $this->submit->execution_time = max($this->submit->execution_time|0,$time);
+        $this->submit->execution_memory = max($this->submit->execution_memory|0,intval($memoryPeak));
+        dump($time,$this->submit->execution_memory,$retval);-
         dump('------');
         // 9 MB is the margin to work
         if($memoryPeak>$this->submit->problem->memory_limit + 9){
@@ -183,6 +185,8 @@ class ExecuteSubmitJob implements ShouldQueue
         $this->submit->status = SubmitStatus::Judging;
         $this->submit->result = SubmitResult::NoResult;
         $this->submit->output = null;
+        $this->submit->execution_memory = null;
+        $this->submit->execution_time = null;
         $this->submit->save();
         $confFile = '/var/nsjail/basic.conf';
         switch($this->submit->language){

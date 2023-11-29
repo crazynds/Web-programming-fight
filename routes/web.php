@@ -58,14 +58,14 @@ Route::middleware('auth')->group(function(){
 
     // Todo fazer polices para submissions, somente o dono pode gerenciar
     // run routes
-    Route::resource('run', SubmitRunController::class)
+    Route::resource('submitRun', SubmitRunController::class)
         ->only(['index','store','create','show']);
     Route::get('/run/{submitRun}/rejudge',[SubmitRunController::class,'rejudge'])
-        ->name('run.rejudge');
+        ->name('submitRun.rejudge');
     Route::get('/run/global/live',[SubmitRunController::class,'global'])
-        ->name('run.global');
+        ->name('submitRun.global');
     Route::get('/run/{submitRun}/download',[SubmitRunController::class,'download'])
-        ->name('run.download');
+        ->name('submitRun.download');
 
     // user routes
     Route::get('/user/profile',[UserController::class,'profile'])

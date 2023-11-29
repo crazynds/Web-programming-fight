@@ -95,7 +95,7 @@ class SubmitRunController extends Controller
                 ExecuteSubmitJob::dispatch($run)->onQueue('submit')->afterCommit();
             }
         });
-        return redirect()->route('run.index');
+        return redirect()->route('submitRun.index');
     }
     
     public function download(SubmitRun $submitRun)
@@ -111,12 +111,14 @@ class SubmitRunController extends Controller
 
     public function rejudge(SubmitRun $submitRun)
     {
+        /** @var User */
         $user = Auth::user();
         if (RateLimiter::tooManyAttempts('resubmission:'.$user->id, 5)) {
             return Redirect::back()->withErrors(['msg' => 'Too many attempts! Wait a moment and try again!']);
         }
         // 10 minutes
-        RateLimiter::hit('resubmission:'.$user->id,60*10);
+        if(!$user->isAdmin())
+            RateLimiter::hit('resubmission:'.$user->id,60*10);
         $submitRun->status = SubmitStatus::WaitingInLine;
         $submitRun->result = SubmitResult::NoResult;
         $submitRun->save();

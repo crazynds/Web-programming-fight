@@ -9,7 +9,7 @@
             </b>
         </div>
         <div class="col">
-            <a style="float:right" href="{{ route('run.create') }}">
+            <a style="float:right" href="{{ route('submitRun.create') }}">
                 <button>New +</button>
             </a>
         </div>
@@ -38,6 +38,7 @@
                 <th class="text-center"><b>Status</b></th>
                 <th class="text-center"><b>Result</b></th>
                 <th class="text-center"><b>Cases</b></th>
+                <th class="text-center"><b>Resources</b></th>
                 <th style="text-align: end;"><b>Actions</b></th>
             </tr>
         </thead>
@@ -136,17 +137,32 @@
                         @endswitch
                     </td>
                     <td class="px-2">
+                        <small>
+                            @if(isset($submitRun->execution_time))
+                            {{ number_format($submitRun->execution_time/1000, 2, '.', ',') }}s
+                            @else
+                            --
+                            @endif
+                            |
+                            @if(isset($submitRun->execution_memory))
+                            {{ $submitRun->execution_memory}} MB
+                            @else
+                            --
+                            @endif
+                        </small>
+                    </td>
+                    <td class="px-2">
                         <div class="hstack gap-1">
                             @if ($submitRun->status == 'Judged' || $submitRun->status == 'Error')
                                 @can('update',$submitRun)
                                     @if(\Illuminate\Support\Facades\RateLimiter::remaining('resubmission:'.Auth::user()->id, 5))
-                                        <a href="{{ route('run.rejudge', ['submitRun' => $submitRun->id]) }}"
+                                        <a href="{{ route('submitRun.rejudge', ['submitRun' => $submitRun->id]) }}"
                                             class="d-flex action-btn">
                                             <i class="las la-redo-alt"></i>
                                         </a>
                                     @endif
                                     @if (isset($submitRun->output))
-                                    <a href="{{ route('run.show', ['run' => $submitRun->id]) }}"
+                                    <a href="{{ route('submitRun.show', ['submitRun' => $submitRun->id]) }}"
                                         class="d-flex action-btn">
                                         <i class="las la-poll-h"></i>
                                     </a>
@@ -154,14 +170,14 @@
                                 @endcan
                                 @can('view')
                                     @if(isset($submitRun->output))
-                                            <a href="{{route('run.show',['run'=>$submitRun->id])}}" class="d-flex" style="text-decoration:none !important;">
+                                            <a href="{{route('submitRun.show',['submitRun'=>$submitRun->id])}}" class="d-flex" style="text-decoration:none !important;">
                                                 <i class="las la-poll-h"></i>
                                             </a>
                                     @endif
                                 @endcan
                             @endif
                             @if ($submitRun->file()->exists())
-                                <a target="_blank" href="{{ route('run.download', ['submitRun' => $submitRun->id]) }}"
+                                <a target="_blank" href="{{ route('submitRun.download', ['submitRun' => $submitRun->id]) }}"
                                     class="d-flex action-btn">
                                     <i class="las la-file-download"></i>
                                 </a>
@@ -197,7 +213,7 @@
                 }, 5000);
             })
             openModal = function(id){
-                var url = '{{route('api.run.code',['submitRun'=>-1])}}'.replace('-1',id)
+                var url = '{{route('api.submitRun.code',['submitRun'=>-1])}}'.replace('-1',id)
                 $('.codeModal').modal("show")
                 clearTimeout(timeout);
                 $('.codeModal').find('#code').html(`

@@ -23,5 +23,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:web')->group(function(){
     Route::get('/run/{submitRun}/code',[SubmitRunController::class,'getCode'])
-        ->name('run.code');
+        ->name('submitRun.code');
 });
