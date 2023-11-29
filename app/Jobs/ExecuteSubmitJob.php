@@ -87,8 +87,10 @@ class ExecuteSubmitJob implements ShouldQueue
                 default:
             }
         }
-        $this->submit->execution_time = max($this->submit->execution_time|0,$time);
-        $this->submit->execution_memory = max($this->submit->execution_memory|0,intval($memoryPeak));
+        if($testCase->validated){
+            $this->submit->execution_time = max($this->submit->execution_time|0,$time);
+            $this->submit->execution_memory = max($this->submit->execution_memory|0,intval($memoryPeak));
+        }
         dump($time,$this->submit->execution_memory,$retval);
         dump('------');
         // 9 MB is the margin to work
@@ -103,6 +105,7 @@ class ExecuteSubmitJob implements ShouldQueue
             // Buscar solução alternativa
             return SubmitResult::RuntimeError;
         }else{
+
             // Carrega o arquivo output para a pasta tmpfs
             $size = $testCase->outputfile()->select('size')->first()->size;
             if($size < 4*1024){
@@ -131,6 +134,8 @@ class ExecuteSubmitJob implements ShouldQueue
                 return SubmitResult::WrongAnswer;
             }
         }
+        $this->submit->execution_time = max($this->submit->execution_time|0,$time);
+        $this->submit->execution_memory = max($this->submit->execution_memory|0,intval($memoryPeak));
         return SubmitResult::Accepted;
     }
 
