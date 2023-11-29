@@ -17,9 +17,11 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
 
-class ExecuteSubmitJob implements ShouldQueue
+class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public $uniqueFor = 86400;
 
     /**
      * Create a new job instance.
@@ -29,6 +31,11 @@ class ExecuteSubmitJob implements ShouldQueue
     )
     {
         //
+    }
+
+    public function uniqueId(): string
+    {
+        return $this->submit->id;
     }
 
     private function executeTestCase(TestCase $testCase,string $config){
@@ -91,7 +98,7 @@ class ExecuteSubmitJob implements ShouldQueue
             $this->submit->execution_time = max($this->submit->execution_time|0,$exectime);
             $this->submit->execution_memory = max($this->submit->execution_memory|0,intval($memoryPeak));
         }
-        dump($exectime,$this->submit->execution_memory,$retval);
+        dump($exectime,$memoryPeak,$retval);
         dump('------');
         // 9 MB is the margin to work
         if($memoryPeak>$this->submit->problem->memory_limit + 9){

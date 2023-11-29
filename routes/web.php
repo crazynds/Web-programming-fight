@@ -60,11 +60,11 @@ Route::middleware('auth')->group(function(){
     // run routes
     Route::resource('submitRun', SubmitRunController::class)
         ->only(['index','store','create','show']);
-    Route::get('/run/{submitRun}/rejudge',[SubmitRunController::class,'rejudge'])
+    Route::get('/submitRun/{submitRun}/rejudge',[SubmitRunController::class,'rejudge'])
         ->name('submitRun.rejudge');
-    Route::get('/run/global/live',[SubmitRunController::class,'global'])
+    Route::get('/submitRun/global/live',[SubmitRunController::class,'global'])
         ->name('submitRun.global');
-    Route::get('/run/{submitRun}/download',[SubmitRunController::class,'download'])
+    Route::get('/submitRun/{submitRun}/download',[SubmitRunController::class,'download'])
         ->name('submitRun.download');
 
     // user routes

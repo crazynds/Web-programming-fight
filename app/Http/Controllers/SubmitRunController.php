@@ -119,10 +119,13 @@ class SubmitRunController extends Controller
         // 10 minutes
         if(!$user->isAdmin())
             RateLimiter::hit('resubmission:'.$user->id,60*10);
-        $submitRun->status = SubmitStatus::WaitingInLine;
-        $submitRun->result = SubmitResult::NoResult;
-        $submitRun->save();
-        ExecuteSubmitJob::dispatch($submitRun)->onQueue('submit')->afterCommit();
+        
+        if(SubmitResult::fromValue(SubmitResult::NoResult)->description != $submitRun->result){
+            $submitRun->status = SubmitStatus::WaitingInLine;
+            $submitRun->result = SubmitResult::NoResult;
+            $submitRun->save();
+            ExecuteSubmitJob::dispatch($submitRun)->onQueue('submit')->afterCommit();
+        }
         return redirect()->back();
     }
 

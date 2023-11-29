@@ -10,7 +10,7 @@
         </div>
     </div>
 
-    <form method="post" enctype="multipart/form-data" action="{{route('submitrun.store')}}">
+    <form method="post" enctype="multipart/form-data" action="{{route('submitRun.store')}}">
         @csrf
         <div class="row">
             <div class="col">
