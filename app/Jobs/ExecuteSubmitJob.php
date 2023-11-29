@@ -197,7 +197,7 @@ class ExecuteSubmitJob implements ShouldQueue
             Storage::disk('nsjail')->writeStream($program, $file->readStream());
             $output = null;
             $retval = null;
-            exec("g++ -O2 /var/work/'$program' -o /var/nsjail/a.bin 2>&1",$output,$retval);
+            exec("g++ -std=c++20 -mtune=native -match=native -w -O2 /var/work/'$program' -o /var/nsjail/a.bin 2>&1",$output,$retval);
             if($retval!=0){
                 $this->submit->output = implode(PHP_EOL,$output);
                 $this->submit->result = SubmitResult::CompilationError;
