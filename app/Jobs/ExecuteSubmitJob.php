@@ -89,7 +89,7 @@ class ExecuteSubmitJob implements ShouldQueue
         }
         $this->submit->execution_time = max($this->submit->execution_time|0,$time);
         $this->submit->execution_memory = max($this->submit->execution_memory|0,intval($memoryPeak));
-        dump($time,$this->submit->execution_memory,$retval);-
+        dump($time,$this->submit->execution_memory,$retval);
         dump('------');
         // 9 MB is the margin to work
         if($memoryPeak>$this->submit->problem->memory_limit + 9){
