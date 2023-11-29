@@ -141,15 +141,18 @@ class TestCaseController extends Controller
                 $inputFile = File::createFile($inputs[$file],"problems/{$problem->id}/input");
                 
                 $outputFile = File::createFile($outputs[$file],"problems/{$problem->id}/output");
-
-                $testCase = new TestCase();
-                $testCase->position = $position;
-                $testCase->type = TestCaseType::FileDiff;
-                $testCase->inputfile()->associate($inputFile);
-                $testCase->outputfile()->associate($outputFile);
-                $testCase->problem()->associate($problem);
-                $testCase->name = $file;
-                $testCase->rankeable = false;
+                $testCase = $problem->testCases()->updateOrCreate([
+                    'name' => $file,
+                ],[
+                    'type' => TestCaseType::FileDiff,
+                    'input_file' => $inputFile->id,
+                    'output_file' => $outputFile->id,
+                    'position' => $position,
+                ]);
+                if(!$testCase->wasRecentlyCreated){
+                    $testCase->position = $testCase->getOriginal('position');
+                    $position--;
+                }
                 $testCase->save();
             }
         });
