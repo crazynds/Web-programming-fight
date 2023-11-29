@@ -70,13 +70,13 @@ class ExecuteSubmitJob implements ShouldQueue
         exec($command,$output,$retval);
         //dump($command);
 
-        $time = 0;
+        $exectime = 0;
         $memoryPeak = 0;
         foreach(explode(PHP_EOL,Storage::disk('nsjail')->get('time')) as $line){
             $arr = explode(': ',trim($line));
             switch($arr[0]){
                 case 'User time (seconds)':
-                    $time = intval(floatval($arr[1])*1000);
+                    $exectime = intval(floatval($arr[1])*1000);
                     break;
                 case 'Maximum resident set size (kbytes)':
                     $memoryPeak = floatval($arr[1])/1024;
@@ -88,16 +88,16 @@ class ExecuteSubmitJob implements ShouldQueue
             }
         }
         if($testCase->validated){
-            $this->submit->execution_time = max($this->submit->execution_time|0,$time);
+            $this->submit->execution_time = max($this->submit->execution_time|0,$exectime);
             $this->submit->execution_memory = max($this->submit->execution_memory|0,intval($memoryPeak));
         }
-        dump($time,$this->submit->execution_memory,$retval);
+        dump($exectime,$this->submit->execution_memory,$retval);
         dump('------');
         // 9 MB is the margin to work
         if($memoryPeak>$this->submit->problem->memory_limit + 9){
             return SubmitResult::MemoryLimit;
         }
-        if($time > $this->submit->problem->time_limit){
+        if($exectime > $this->submit->problem->time_limit){
             return SubmitResult::TimeLimit;
         }
         if($retval!=0){
@@ -134,7 +134,7 @@ class ExecuteSubmitJob implements ShouldQueue
                 return SubmitResult::WrongAnswer;
             }
         }
-        $this->submit->execution_time = max($this->submit->execution_time|0,$time);
+        $this->submit->execution_time = max($this->submit->execution_time|0,$exectime);
         $this->submit->execution_memory = max($this->submit->execution_memory|0,intval($memoryPeak));
         return SubmitResult::Accepted;
     }
