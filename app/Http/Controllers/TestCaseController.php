@@ -133,6 +133,7 @@ class TestCaseController extends Controller
             $outputs[$file->getClientOriginalName()] = $file;
         }
         $files = array_intersect(array_keys($inputs),array_keys($outputs));
+        $filesToDelete = [];
         DB::transaction(function() use($problem,$inputs,$outputs,$files){
             $position = $problem->testCases()->count();
             foreach($files as $file){
@@ -151,11 +152,18 @@ class TestCaseController extends Controller
                 ]);
                 if(!$testCase->wasRecentlyCreated){
                     $testCase->position = $testCase->getOriginal('position');
+                    $input = $testCase->getOriginal('input_file');
+                    $output = $testCase->getOriginal('output_file');
+                    $filesToDelete[] = $input;
+                    $filesToDelete[] = $output;
+                    $testCase->save();
                     $position--;
                 }
-                $testCase->save();
             }
         });
+        foreach(File::whereIn('id',$filesToDelete)->lazy() as $file){
+            $file->delete();
+        }
         return redirect()->route('problem.testCase.index',['problem'=>$problem->id]);
     }
 
