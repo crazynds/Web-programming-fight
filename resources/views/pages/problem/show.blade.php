@@ -1,5 +1,12 @@
 @extends('layouts.boca')
 
+@section('header')
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+@endsection
+
 
 @section('content')
 
@@ -57,10 +64,10 @@
 
             @foreach ($testCases as $testCase)
                 <div class="row justify-content-center mt-2">
-                    <div class="col-5 px-1" style="background: #efefef;border: 1px gray solid;">
+                    <div class="col-4 px-1" style="background: #efefef;border: 1px gray solid;">
                         <pre style="margin:0">{{$testCase->inputFile->get()}}</pre>
                     </div>
-                    <div class="col-5 px-1" style="background: #efefef;border: 1px gray solid;border-left:0;">
+                    <div class="col-4 px-1" style="background: #efefef;border: 1px gray solid;border-left:0;">
                         <pre style="margin:0">{{$testCase->outputFile->get()}}</pre>
                     </div>
                 </div>
@@ -71,8 +78,12 @@
 @endsection
 
 @section('script')
-<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-<script type="text/javascript" id="MathJax-script" async
-    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+<script>
+    window.addEventListener("load",function(){
+        setTimeout(()=>{
+            if(MathJax)
+                MathJax.typesetPromise()
+        },100)
+    });
 </script>
 @endsection
