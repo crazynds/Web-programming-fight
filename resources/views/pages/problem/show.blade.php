@@ -83,10 +83,10 @@
         console.log('configura')
         const func = ()=>{
             console.log('tenta')
-            if(MathJax.typesetPromise)
+            if(MathJax.typesetPromise){
                 console.log('consegue')
                 MathJax.typesetPromise()
-            else{
+            }else{
                 setTimeout(func,100)
             }
         }
