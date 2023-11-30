@@ -26,7 +26,7 @@ class AuthController extends Controller
         $user = User::updateOrCreate([
             'provider_id' => $user->id
         ],[
-            'name' => $user->name,
+            'name' => $user->name ?? $user->nickname,
             'email' => $user->email,
             'avatar' => $user->avatar,
             //'github_token' => $user->token,
