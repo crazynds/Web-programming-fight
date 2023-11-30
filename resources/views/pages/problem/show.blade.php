@@ -80,10 +80,14 @@
 @section('script')
 <script>
     window.addEventListener("load",function(){
-        setTimeout(()=>{
-            if(MathJax)
+        const func = ()=>{
+            if(MathJax.typesetPromise)
                 MathJax.typesetPromise()
-        },100)
+            else{
+                setTimeout(func,100)
+            }
+        }
+        setTimeout(func,100)
     });
 </script>
 @endsection
