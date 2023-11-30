@@ -1,9 +1,6 @@
 @extends('layouts.boca')
 
 @section('head')
-<script type="text/javascript" async
-  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML&delayStartupUntil=configured">
-</script>
 @endsection
 
 
@@ -77,20 +74,7 @@
 @endsection
 
 @section('script')
-<script>
-    window.addEventListener("load",function(){
-        MathJax.Hub.Configured()
-        console.log('configura')
-        const func = ()=>{
-            console.log('tenta')
-            if(MathJax.typesetPromise){
-                console.log('consegue')
-                MathJax.typesetPromise()
-            }else{
-                setTimeout(func,100)
-            }
-        }
-        setTimeout(func,100)
-    });
+<script type="text/javascript" async
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
 </script>
 @endsection
