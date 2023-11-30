@@ -46,7 +46,7 @@
         @endif
 
         <p class="mt-3">
-            <input type="submit" class="btn btn-primary" />
+            <input type="submit" class="btn btn-primary" value="Submit"/>
         </p>
     </form>
 
