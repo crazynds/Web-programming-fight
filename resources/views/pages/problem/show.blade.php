@@ -1,6 +1,7 @@
 @extends('layouts.boca')
 
 @section('head')
+<script id="MathJax-script" async src="{{asset('mathjax/tex-chtml.js')}}"></script>
 @endsection
 
 
@@ -74,7 +75,4 @@
 @endsection
 
 @section('script')
-<script type="text/javascript" async
-  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
-</script>
 @endsection
