@@ -41,7 +41,7 @@ class ProblemController extends Controller
             ->where(function($query){
                 /** @var User */
                 $user = Auth::user();
-                if($user->isAdmin())
+                if(!$user->isAdmin())
                     $query->where('user_id',$user->id)
                         ->orWhere('visible',true);
             })
