@@ -149,7 +149,6 @@ class TestCaseController extends Controller
                     'type' => TestCaseType::FileDiff,
                     'input_file' => $inputFile->id,
                     'output_file' => $outputFile->id,
-                    'position' => $position,
                 ]);
                 if(!$testCase->wasRecentlyCreated){
                     $testCase->position = $testCase->getOriginal('position');
@@ -159,9 +158,11 @@ class TestCaseController extends Controller
                     $filesToDelete[] = $output;
                     $testCase->save();
                     $position--;
-                }else{
                     Cache::forget('input_'.$testCase->id);
                     Cache::forget('output_'.$testCase->id);
+                }else{
+                    $testCase->position = $position;
+                    $testCase->save();
                 }
             }
         });
