@@ -69,13 +69,13 @@
                         </a>
                     </td>
                     <td class="px-2">
-                        <small>
                             {{ $submitRun->language }}
-                        </small>
                     </td>
                     <td class="px-2">
                         <strong>
-                            {{ $submitRun->status }}
+                            <small>
+                                {{ $submitRun->status }}
+                            </small>
                         </strong>
                     </td>
                     <td class="px-2">
@@ -101,10 +101,13 @@
                             @default
                                 style="color:grey"
                         @endswitch>
-                            {{ $submitRun->result }}
+                            <small>
+                                {{ $submitRun->result }}
+                            </small>
                         </span>
                     </td>
                     <td class="px-2 text-center">
+                        <small>
                         @switch($submitRun->result)
                         @case('Accepted')
                             <span style="color:#0a0">
@@ -133,6 +136,7 @@
                             @default
                                 ---
                         @endswitch
+                        </small>
                     </td>
                     <td class="px-2">
                         <small>
@@ -204,11 +208,11 @@
 
             timeout = setTimeout(function(){
                 window.location.reload(1);
-            }, 5000);
+            }, 6000);
             $('.codeModal').on('hide.bs.modal', function () {
                 timeout = setTimeout(function(){
                     window.location.reload(1);
-                }, 5000);
+                }, 6000);
             })
             openModal = function(id){
                 var url = '{{route('api.submitRun.code',['submitRun'=>-1])}}'.replace('-1',id)
