@@ -41,13 +41,13 @@
                     <x-ballon />
                     <font color="#000000">{{ config('app.name') }}</font>
                 </td>
-                <td bgcolor="#ffa020" width="99%" style="padding-left:6px;">
+                <td bgcolor="#ffa020" width="99%" style="padding-left:6px;overflow: unset;">
                     2023 |
                     <a href="{{ route('problem.index') }}">Problems</a> |
                     <a href="{{ route('submitRun.create') }}">Submit</a> |
                     <a href="{{ route('submitRun.index') }}">Runs</a> |
                     {{-- <a href="./Statistics.html">Ranking</a> | --}}
-                    <div class="dropdown me-2" style="float:right;overflow: unset;">
+                    <div class="dropdown me-2" style="float:right">
                         <a class="dropdown-toggle" type="button" id="dropdown-headbar"
                             data-bs-toggle="dropdown" aria-expanded="false">
                             Options
