@@ -163,6 +163,8 @@
                                             <i class="las la-redo-alt"></i>
                                         </a>
                                     @endif
+                                @endcan
+                                @can('view',$submitRun)
                                     @if (isset($submitRun->output))
                                     <a href="{{ route('submitRun.show', ['submitRun' => $submitRun->id]) }}"
                                         class="d-flex action-btn">
@@ -170,20 +172,15 @@
                                     </a>
                                     @endif
                                 @endcan
-                                @can('view')
-                                    @if(isset($submitRun->output))
-                                            <a href="{{route('submitRun.show',['submitRun'=>$submitRun->id])}}" class="d-flex" style="text-decoration:none !important;">
-                                                <i class="las la-poll-h"></i>
-                                            </a>
-                                    @endif
-                                @endcan
                             @endif
-                            @if ($submitRun->file()->exists())
-                                <a target="_blank" href="{{ route('submitRun.download', ['submitRun' => $submitRun->id]) }}"
-                                    class="d-flex action-btn">
-                                    <i class="las la-file-download"></i>
-                                </a>
-                            @endif
+                            @can('view',$submitRun)
+                                @if ($submitRun->file()->exists())
+                                    <a target="_blank" href="{{ route('submitRun.download', ['submitRun' => $submitRun->id]) }}"
+                                        class="d-flex action-btn">
+                                        <i class="las la-file-download"></i>
+                                    </a>
+                                @endif
+                            @endcan
                         </div>
                     </td>
                 </tr>
