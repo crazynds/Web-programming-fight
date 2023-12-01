@@ -32,8 +32,8 @@ class SubmitRun extends Model
     protected function output(): Attribute
     {
         return Attribute::make(
-            set: fn (string $string) => (strlen($string) > 1024*7) ? substr($string,0,1024*7).'...' : $string,
-            get: fn (string $value) => SubmitStatus::fromValue(intval($value))->description,
+            set: fn (?string $value) => (!$value)?((strlen($value) > 1024*7) ? substr($value,0,1024*7).'...' : $value) :  $value,
+            get: fn ($value) => (!$value)?SubmitStatus::fromValue(intval($value))->description : $value,
         );
     }
     protected function result(): Attribute
