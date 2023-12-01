@@ -44,12 +44,16 @@
         <tbody>
             @foreach ($submitRuns as $submitRun)
                 <tr>
-                    <td class="pr-2">
+                    <td>
+                        @can('view',$submitRun)
                         <a href="#" onclick="openModal({{$submitRun->id}})">
                             #{{ $submitRun->id }}
                         </a>
+                        @else
+                            #{{ $submitRun->id }}
+                        @endcan
                     </td>
-                    <td class="px-2">
+                    <td class="px-1 text-center">
                         <small>
                         @if($submitRun->created_at->format('d/m/Y') != (new DateTime())->format('d/m/Y'))
                             {{ $submitRun->created_at->format('d/m/Y') }}
@@ -58,24 +62,20 @@
                         @endif
                         </small>
                     </td>
-                    <td class="px-2">
-                        <small>
+                    <td class="px-1">
                             {{ $submitRun->user->name }}
-                        </small>
                     </td>
-                    <td class="px-2">
+                    <td class="px-1">
                         <a href="{{ route('problem.show', ['problem' => $submitRun->problem->id]) }}">
                             {{ $submitRun->problem->title }}
                         </a>
                     </td>
-                    <td class="px-2">
-                            {{ $submitRun->language }}
+                    <td class="px-1">
+                        {{ $submitRun->language }}
                     </td>
                     <td class="px-2">
                         <strong>
-                            <small>
-                                {{ $submitRun->status }}
-                            </small>
+                            {{ $submitRun->status }}
                         </strong>
                     </td>
                     <td class="px-2">
@@ -101,9 +101,7 @@
                             @default
                                 style="color:grey"
                         @endswitch>
-                            <small>
                                 {{ $submitRun->result }}
-                            </small>
                         </span>
                     </td>
                     <td class="px-2 text-center">
@@ -138,20 +136,18 @@
                         @endswitch
                         </small>
                     </td>
-                    <td class="px-2">
-                        <small>
-                            @if(isset($submitRun->execution_time))
-                            {{ number_format($submitRun->execution_time/1000, 2, '.', ',') }}s
-                            @else
-                            --
-                            @endif
-                            |
-                            @if(isset($submitRun->execution_memory))
-                            {{ $submitRun->execution_memory}} MB
-                            @else
-                            --
-                            @endif
-                        </small>
+                    <td class="px-2" style="font-size: 0.9em">
+                        @if(isset($submitRun->execution_time))
+                        {{ number_format($submitRun->execution_time/1000, 2, '.', ',') }}s
+                        @else
+                        --
+                        @endif
+                        |
+                        @if(isset($submitRun->execution_memory))
+                        {{ $submitRun->execution_memory}} MB
+                        @else
+                        --
+                        @endif
                     </td>
                     <td class="px-2">
                         <div class="hstack gap-1">
