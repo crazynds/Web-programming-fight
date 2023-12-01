@@ -31,9 +31,10 @@ class SubmitRun extends Model
     }
     protected function output(): Attribute
     {
+        $limit = 1024 * 4;
         return Attribute::make(
-            set: fn (?string $value) => (!$value)?((strlen($value) > 1024*7) ? substr($value,0,1024*7).'...' : $value) :  $value,
-            get: fn ($value) => (!$value)?SubmitStatus::fromValue(intval($value))->description : $value,
+            set: fn (?string $value) => (isset($value) && strlen($value) > $limit) ? substr($value,0,$limit).'(...)' : $value,
+            get: fn (?string $value) => $value,
         );
     }
     protected function result(): Attribute
