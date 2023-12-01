@@ -51,6 +51,10 @@ thead, tbody, tfoot, tr, td, th{
   border-color: #2B2E21;
   border-style: double;
   border-width: 1px;
+  white-space: nowrap;
+  overflow: hidden; 
+  font-size: 13px;
+  max-width: 250px;
 }
 
 .action-btn{

@@ -30,8 +30,7 @@
         <thead>
             <tr>
                 <th><b>#</b></th>
-                <th class="text-center"><b>Date</b></th>
-                <th class="text-center"><b>Time</b></th>
+                <th class="text-center"><b>When</b></th>
                 <th class="text-center"><b>Who</b></th>
                 <th class="text-center"><b>Problem</b></th>
                 <th class="text-center"><b>Lang</b></th>
@@ -52,12 +51,11 @@
                     </td>
                     <td class="px-2">
                         <small>
+                        @if($submitRun->created_at->format('d/m/Y') != (new DateTime())->format('d/m/Y'))
                             {{ $submitRun->created_at->format('d/m/Y') }}
-                        </small>
-                    </td>
-                    <td class="px-2">
-                        <small>
+                        @else
                             {{ $submitRun->created_at->format('h:i:s') }}
+                        @endif
                         </small>
                     </td>
                     <td class="px-2">
