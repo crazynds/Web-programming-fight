@@ -35,7 +35,7 @@
                 class="bg-black"
                 style="--bs-bg-opacity: 0.125;"
                 @elseif($problem->my_accepted_submissions > 0)
-                class="bg-green"
+                class="bg-success"
                 style="--bs-bg-opacity: 0.125;"
                 @endif
                 >
