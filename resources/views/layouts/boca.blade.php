@@ -41,7 +41,7 @@
                     <x-ballon />
                     <font color="#000000">{{ config('app.name') }}</font>
                 </td>
-                <td bgcolor="#ffa020" width="99%" style="padding-left:6px;">
+                <td bgcolor="#ffa020" width="99%" style="padding-left:6px;overflow: unset;">
                     2023 |
                     <a href="{{ route('problem.index') }}">Problems</a> |
                     <a href="{{ route('submitRun.create') }}">Submit</a> |

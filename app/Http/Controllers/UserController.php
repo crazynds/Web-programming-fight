@@ -11,7 +11,6 @@ class UserController extends Controller
 {
     public function index(){
         $users = User::with('lastRun:submit_runs.user_id,created_at')->get();
-        $user = $users->first();
         return view('pages.user.index',[
             'users' => $users
         ]);

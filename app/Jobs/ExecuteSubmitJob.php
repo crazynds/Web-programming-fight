@@ -230,7 +230,7 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
     {
         $this->submit->status = SubmitStatus::Error;
         $this->submit->result = SubmitResult::Error;
-        $this->submit->output = $exception->__toString();
+        $this->submit->output = $exception->getTraceAsString();
         $this->submit->save();
     }
 }

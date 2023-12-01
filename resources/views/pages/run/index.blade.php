@@ -30,8 +30,7 @@
         <thead>
             <tr>
                 <th><b>#</b></th>
-                <th class="text-center"><b>Date</b></th>
-                <th class="text-center"><b>Time</b></th>
+                <th class="text-center"><b>When</b></th>
                 <th class="text-center"><b>Who</b></th>
                 <th class="text-center"><b>Problem</b></th>
                 <th class="text-center"><b>Lang</b></th>
@@ -45,35 +44,34 @@
         <tbody>
             @foreach ($submitRuns as $submitRun)
                 <tr>
-                    <td class="pr-2">
+                    <td>
+                        @can('view',$submitRun)
                         <a href="#" onclick="openModal({{$submitRun->id}})">
                             #{{ $submitRun->id }}
                         </a>
+                        @else
+                            #{{ $submitRun->id }}
+                        @endcan
                     </td>
-                    <td class="px-2">
+                    <td class="px-1 text-center">
                         <small>
+                        @if($submitRun->created_at->format('d/m/Y') != (new DateTime())->format('d/m/Y'))
                             {{ $submitRun->created_at->format('d/m/Y') }}
+                        @else
+                            {{ $submitRun->created_at->format('H:i:s') }}
+                        @endif
                         </small>
                     </td>
-                    <td class="px-2">
-                        <small>
-                            {{ $submitRun->created_at->format('h:i:s') }}
-                        </small>
-                    </td>
-                    <td class="px-2">
-                        <small>
+                    <td class="px-1">
                             {{ $submitRun->user->name }}
-                        </small>
                     </td>
-                    <td class="px-2">
+                    <td class="px-1">
                         <a href="{{ route('problem.show', ['problem' => $submitRun->problem->id]) }}">
                             {{ $submitRun->problem->title }}
                         </a>
                     </td>
-                    <td class="px-2">
-                        <small>
-                            {{ $submitRun->language }}
-                        </small>
+                    <td class="px-1">
+                        {{ $submitRun->language }}
                     </td>
                     <td class="px-2">
                         <strong>
@@ -103,10 +101,11 @@
                             @default
                                 style="color:grey"
                         @endswitch>
-                            {{ $submitRun->result }}
+                                {{ $submitRun->result }}
                         </span>
                     </td>
                     <td class="px-2 text-center">
+                        <small>
                         @switch($submitRun->result)
                         @case('Accepted')
                             <span style="color:#0a0">
@@ -135,21 +134,20 @@
                             @default
                                 ---
                         @endswitch
-                    </td>
-                    <td class="px-2">
-                        <small>
-                            @if(isset($submitRun->execution_time))
-                            {{ number_format($submitRun->execution_time/1000, 2, '.', ',') }}s
-                            @else
-                            --
-                            @endif
-                            |
-                            @if(isset($submitRun->execution_memory))
-                            {{ $submitRun->execution_memory}} MB
-                            @else
-                            --
-                            @endif
                         </small>
+                    </td>
+                    <td class="px-2" style="font-size: 0.9em">
+                        @if(isset($submitRun->execution_time))
+                        {{ number_format($submitRun->execution_time/1000, 2, '.', ',') }}s
+                        @else
+                        --
+                        @endif
+                        |
+                        @if(isset($submitRun->execution_memory))
+                        {{ $submitRun->execution_memory}} MB
+                        @else
+                        --
+                        @endif
                     </td>
                     <td class="px-2">
                         <div class="hstack gap-1">
@@ -161,6 +159,8 @@
                                             <i class="las la-redo-alt"></i>
                                         </a>
                                     @endif
+                                @endcan
+                                @can('view',$submitRun)
                                     @if (isset($submitRun->output))
                                     <a href="{{ route('submitRun.show', ['submitRun' => $submitRun->id]) }}"
                                         class="d-flex action-btn">
@@ -168,20 +168,15 @@
                                     </a>
                                     @endif
                                 @endcan
-                                @can('view')
-                                    @if(isset($submitRun->output))
-                                            <a href="{{route('submitRun.show',['submitRun'=>$submitRun->id])}}" class="d-flex" style="text-decoration:none !important;">
-                                                <i class="las la-poll-h"></i>
-                                            </a>
-                                    @endif
-                                @endcan
                             @endif
-                            @if ($submitRun->file()->exists())
-                                <a target="_blank" href="{{ route('submitRun.download', ['submitRun' => $submitRun->id]) }}"
-                                    class="d-flex action-btn">
-                                    <i class="las la-file-download"></i>
-                                </a>
-                            @endif
+                            @can('view',$submitRun)
+                                @if ($submitRun->file()->exists())
+                                    <a target="_blank" href="{{ route('submitRun.download', ['submitRun' => $submitRun->id]) }}"
+                                        class="d-flex action-btn">
+                                        <i class="las la-file-download"></i>
+                                    </a>
+                                @endif
+                            @endcan
                         </div>
                     </td>
                 </tr>
@@ -206,11 +201,11 @@
 
             timeout = setTimeout(function(){
                 window.location.reload(1);
-            }, 5000);
+            }, 6000);
             $('.codeModal').on('hide.bs.modal', function () {
                 timeout = setTimeout(function(){
                     window.location.reload(1);
-                }, 5000);
+                }, 6000);
             })
             openModal = function(id){
                 var url = '{{route('api.submitRun.code',['submitRun'=>-1])}}'.replace('-1',id)

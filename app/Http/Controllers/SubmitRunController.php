@@ -94,10 +94,12 @@ class SubmitRunController extends Controller
     
     public function download(SubmitRun $submitRun)
     {
+        $this->authorize('view', $submitRun);
         return $submitRun->file->download('#'.$submitRun->id.'_'.Str::slug($submitRun->problem->title).'.'.$submitRun->file->type);
     }
 
     public function getCode(SubmitRun $submitRun){
+        $this->authorize('view', $submitRun);
         return response()->json([
             'code' => $submitRun->file->get()
         ]);
@@ -105,6 +107,7 @@ class SubmitRunController extends Controller
 
     public function rejudge(SubmitRun $submitRun)
     {
+        $this->authorize('update', $submitRun);
         /** @var User */
         $user = Auth::user();
         if (RateLimiter::tooManyAttempts('resubmission:'.$user->id, 5)) {

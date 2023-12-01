@@ -29,6 +29,20 @@ class SubmitRun extends Model
             get: fn (string $value) => SubmitStatus::fromValue(intval($value))->description,
         );
     }
+    protected function output(): Attribute
+    {
+        return Attribute::make(
+            set: function (?string $value) {
+                $limit = 1024 * 4;
+                $value = (isset($value) && strlen($value) > $limit) ? substr($value,0,$limit).'(...)' : $value;
+                if(is_string($value)){
+                    $value = mb_convert_encoding($value,"UTF-8");
+                }
+                return $value;
+            },
+            get: fn (?string $value) => $value,
+        );
+    }
     protected function result(): Attribute
     {
         return Attribute::make(
