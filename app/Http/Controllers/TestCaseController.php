@@ -156,6 +156,10 @@ class TestCaseController extends Controller
                     $output = $testCase->getOriginal('output_file');
                     $filesToDelete[] = $input;
                     $filesToDelete[] = $output;
+                    // Clear test who ran in this testcase 
+                    $testCase->validated = false;
+                    $testCase->submitRuns()->sync([]);
+                    
                     $testCase->save();
                     $position--;
                     Cache::forget('input_'.$testCase->id);
