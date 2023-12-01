@@ -1,10 +1,16 @@
 @extends('layouts.boca')
 
-@section('header')
-<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-<script type="text/javascript" id="MathJax-script" async
-    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+@section('head')
+<script>
+window.MathJax= {
+    processClass: "mathjax",
+    ignoreClass: "no-mathjax",
+    tex: {
+        inlineMath: [['$', '$']]
+    }
+}
 </script>
+<script id="MathJax-script" async src="{{asset('mathjax/tex-chtml.js')}}"></script>
 @endsection
 
 
@@ -78,16 +84,4 @@
 @endsection
 
 @section('script')
-<script>
-    window.addEventListener("load",function(){
-        const func = ()=>{
-            if(MathJax.typesetPromise)
-                MathJax.typesetPromise()
-            else{
-                setTimeout(func,100)
-            }
-        }
-        setTimeout(func,100)
-    });
-</script>
 @endsection

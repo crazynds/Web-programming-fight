@@ -20,7 +20,7 @@
             </h2>
             <div class="card">
                 <div class="card-body">
-                    {{$input}}
+                    <pre style="margin:0">{{$input}}</pre>
                 </div>
             </div>
         </div>
@@ -30,7 +30,7 @@
             </h2>
             <div class="card">
                 <div class="card-body">
-                    {{$output}}
+                    <pre style="margin:0">{{$output}}</pre>
                 </div>
             </div>
         </div>

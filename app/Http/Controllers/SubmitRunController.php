@@ -62,14 +62,8 @@ class SubmitRunController extends Controller
         }
         // 1 Hour
         RateLimiter::hit('submission:'.$user->id, 60*60);
-        DB::transaction(function() use($request){
-            $user = User::first();
-            if(!$user)
-                $user = User::query()->create([
-                    'name' => "test",
-                    'email' => "test@test.com",
-                    'password' => 'test@test',
-                ]);
+        DB::transaction(function() use($request,$user){
+            
             $originalFile = $request->file('code');
 
             // 4 MB
