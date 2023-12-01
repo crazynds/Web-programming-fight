@@ -33,6 +33,10 @@ class ProblemController extends Controller
                 'submissions as accepted_submissions' => function($query){
                     $query->where('submit_runs.result','=',SubmitResult::Accepted);
                 },
+                'submissions as my_accepted_submissions' => function($query){
+                    $query->where('submit_runs.result','=',SubmitResult::Accepted)
+                        ->where('submit_runs.user_id','=',Auth::user()->id);
+                },
             ])
             ->where(function($query){
                 $query->where('user_id',Auth::user()->id)
