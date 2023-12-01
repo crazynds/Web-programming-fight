@@ -10,6 +10,7 @@ use App\Models\File;
 use App\Models\Problem;
 use App\Models\TestCase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -158,6 +159,9 @@ class TestCaseController extends Controller
                     $filesToDelete[] = $output;
                     $testCase->save();
                     $position--;
+                }else{
+                    Cache::forget('input_'.$testCase->id);
+                    Cache::forget('output_'.$testCase->id);
                 }
             }
         });
