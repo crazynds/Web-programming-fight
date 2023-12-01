@@ -58,7 +58,7 @@
                         @if($submitRun->created_at->format('d/m/Y') != (new DateTime())->format('d/m/Y'))
                             {{ $submitRun->created_at->format('d/m/Y') }}
                         @else
-                            {{ $submitRun->created_at->format('h:i:s') }}
+                            {{ $submitRun->created_at->format('H:i:s') }}
                         @endif
                         </small>
                     </td>
