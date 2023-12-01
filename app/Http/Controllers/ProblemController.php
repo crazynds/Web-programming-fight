@@ -39,8 +39,11 @@ class ProblemController extends Controller
                 },
             ])
             ->where(function($query){
-                $query->where('user_id',Auth::user()->id)
-                    ->orWhere('visible',true);
+                /** @var User */
+                $user = Auth::user();
+                if($user->isAdmin())
+                    $query->where('user_id',$user->id)
+                        ->orWhere('visible',true);
             })
             ->orderBy('id')->get();
         return view('pages.problem.index',[
