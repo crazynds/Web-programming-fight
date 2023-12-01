@@ -1,6 +1,15 @@
 @extends('layouts.boca')
 
 @section('head')
+<script>
+window.MathJax= {
+    processClass: "mathjax",
+    ignoreClass: "no-mathjax",
+    tex: {
+        inlineMath: [['$', '$']]
+    }
+}
+</script>
 <script id="MathJax-script" async src="{{asset('mathjax/tex-chtml.js')}}"></script>
 @endsection
 

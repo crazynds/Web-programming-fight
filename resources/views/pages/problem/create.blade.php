@@ -1,11 +1,18 @@
 @extends('layouts.boca')
 
 @section('head')
-<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-<script type="text/javascript" id="MathJax-script" async
-    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+<script>
+window.MathJax= {
+    processClass: "mathjax",
+    ignoreClass: "no-mathjax",
+    tex: {
+        inlineMath: [['$', '$']]
+    }
+}
 </script>
+<script id="MathJax-script" async src="{{asset('mathjax/tex-chtml.js')}}"></script>
 @endsection
+
 @section('content')
     <div class="row mb-4">
         <div class="col">
