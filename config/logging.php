@@ -62,6 +62,12 @@ return [
             'channels' => ['single'],
             'ignore_exceptions' => false,
         ],
+        'leakedfiles' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/leakedfiles.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+        ],
 
         'single' => [
             'driver' => 'single',
