@@ -153,7 +153,7 @@
                         <div class="hstack gap-1">
                             @if ($submitRun->status == 'Judged' || $submitRun->status == 'Error')
                                 @can('update',$submitRun)
-                                    @if(\Illuminate\Support\Facades\RateLimiter::remaining('resubmission:'.Auth::user()->id, 5))
+                                    @if($limit && $submitRun->status != 'Compilation error')
                                         <a href="{{ route('submitRun.rejudge', ['submitRun' => $submitRun->id]) }}"
                                             class="d-flex action-btn">
                                             <i class="las la-redo-alt"></i>
@@ -170,7 +170,7 @@
                                 @endcan
                             @endif
                             @can('view',$submitRun)
-                                @if ($submitRun->file()->exists())
+                                @if ($submitRun->file_id != null)
                                     <a target="_blank" href="{{ route('submitRun.download', ['submitRun' => $submitRun->id]) }}"
                                         class="d-flex action-btn">
                                         <i class="las la-file-download"></i>

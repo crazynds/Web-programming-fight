@@ -23,7 +23,4 @@ class Problem extends Model
         return $this->belongsTo(User::class);
     }
 
-    public static function visible(){
-        return Problem::query()->where('visible',true)->get();
-    }
 }

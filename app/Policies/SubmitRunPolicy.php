@@ -37,6 +37,7 @@ class SubmitRunPolicy
      */
     public function update(User $user, SubmitRun $submitRun): bool
     {
+        if(!$submitRun->file_id)return false;
         return $user->id==$submitRun->user_id || $user->isAdmin();
     }
 

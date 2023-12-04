@@ -19,6 +19,18 @@
             </a>
         </div>
     </div>
+    
+    @if ($errors->any())
+            <div class="row p-3">
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        @endif
 
     <table border="1">
         <thead>
@@ -140,4 +152,11 @@
             @endforeach
         </tbody>
     </table>
+
+    
+    <div class="row mt-4">
+        <ul>
+            <li>To validate a test case, you need to submit a solution that pass the test case.</li>
+        </ul>
+    </div>
 @endsection

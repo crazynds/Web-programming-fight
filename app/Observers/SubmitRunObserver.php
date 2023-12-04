@@ -27,7 +27,8 @@ class SubmitRunObserver
      */
     public function deleted(SubmitRun $submitRun): void
     {
-        $submitRun->file->delete();
+        if(!!$submitRun->file_id)
+            $submitRun->file->delete();
     }
 
     /**

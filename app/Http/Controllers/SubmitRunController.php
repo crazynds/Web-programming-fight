@@ -28,8 +28,15 @@ class SubmitRunController extends Controller
 
     public function global()
     {
+        $runs = SubmitRun::whereHas('problem',function($query){
+            // Hide not visible problems to global
+            $query->where('problems.visible',true);
+        })->orderByDesc('id')->limit(100)->get();
+
+
         return view('pages.run.index',[
-            'submitRuns' => SubmitRun::orderByDesc('id')->limit(100)->get()
+            'submitRuns' => $runs,
+            'limit' => \Illuminate\Support\Facades\RateLimiter::remaining('resubmission:'.Auth::user()->id, 5)
         ]);
     }
     
@@ -39,7 +46,8 @@ class SubmitRunController extends Controller
     public function index()
     {
         return view('pages.run.index',[
-            'submitRuns' => $this->user()->submissions()->orderBy('id','desc')->get()
+            'submitRuns' => $this->user()->submissions()->orderBy('id','desc')->get(),
+            'limit' => \Illuminate\Support\Facades\RateLimiter::remaining('resubmission:'.Auth::user()->id, 5)
         ]);
     }
 
@@ -48,7 +56,16 @@ class SubmitRunController extends Controller
      */
     public function create()
     {
-        return view('pages.run.create');
+        /** @var $user */
+        $user = Auth::user();
+        if($user->isAdmin()){
+            $problems = Problem::all();
+        }else{
+            $problems = Problem::where('visible',true)->orWhere('user_id',$user->id)->get();
+        }
+        return view('pages.run.create',[
+            'problems' => $problems
+        ]);
     }
 
     /**

@@ -17,6 +17,14 @@ class ProblemController extends Controller
 
     public function publicChange(Problem $problem){
         $this->authorize('update', $problem);
+        $MINIMUN = 5;
+        if($problem->testCases()->where('validated',true)->count() < $MINIMUN){        
+            $problem->visible = false;
+            $problem->save();
+            return redirect()->route('problem.testCase.index',[
+                'problem' => $problem->id
+            ])->withErrors(['msg' => 'To enable a problem, you need to validate at least '.$MINIMUN.' test cases']);
+        }
         $problem->visible = !$problem->visible;
         $problem->save();
         return redirect()->route('problem.index');
