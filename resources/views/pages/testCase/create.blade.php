@@ -29,11 +29,6 @@
         @endif
 
         <div class="row">
-            <strong>
-                *Each input file need an output file with the same name to create a test case.
-            </strong>
-        </div>
-        <div class="row">
             <div class="col-6">
                 <h3>
                     Arquivos de input
@@ -50,6 +45,14 @@
             </div>
         </div>
 
+        <div class="row">
+            <strong>
+                *Each input file need an output file with the same name to create a test case.
+            </strong>
+            <strong>
+                *Test cases with the same name as the files sended will be replaced.
+            </strong>
+        </div>
 
         <p class="mt-3">
             <input type="submit" class="btn btn-primary" value="Submit"/>

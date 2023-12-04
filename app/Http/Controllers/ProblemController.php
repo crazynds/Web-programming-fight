@@ -139,20 +139,17 @@ class ProblemController extends Controller
             $input_description = $problem->input_description;
             $output_description = $problem->output_description;
 
-            $markdown = `# {$titulo}
-            
-            {$description}
-            
-            ## Input
+            $markdown = "# {$titulo}
 
-            {$input_description}
-            
-            ## Output
+{$description}
 
-            {$output_description}
-            
-            `;
-            dd($markdown);
+## Input
+
+{$input_description}
+
+## Output
+
+{$output_description}";
 
             $zip->addFromString('README.md',$markdown);
 

@@ -85,7 +85,11 @@
                             @endcan
                             @can('update', $problem)
                                 <div class="vr"></div>
-                                
+                                <a href="{{route('problem.download',['problem'=>$problem->id])}}" target="_blank" class="d-flex action-btn">
+                                    <i class="las la-file-archive"></i>
+                                </a>
+
+                                <div class="vr"></div>
                                 <a href="{{route('problem.edit',['problem'=>$problem->id])}}" class="d-flex action-btn">
                                     <i class="las la-edit"></i>
                                 </a>

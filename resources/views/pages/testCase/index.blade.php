@@ -104,16 +104,20 @@
                         @endif
                     </td>
                     <td class="text-center">
-                        @if($testCase->public)
-                            Yes
-                            <a href="{{route('problem.testCase.edit.public',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" style="text-decoration:none !important;">
-                                <i class="las la-lock"></i>
-                            </a>
-                        @else
+                        @if(!$testCase->validated)
                             No
-                            <a href="{{route('problem.testCase.edit.public',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" style="text-decoration:none !important;">
-                                <i class="las la-unlock"></i>
-                            </a>
+                        @else
+                            @if($testCase->public)
+                                Yes
+                                <a href="{{route('problem.testCase.edit.public',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" style="text-decoration:none !important;">
+                                    <i class="las la-lock"></i>
+                                </a>
+                            @else
+                                No
+                                <a href="{{route('problem.testCase.edit.public',['problem'=>$problem->id,'testCase'=>$testCase->id])}}" style="text-decoration:none !important;">
+                                    <i class="las la-unlock"></i>
+                                </a>
+                            @endif
                         @endif
                     </td>
                     <td class="text-center">
@@ -153,10 +157,9 @@
         </tbody>
     </table>
 
-    
-    <div class="row mt-4">
-        <ul>
-            <li>To validate a test case, you need to submit a solution that pass the test case.</li>
-        </ul>
+    <div class="row">
+        <strong>
+            *To validate a test case, you need to submit a solution that pass the test case
+        </strong>
     </div>
 @endsection
