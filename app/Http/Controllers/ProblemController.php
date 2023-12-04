@@ -6,6 +6,7 @@ use App\Enums\SubmitResult;
 use App\Http\Requests\StoreProblemRequest;
 use App\Models\Problem;
 use Illuminate\Support\Facades\Auth;
+use ZipArchive;
 
 class ProblemController extends Controller
 {
@@ -120,5 +121,54 @@ class ProblemController extends Controller
     {
         $problem->delete();
         return $this->index();
+    }
+    
+    public function download(Problem $problem){
+        $this->authorize('update', $problem);
+
+        $zip = new ZipArchive();
+        $zipFileName = 'problem_'.$problem->id.'.zip';
+
+        if ($zip->open(public_path($zipFileName), ZipArchive::CREATE) === TRUE) {
+            
+            $zip->addEmptyDir('input');
+            $zip->addEmptyDir('output');
+
+            $titulo = $problem->title;
+            $description = $problem->description;
+            $input_description = $problem->input_description;
+            $output_description = $problem->output_description;
+
+            $markdown = `# {$titulo}
+            
+            {$description}
+            
+            ## Input
+
+            {$input_description}
+            
+            ## Output
+
+            {$output_description}
+            
+            `;
+            dd($markdown);
+
+            $zip->addFromString('README.md',$markdown);
+
+            foreach($problem->testCases()->with(['inputfile','outputfile'])->lazy() as $testCase){
+                $inFile = $testCase->inputFile;
+                $outFile = $testCase->outputFile;
+                
+                $zip->addFromString('input/'.$testCase->name,$inFile->get());
+                $zip->addFromString('output/'.$testCase->name,$outFile->get());
+            }
+
+            $zip->close();
+
+            return response()->download(public_path($zipFileName))->deleteFileAfterSend(true);
+        } else {
+            return "Failed to create the zip file.";
+        }
     }
 }

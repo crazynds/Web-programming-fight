@@ -41,6 +41,8 @@ Route::middleware('auth')->group(function(){
         ->except(['edit','update']);
     Route::get('/problem/{problem}/public',[ProblemController::class,'publicChange'])
         ->name('problem.public');
+    Route::get('/problem/{problem}/download',[ProblemController::class,'download'])
+        ->name('problem.download');
     Route::controller(TestCaseController::class)
         ->name('problem.')->prefix('problem/{problem}')
         ->group(function(){
