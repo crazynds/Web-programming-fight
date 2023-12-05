@@ -37,7 +37,8 @@ class StoreTestCaseRequest extends FormRequest
                 'file',
                 // 100 MB
                 'size:102400',
-            ]
+            ],
+            recaptchaFieldName() => recaptchaRuleName()
         ];
     }
 }

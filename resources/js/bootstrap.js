@@ -34,3 +34,11 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //     forceTLS: (import.meta.env.VITE_PUSHER_SCHEME ?? 'https') === 'https',
 //     enabledTransports: ['ws', 'wss'],
 // });
+
+// Re-captcha required
+window.addEventListener('load', () => {
+    const $recaptcha = document.querySelector('#g-recaptcha-response');
+    if ($recaptcha) {
+        $recaptcha.setAttribute('required', 'required');
+    }
+})

@@ -1,5 +1,9 @@
 @extends('layouts.boca')
 
+@section('head')
+{!! ReCaptcha::htmlScriptTagJsApi() !!}
+@endsection
+
 @section('content')
     <div class="row mb-4">
         <div class="col">
@@ -10,7 +14,7 @@
         </div>
     </div>
 
-    <form method="post" enctype="multipart/form-data" action="{{route('submitRun.store')}}">
+    <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data" action="{{route('submitRun.store')}}">
         @csrf
         <div class="row">
             <div class="col">
@@ -38,7 +42,7 @@
             </div>
         </div>
         @if ($errors->any())
-            <div class="row p-3">
+            <div class="row mt-3">
                 <div class="alert alert-danger">
                     <ul>
                         @foreach ($errors->all() as $error)
@@ -51,7 +55,9 @@
 
 
         <p class="mt-3">
-            <input type="submit" class="btn btn-primary" value="Submit"/>
+           {!! htmlFormButton('Submit', [
+            'class' => "btn btn-primary"
+           ]) !!}
         </p>
     </form>
 

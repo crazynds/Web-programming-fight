@@ -10,7 +10,7 @@ window.MathJax= {
     }
 }
 </script>
-<script id="MathJax-script" async src="{{asset('mathjax/tex-chtml.js')}}"></script>
+<script id="MathJax-script" async src="{{asset('js/mathjax/tex-chtml.js')}}"></script>
 @endsection
 
 

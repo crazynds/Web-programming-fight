@@ -32,7 +32,8 @@ class StoreSubmitRunRequest extends FormRequest
             'code' => [
                 'required',
                 ...LanguagesType::validation($this->input('lang',0)),
-            ]
+            ],
+            recaptchaFieldName() => recaptchaRuleName()
         ];
     }
 }

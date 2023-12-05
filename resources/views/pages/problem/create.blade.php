@@ -10,7 +10,9 @@ window.MathJax= {
     }
 }
 </script>
-<script id="MathJax-script" async src="{{asset('mathjax/tex-chtml.js')}}"></script>
+<script id="MathJax-script" async src="{{asset('js/mathjax/tex-chtml.js')}}"></script>
+{!! ReCaptcha::htmlScriptTagJsApi() !!}
+
 @endsection
 
 @section('content')
@@ -26,7 +28,7 @@ window.MathJax= {
         </div>
     </div>
 
-    <form method="post" action="@if(isset($problem->id)){{ route('problem.update',['problem'=>$problem->id])}}@else{{route('problem.store')}}@endif" id="form">
+    <form id="{{ getFormId() }}" method="post" action="@if(isset($problem->id)){{ route('problem.update',['problem'=>$problem->id])}}@else{{route('problem.store')}}@endif" id="form">
         @csrf
         @if(isset($problem->id))
         @method('PUT')
@@ -92,7 +94,9 @@ window.MathJax= {
         </div>
 
         <p class="mt-3">
-            <input type="submit" class="btn btn-primary" value="Submit"/>
+           {!! htmlFormButton('Submit', [
+            'class' => "btn btn-primary"
+           ]) !!}
         </p>
     </form>
 @endsection

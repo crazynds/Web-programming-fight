@@ -1,5 +1,9 @@
 @extends('layouts.boca')
 
+@section('head')
+{!! ReCaptcha::htmlScriptTagJsApi() !!}
+@endsection
+
 @section('content')
     <div class="row mb-4">
         <div class="col">
@@ -10,7 +14,7 @@
         </div>
     </div>
 
-    <form method="post" enctype="multipart/form-data" action="@if(isset($team->id)){{ route('team.update',['team'=>$team->id])}}@else{{route('team.store')}}@endif">
+    <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data" action="@if(isset($team->id)){{ route('team.update',['team'=>$team->id])}}@else{{route('team.store')}}@endif">
         @csrf
         @if(isset($team->id))
         @method('PUT')
@@ -23,7 +27,7 @@
             </div>
             <div class="col-3">
                 <label for="acronym" class="form-label">Team acronym: </label><br />
-                <input type="text" name="acronym" class="form-control"
+                <input type="text" maxlength="5" name="acronym" class="form-control"
                     value="{{old('acronym',$team->acronym)}}"/>
             </div>
         </div>
@@ -45,8 +49,11 @@
             </div>
         @endif
 
+        
         <p class="mt-3">
-            <input type="submit" class="btn btn-primary" value="Submit"/>
+           {!! htmlFormButton('Submit', [
+            'class' => "btn btn-primary"
+           ]) !!}
         </p>
     </form>
 

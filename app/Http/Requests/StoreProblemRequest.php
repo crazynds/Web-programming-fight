@@ -29,6 +29,7 @@ class StoreProblemRequest extends FormRequest
             'description' => 'required|string|max:65000',
             'input_description' => 'required|string|max:32000',
             'output_description' => 'required|string|max:32000',
+            recaptchaFieldName() => recaptchaRuleName()
         ];
     }
 }
