@@ -27,7 +27,7 @@ class StoreTeamRequest extends FormRequest
      */
     public function rules(): array
     {
-        $teamId = $this->input('team');
+        $teamId = $this->route('team')?->id;
         if(!$teamId){
             $teamId=-1;
         }
