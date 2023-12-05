@@ -11,6 +11,12 @@ use Illuminate\Support\Facades\DB;
 
 class TeamController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(Team::class, 'team');
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -51,12 +57,6 @@ class TeamController extends Controller
      */
     public function create(Request $request)
     {
-        /** @var User */
-        $user = Auth::user();
-        $cont = $user->myTeams()->count();
-        if($cont > 10){
-            return redirect()->route('team.index');
-        }
         return $this->edit(new Team());
     }
 

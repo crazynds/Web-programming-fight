@@ -1,7 +1,7 @@
 @extends('layouts.boca')
 
 @section('head')
-{!! ReCaptcha::htmlScriptTagJsApi() !!}
+{!! htmlScriptTagJsApi() !!}
 @endsection
 
 @section('content')
