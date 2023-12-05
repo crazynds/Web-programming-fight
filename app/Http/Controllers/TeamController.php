@@ -11,6 +11,12 @@ use Illuminate\Support\Facades\DB;
 
 class TeamController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(Team::class, 'team');
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -51,12 +57,6 @@ class TeamController extends Controller
      */
     public function create(Request $request)
     {
-        /** @var User */
-        $user = Auth::user();
-        $cont = $user->myTeams()->count();
-        if($cont > 10){
-            return redirect()->route('team.index');
-        }
         return $this->edit(new Team());
     }
 
@@ -65,38 +65,20 @@ class TeamController extends Controller
      */
     public function store(StoreTeamRequest $request)
     {
+        $data = $request->safe([
+            'name',
+            'acronym',
+        ]);
+        /** @var User */
+        $user = Auth::user();
+        $team = new Team($data);
+        $team->save();
+        $team->members()->attach($user,[
+            'owner' => true,
+            'accepted' => true
+        ]);
 
-        DB::transaction(function ()use($request){
-            $data = $request->safe([
-                'name',
-                'acronym',
-            ]);
-            $members = $request->input('membersjson');
-            /** @var User */
-            $user = Auth::user();
-            $team = new Team($data);
-            $team->save();
-            $team->members()->attach($user,[
-                'owner' => true,
-                'accepted' => true
-            ]);
-            if($members){
-                $members = json_decode($members);
-                $cont = 0;
-                foreach($members as $member){
-                    $user = User::where('name',\Str::lower($member->value))->first();
-
-                    if($user){
-                        $team->related()->attach($user);
-                        $cont += 1;
-                    }
-                    if($cont >= 5){
-                        break;
-                    }
-                }
-            }
-        });
-        return redirect()->route('team.index');
+        return $this->update($request,$team);
     }
 
     /**
@@ -141,7 +123,7 @@ class TeamController extends Controller
 
                     if($user){
                         $idsAdded[] = $user->id;
-                        $team->related()->attach($user);
+                        $team->related()->syncWithoutDetaching([$user->id]);
                         $cont += 1;
                     }
                     if($cont >= 5){

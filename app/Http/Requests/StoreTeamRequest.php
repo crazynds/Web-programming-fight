@@ -27,13 +27,13 @@ class StoreTeamRequest extends FormRequest
      */
     public function rules(): array
     {
-        $teamId = $this->input('team');
+        $teamId = $this->route('team')?->id;
         if(!$teamId){
             $teamId=-1;
         }
         return [
             'name' => "required|string|min:2|max:250",
-            'acronym' => "required|string|min:3|max:5|alpha_dash:ascii|unique:teams,id,".$teamId,
+            'acronym' => "required|string|min:3|max:5|alpha_dash:ascii|unique:teams,acronym,".$teamId,
             'membersjson' => "nullable|json",
             recaptchaFieldName() => recaptchaRuleName()
         ];

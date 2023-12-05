@@ -29,7 +29,7 @@ class TeamPolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        return $user->myTeams()->count() < 10;
     }
 
     /**

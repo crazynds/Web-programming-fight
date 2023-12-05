@@ -22,16 +22,22 @@ class SubmitRunController extends Controller
     
     public function __construct()
     {
-        $this->middleware('auth');
         $this->authorizeResource(SubmitRun::class, 'submitRun');
     }
 
     public function global()
     {
         $runs = SubmitRun::whereHas('problem',function($query){
-            // Hide not visible problems to global
-            $query->where('problems.visible',true);
-        })->orderByDesc('id')->limit(100)->get();
+                // Hide not visible problems to global
+                $query->where('problems.visible',true);
+            })
+            ->with('user', function($query){
+                $query->select('id','name');
+            })
+            ->with('problem', function($query){
+                $query->select('id','title');
+            })
+            ->orderByDesc('id')->limit(100)->get();
 
 
         return view('pages.run.index',[
@@ -46,7 +52,15 @@ class SubmitRunController extends Controller
     public function index()
     {
         return view('pages.run.index',[
-            'submitRuns' => $this->user()->submissions()->orderBy('id','desc')->get(),
+            'submitRuns' => $this->user()
+                ->submissions()
+                ->with('user', function($query){
+                    $query->select('id','name');
+                })
+                ->with('problem', function($query){
+                    $query->select('id','title');
+                })
+                ->orderBy('id','desc')->get(),
             'limit' => \Illuminate\Support\Facades\RateLimiter::remaining('resubmission:'.Auth::user()->id, 5)
         ]);
     }

@@ -8,11 +8,13 @@
                 Teams:
             </b>
         </div>
+        @can('create',\App\Models\Team::class)
         <div class="col">
             <a style="float:right" href="{{route('team.create')}}">
                 <button>New +</button>
             </a>
         </div>
+        @endcan
     </div>
 
     <table border="1">

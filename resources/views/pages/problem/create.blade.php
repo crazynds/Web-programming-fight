@@ -11,7 +11,7 @@ window.MathJax= {
 }
 </script>
 <script id="MathJax-script" async src="{{asset('js/mathjax/tex-chtml.js')}}"></script>
-{!! ReCaptcha::htmlScriptTagJsApi() !!}
+{!! htmlScriptTagJsApi() !!}
 
 @endsection
 
