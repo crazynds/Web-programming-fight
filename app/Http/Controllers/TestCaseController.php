@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Enums\SubmitResult;
+use App\Enums\SubmitStatus;
 use App\Enums\TestCaseType;
 use App\Http\Requests\StoreTestCaseRequest;
 use App\Http\Requests\UpdateTestCaseRequest;
+use App\Jobs\ExecuteSubmitJob;
 use App\Models\File;
 use App\Models\Problem;
 use App\Models\TestCase;
@@ -182,10 +184,18 @@ class TestCaseController extends Controller
     public function destroy(Problem $problem,TestCase $testCase)
     {
         $this->authorize('update', $problem);
-        $testCase->delete();
-        $problem->testCases()
-            ->where('position','>',$testCase->position)
-            ->decrement('position');
+        DB::transaction(function()use($problem,$testCase){
+            foreach($testCase->submitRuns()->wherePivot('result','!=',SubmitResult::Accepted)->lazy() as $run){
+                $run->status = SubmitStatus::WaitingInLine;
+                $run->result = SubmitResult::NoResult;
+                $run->save();
+                ExecuteSubmitJob::dispatch($run)->onQueue('submit')->afterCommit();
+            }
+            $testCase->delete();
+            $problem->testCases()
+                ->where('position','>',$testCase->position)
+                ->decrement('position');
+        });
         return redirect()->route('problem.testCase.index',['problem' => $problem->id]);
     }
 }
