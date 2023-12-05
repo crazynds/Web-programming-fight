@@ -79,7 +79,8 @@ Route::middleware('auth')->group(function(){
 
 
         
-    Route::resource('team', TeamController::class);
+    Route::resource('team', TeamController::class)
+        ->only(['index','store','create','edit','update','destroy']);
     Route::get('/team/{team}/accept',[TeamController::class,'accept'])
         ->name('team.accept');
     Route::get('/team/{team}/deny',[TeamController::class,'deny'])
