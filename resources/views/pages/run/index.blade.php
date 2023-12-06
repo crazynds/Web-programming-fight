@@ -347,15 +347,12 @@
                 $.get('{{route('api.submitRun.result',['submitRun'=>-1])}}'.replace('-1',$(obj).data('id')),function(data){
                     if(data.data)
                         data = data.data
-                    console.log(data)
                     $(obj).find("#status").text(data.status);
 
                     if(data.status!='Judged'){
-                        console.log('repete',data.status)
                         setTimeout(func,1000)
                         $(obj).find("#result").text(data.result);
                     }else{
-                        console.log('concluiu')
                         $(obj).removeClass('blink')
                         switch(data.result){
                             case 'Wrong answer':
