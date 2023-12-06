@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
 use App\Http\Requests\StoreSubmitRunRequest;
+use App\Http\Resources\SubmitRunResultResource;
 use App\Jobs\ExecuteSubmitJob;
 use App\Models\SubmitRun;
 use App\Models\File;
@@ -134,6 +135,11 @@ class SubmitRunController extends Controller
         return response()->json([
             'code' => $submitRun->file->get()
         ]);
+    }
+
+    public function result(SubmitRun $submitRun){
+        $this->authorize('view', $submitRun);
+        return new SubmitRunResultResource($submitRun);
     }
 
     public function rejudge(SubmitRun $submitRun)

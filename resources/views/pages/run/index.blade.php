@@ -1,5 +1,36 @@
 @extends('layouts.boca')
 
+@section('head')
+<style>
+.blink {
+    -webkit-animation: blink 2s infinite both;
+            animation: blink 2s infinite both;
+}
+
+@-webkit-keyframes blink {
+  0%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+  25%,
+  75% {
+    opacity: 0.4;
+  }
+}
+@keyframes blink {
+  0%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+  25%,
+  75% {
+    opacity: 0.4;
+  }
+}
+</style>
+@endsection
 @section('content')
     <div class="row mb-4">
         <div class="col">
@@ -43,7 +74,10 @@
         </thead>
         <tbody>
             @foreach ($submitRuns as $submitRun)
-                <tr>
+                <tr data-id="{{$submitRun->id}}"
+                    @if($submitRun->status!='Judged')
+                    class="notJudged blink"
+                    @endif>
                     <td>
                         @can('view',$submitRun)
                         <a href="#" onclick="openModal({{$submitRun->id}})">
@@ -74,12 +108,12 @@
                         {{ $submitRun->language }}
                     </td>
                     <td class="px-2">
-                        <strong>
+                        <strong id="status">
                             {{ $submitRun->status }}
                         </strong>
                     </td>
                     <td class="px-2">
-                        <span
+                        <span id="result"
                             @switch($submitRun->result)
                             @case('Accepted')
                                 style="color:#0a0"
@@ -194,35 +228,200 @@
     </div>
 @endsection
 @section('script')
-    <script>
-        var openModal = function(){}
-        window.addEventListener("load",function(){
-            var timeout = null
+<script>
+    function failed(){
+        var scalar = 12;
+        var sadFace = confetti.shapeFromText({ text: '😔', scalar });
+        var duration = 6 * 1000;
+        var animationEnd = Date.now() + duration;
+        var skew = 1;
 
-            timeout = setTimeout(function(){
-                window.location.reload(1);
-            }, 6000);
-            $('.codeModal').on('hide.bs.modal', function () {
-                timeout = setTimeout(function(){
-                    window.location.reload(1);
-                }, 6000);
-            })
-            openModal = function(id){
-                var url = '{{route('api.submitRun.code',['submitRun'=>-1])}}'.replace('-1',id)
-                $('.codeModal').modal("show")
-                clearTimeout(timeout);
-                $('.codeModal').find('#code').html(`
-                    <div class="d-flex justify-content-center">
-                        <div class="spinner-grow" role="status">
-                            <span class="sr-only">Loading...</span>
-                        </div>
-                    </div>
-                `)
-                $.get(url,function(data){
-                    if(data.code)
-                        $('.codeModal').find('#code').text(data.code) 
-                });
+        function randomInRange(min, max) {
+        return Math.random() * (max - min) + min;
+        }
+
+        (function frame() {
+            var timeLeft = animationEnd - Date.now();
+            var ticks = Math.max(200, 500 * (timeLeft / duration));
+            skew = Math.max(0.8, skew - 0.001);
+
+            confetti({
+                particleCount: 1,
+                startVelocity: 0,
+                ticks: ticks,
+                origin: {
+                    x: Math.random(),
+                    // since particles fall down, skew start toward the top
+                    y: -0.05
+                },
+                flat: true,
+                shapes: [sadFace],
+                gravity: randomInRange(0.4, 0.6),
+                scalar: randomInRange(1, 6),
+            });
+
+            if (timeLeft > 0) {
+                setTimeout(()=>requestAnimationFrame(frame),100)
             }
-        })
-    </script>
+        }());
+    }
+    function confeti(){
+        var duration = 10 * 1000;
+        var animationEnd = Date.now() + duration;
+        var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+        function randomInRange(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+        setTimeout(function(){
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                var particleCount = 50 * (timeLeft / duration);
+                // since particles fall down, start a bit higher than random
+                window.confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+                window.confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+            }, 250);
+        },500)
+        var count = 200;
+        const defaults2 = {
+            origin: { y: 0.9 }
+        };
+
+        function fire(particleRatio, opts) {
+        confetti({
+            ...defaults2,
+            ...opts,
+            particleCount: Math.floor(count * particleRatio)
+        });
+        }
+
+        fire(0.25, {
+            spread: 26,
+            startVelocity: 55,
+        });
+        fire(0.2, {
+            spread: 60,
+        });
+        fire(0.35, {
+            spread: 100,
+            decay: 0.91,
+            scalar: 0.8
+        });
+        fire(0.1, {
+            spread: 120,
+            startVelocity: 25,
+            decay: 0.92,
+            scalar: 1.2
+        });
+        fire(0.1, {
+            spread: 120,
+            startVelocity: 45,
+        });
+    }
+    var openModal = function(){}
+    window.addEventListener("load",function(){
+
+        openModal = function(id){
+            var url = '{{route('api.submitRun.code',['submitRun'=>-1])}}'.replace('-1',id)
+            $('.codeModal').modal("show")
+            clearTimeout(timeout);
+            $('.codeModal').find('#code').html(`
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-grow" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            `)
+            $.get(url,function(data){
+                if(data.code)
+                    $('.codeModal').find('#code').text(data.code) 
+            });
+        }
+        $('.notJudged').each(function(_, obj) {
+            const func = function(){
+                $.get('{{route('api.submitRun.result',['submitRun'=>-1])}}'.replace('-1',$(obj).data('id')),function(data){
+                    if(data.data)
+                        data = data.data
+                    console.log(data)
+                    $(obj).find("#status").text(data.status);
+
+                    if(data.status!='Judged'){
+                        console.log('repete',data.status)
+                        setTimeout(func,1000)
+                        $(obj).find("#result").text(data.result);
+                    }else{
+                        console.log('concluiu')
+                        $(obj).removeClass('blink')
+                        switch(data.result){
+                            case 'Wrong answer':
+                            case 'Time limit':
+                            case 'Memory limit':
+                            case 'Runtime error':
+                            case 'Accepted':
+                                suspense = data.suspense >= 0.4;
+                                break;
+                            case 'Compilation error':
+                            case 'Error':
+                            default:
+                                failed()
+                                suspense = false;
+                                break;
+                        }
+
+                        const geraResultado = function(){
+                            $(obj).find("#result").text(data.result);
+                            switch(data.result){
+                            case 'Compilation error':
+                            case 'Runtime error':
+                                $(obj).find("#result").css('color','#aa0')
+                                break;
+                            case 'Error':
+                                $(obj).find("#result").css('color','#f00')
+                                break;
+                            case 'Wrong answer':
+                                $(obj).find("#result").css('color','#a00')
+                                break;
+                            case 'Time limit':
+                            case 'Memory limit':
+                                $(obj).find("#result").css('color','#00a')
+                                break;
+                            case 'Accepted':
+                                $(obj).find("#result").css('color','#0a0')
+                                confeti();
+                                break;
+                            default:
+                            }
+                        }
+                        const bateria = function(){
+                            const text = $(obj).find("#result").text();
+                            if(text.length<5){
+                                $(obj).find("#result").text(text+'🥁')
+                                setTimeout(bateria,800 + text.length * 100)
+                            }else{
+                                if(data.result!='Accepted'){
+                                    setTimeout(()=>failed(),400)
+                                }
+                                setTimeout(geraResultado,1000)
+                            }
+                        }
+
+                        
+                        if(suspense){
+                            $(obj).find("#result").text('');
+                            setTimeout(bateria,500)
+                        }else{
+                            geraResultado();
+                        }
+                    }
+                });
+            };
+            setTimeout(func,1000)
+        });
+    })
+</script>
 @endsection
