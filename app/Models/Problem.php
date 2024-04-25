@@ -13,14 +13,25 @@ class Problem extends Model
     public $guarded = [];
 
 
-    public function testCases(){
+    public function testCases()
+    {
         return $this->hasMany(TestCase::class);
     }
-    public function submissions(){
+    public function submissions()
+    {
         return $this->hasMany(SubmitRun::class);
     }
-    public function user(){
+    public function scorers()
+    {
+        return $this->hasMany(Scorer::class);
+    }
+    public function ranks($category = null)
+    {
+        if ($category != null) return $this->hasMany(Rank::class)->where('category', $category);
+        return $this->hasMany(Rank::class);
+    }
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
-
 }

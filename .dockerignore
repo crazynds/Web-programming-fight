@@ -5,7 +5,7 @@
 !/docker/start-container
 !/docker/supervisord.conf
 !/docker/php.ini
-!/docker/basic.conf
+!/docker/config/*
 !/docker/prod/supervisord.conf
 !/docker/prod/start.sh
 /stubs

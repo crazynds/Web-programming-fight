@@ -17,13 +17,13 @@ RUN apt-get update \
 
 RUN apt-get update \
     && apt-get install -y php8.2-cli php8.2-dev \
-       php8.2-gd \
-       php8.2-curl \
-       php8.2-imap php8.2-mysql php8.2-mbstring \
-       php8.2-zip \
-       php8.2-intl php8.2-readline \
-       php8.2-ldap \
-       php8.2-redis php8.2-swoole \
+    php8.2-gd \
+    php8.2-curl \
+    php8.2-imap php8.2-mysql php8.2-mbstring \
+    php8.2-zip \
+    php8.2-intl php8.2-readline \
+    php8.2-ldap \
+    php8.2-redis php8.2-swoole \
     && curl -sLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
 
 RUN apt-get update
@@ -80,7 +80,7 @@ RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN mkdir /var/nsjail
 RUN chmod 0777 /var/nsjail
-COPY ./docker/basic.conf /var/nsjail/basic.conf
+COPY ./docker/config/ /var/nsjail/
 
 ENTRYPOINT ["php", "/var/www/html/artisan", "queue:work", "--queue=high,contest,submit,low,rank","--sleep=2","--tries=1","--max-jobs=1000"]
 

@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Storage;
 
 class SubmitRunController extends Controller
 {
-    
+
     public function __construct()
     {
         $this->authorizeResource(SubmitRun::class, 'submitRun');
@@ -28,41 +28,41 @@ class SubmitRunController extends Controller
 
     public function global()
     {
-        $runs = SubmitRun::whereHas('problem',function($query){
-                // Hide not visible problems to global
-                $query->where('problems.visible',true);
+        $runs = SubmitRun::whereHas('problem', function ($query) {
+            // Hide not visible problems to global
+            $query->where('problems.visible', true);
+        })
+            ->with('user', function ($query) {
+                $query->select('id', 'name');
             })
-            ->with('user', function($query){
-                $query->select('id','name');
-            })
-            ->with('problem', function($query){
-                $query->select('id','title');
+            ->with('problem', function ($query) {
+                $query->select('id', 'title');
             })
             ->orderByDesc('id')->limit(100)->get();
 
 
-        return view('pages.run.index',[
+        return view('pages.run.index', [
             'submitRuns' => $runs,
-            'limit' => \Illuminate\Support\Facades\RateLimiter::remaining('resubmission:'.Auth::user()->id, 5)
+            'limit' => \Illuminate\Support\Facades\RateLimiter::remaining('resubmission:' . Auth::user()->id, 5)
         ]);
     }
-    
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('pages.run.index',[
+        return view('pages.run.index', [
             'submitRuns' => $this->user()
                 ->submissions()
-                ->with('user', function($query){
-                    $query->select('id','name');
+                ->with('user', function ($query) {
+                    $query->select('id', 'name');
                 })
-                ->with('problem', function($query){
-                    $query->select('id','title');
+                ->with('problem', function ($query) {
+                    $query->select('id', 'title');
                 })
-                ->orderBy('id','desc')->get(),
-            'limit' => \Illuminate\Support\Facades\RateLimiter::remaining('resubmission:'.Auth::user()->id, 5)
+                ->orderBy('id', 'desc')->get(),
+            'limit' => \Illuminate\Support\Facades\RateLimiter::remaining('resubmission:' . Auth::user()->id, 5)
         ]);
     }
 
@@ -73,12 +73,12 @@ class SubmitRunController extends Controller
     {
         /** @var $user */
         $user = Auth::user();
-        if($user->isAdmin()){
+        if ($user->isAdmin()) {
             $problems = Problem::all();
-        }else{
-            $problems = Problem::where('visible',true)->orWhere('user_id',$user->id)->get();
+        } else {
+            $problems = Problem::where('visible', true)->orWhere('user_id', $user->id)->get();
         }
-        return view('pages.run.create',[
+        return view('pages.run.create', [
             'problems' => $problems
         ]);
     }
@@ -89,17 +89,17 @@ class SubmitRunController extends Controller
     public function store(StoreSubmitRunRequest $request)
     {
         $user = Auth::user();
-        if (RateLimiter::tooManyAttempts('submission:'.$user->id, 30)) {
+        if (RateLimiter::tooManyAttempts('submission:' . $user->id, 30)) {
             return Redirect::back()->withErrors(['msg' => 'Too many attempts! Wait a moment and try again!']);
         }
         // 1 Hour
-        RateLimiter::hit('submission:'.$user->id, 60*60);
-        DB::transaction(function() use($request,$user){
-            
+        RateLimiter::hit('submission:' . $user->id, 60 * 60);
+        DB::transaction(function () use ($request, $user) {
+
             $originalFile = $request->file('code');
 
             // 4 MB
-            if($originalFile->getSize()>1024*1024*4){
+            if ($originalFile->getSize() > 1024 * 1024 * 4) {
                 $run = new SubmitRun();
                 $run->language = $request->input('lang');
                 $run->problem()->associate(Problem::find($request->problem));
@@ -107,9 +107,9 @@ class SubmitRunController extends Controller
                 $run->status = SubmitStatus::Judged;
                 $run->result = SubmitResult::FileTooLarge;
                 $run->save();
-            }else{
-                $file = File::createFile($originalFile,'users/'.$user->id."/attempts".'/'.$request->problem);    
-    
+            } else {
+                $file = File::createFile($originalFile, 'users/' . $user->id . "/attempts" . '/' . $request->problem);
+
                 $run = new SubmitRun();
                 $run->language = $request->input('lang');
                 $run->problem()->associate(Problem::find($request->problem));
@@ -117,27 +117,29 @@ class SubmitRunController extends Controller
                 $run->user()->associate($user);
                 $run->status = SubmitStatus::WaitingInLine;
                 $run->save();
-                
+
                 ExecuteSubmitJob::dispatch($run)->onQueue('submit')->afterCommit();
             }
         });
         return redirect()->route('submitRun.index');
     }
-    
+
     public function download(SubmitRun $submitRun)
     {
         $this->authorize('view', $submitRun);
-        return $submitRun->file->download('#'.$submitRun->id.'_'.Str::slug($submitRun->problem->title).'.'.$submitRun->file->type);
+        return $submitRun->file->download('#' . $submitRun->id . '_' . Str::slug($submitRun->problem->title) . '.' . $submitRun->file->type);
     }
 
-    public function getCode(SubmitRun $submitRun){
+    public function getCode(SubmitRun $submitRun)
+    {
         $this->authorize('view', $submitRun);
         return response()->json([
             'code' => $submitRun->file->get()
         ]);
     }
 
-    public function result(SubmitRun $submitRun){
+    public function result(SubmitRun $submitRun)
+    {
         $this->authorize('view', $submitRun);
         return new SubmitRunResultResource($submitRun);
     }
@@ -147,14 +149,14 @@ class SubmitRunController extends Controller
         $this->authorize('update', $submitRun);
         /** @var User */
         $user = Auth::user();
-        if (RateLimiter::tooManyAttempts('resubmission:'.$user->id, 5)) {
+        if (RateLimiter::tooManyAttempts('resubmission:' . $user->id, 5)) {
             return Redirect::back()->withErrors(['msg' => 'Too many attempts! Wait a moment and try again!']);
         }
         // 10 minutes
-        if(!$user->isAdmin())
-            RateLimiter::hit('resubmission:'.$user->id,60*10);
-        
-        if(SubmitResult::fromValue(SubmitResult::NoResult)->description != $submitRun->result){
+        if (!$user->isAdmin())
+            RateLimiter::hit('resubmission:' . $user->id, 60 * 10);
+
+        if (SubmitStatus::fromValue(SubmitStatus::Judged)->description == $submitRun->status || SubmitStatus::fromValue(SubmitStatus::Error)->description == $submitRun->status) {
             $submitRun->status = SubmitStatus::WaitingInLine;
             $submitRun->result = SubmitResult::NoResult;
             $submitRun->save();
@@ -165,10 +167,9 @@ class SubmitRunController extends Controller
 
     public function show(SubmitRun $submitRun)
     {
-        return view('pages.run.show',[
+        return view('pages.run.show', [
             'submitRun' => $submitRun,
             'output' => $submitRun->output
         ]);
     }
-
 }

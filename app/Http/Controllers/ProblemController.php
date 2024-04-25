@@ -16,15 +16,16 @@ class ProblemController extends Controller
         $this->authorizeResource(Problem::class, 'problem');
     }
 
-    public function publicChange(Problem $problem){
+    public function publicChange(Problem $problem)
+    {
         $this->authorize('update', $problem);
         $MINIMUN = 5;
-        if($problem->testCases()->where('validated',true)->count() < $MINIMUN){        
+        if ($problem->testCases()->where('validated', true)->count() < $MINIMUN) {
             $problem->visible = false;
             $problem->save();
-            return redirect()->route('problem.testCase.index',[
+            return redirect()->route('problem.testCase.index', [
                 'problem' => $problem->id
-            ])->withErrors(['msg' => 'To enable a problem, you need to validate at least '.$MINIMUN.' test cases']);
+            ])->withErrors(['msg' => 'To enable a problem, you need to validate at least ' . $MINIMUN . ' test cases']);
         }
         $problem->visible = !$problem->visible;
         $problem->save();
@@ -38,24 +39,25 @@ class ProblemController extends Controller
     public function index()
     {
         $problems = Problem::withCount([
-                'submissions',
-                'submissions as accepted_submissions' => function($query){
-                    $query->where('submit_runs.result','=',SubmitResult::Accepted);
-                },
-                'submissions as my_accepted_submissions' => function($query){
-                    $query->where('submit_runs.result','=',SubmitResult::Accepted)
-                        ->where('submit_runs.user_id','=',Auth::user()->id);
-                },
-            ])
-            ->where(function($query){
+            'submissions',
+            'submissions as accepted_submissions' => function ($query) {
+                $query->where('submit_runs.result', '=', SubmitResult::Accepted);
+            },
+            'submissions as my_accepted_submissions' => function ($query) {
+                $query->where('submit_runs.result', '=', SubmitResult::Accepted)
+                    ->where('submit_runs.user_id', '=', Auth::user()->id);
+            },
+            'ranks'
+        ])
+            ->where(function ($query) {
                 /** @var User */
                 $user = Auth::user();
-                if(!$user->isAdmin())
-                    $query->where('user_id',$user->id)
-                        ->orWhere('visible',true);
+                if (!$user->isAdmin())
+                    $query->where('user_id', $user->id)
+                        ->orWhere('visible', true);
             })
             ->orderBy('id')->get();
-        return view('pages.problem.index',[
+        return view('pages.problem.index', [
             'problems' => $problems,
         ]);
     }
@@ -65,7 +67,7 @@ class ProblemController extends Controller
      */
     public function create()
     {
-        return view('pages.problem.create')->with('problem',new Problem());
+        return view('pages.problem.create')->with('problem', new Problem());
     }
 
     /**
@@ -75,22 +77,33 @@ class ProblemController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
-        $data =$request->safe([
-            'title','author','time_limit','memory_limit','description','input_description','output_description'
+        $data = $request->safe([
+            'title', 'author', 'time_limit', 'memory_limit', 'description', 'input_description', 'output_description'
         ]);
         $problem = $user->problems()->create($data);
 
-        return redirect()->route('problem.show',['problem' => $problem->id]);
+        return redirect()->route('problem.show', ['problem' => $problem->id]);
     }
+
+
+    public function podium(Problem $problem)
+    {
+        $categories = $problem->ranks()->pluck("category")->unique();
+        return view('pages.problem.podium', [
+            'problem' => $problem,
+            'categories' => $categories
+        ]);
+    }
+
 
     /**
      * Display the specified resource.
      */
     public function show(Problem $problem)
     {
-        return view('pages.problem.show',[
+        return view('pages.problem.show', [
             'problem' => $problem,
-            'testCases' => $problem->testCases()->orderBy('position')->where('public',true)->where('validated',true)->get()
+            'testCases' => $problem->testCases()->orderBy('position')->where('public', true)->where('validated', true)->get()
         ]);
     }
 
@@ -99,7 +112,7 @@ class ProblemController extends Controller
      */
     public function edit(Problem $problem)
     {
-        return view('pages.problem.create')->with('problem',$problem);
+        return view('pages.problem.create')->with('problem', $problem);
     }
 
     /**
@@ -108,10 +121,10 @@ class ProblemController extends Controller
     public function update(StoreProblemRequest $request, Problem $problem)
     {
         $problem->update($request->safe([
-            'title','author','time_limit','memory_limit','description','input_description','output_description'
+            'title', 'author', 'time_limit', 'memory_limit', 'description', 'input_description', 'output_description'
         ]));
 
-        return redirect()->route('problem.show',['problem' => $problem->id]);
+        return redirect()->route('problem.show', ['problem' => $problem->id]);
     }
 
     /**
@@ -122,15 +135,16 @@ class ProblemController extends Controller
         $problem->delete();
         return $this->index();
     }
-    
-    public function download(Problem $problem){
+
+    public function download(Problem $problem)
+    {
         $this->authorize('update', $problem);
 
         $zip = new ZipArchive();
-        $zipFileName = 'problem_'.$problem->id.'.zip';
+        $zipFileName = 'problem_' . $problem->id . '.zip';
 
         if ($zip->open(public_path($zipFileName), ZipArchive::CREATE) === TRUE) {
-            
+
             $zip->addEmptyDir('input');
             $zip->addEmptyDir('output');
 
@@ -151,14 +165,14 @@ class ProblemController extends Controller
 
 {$output_description}";
 
-            $zip->addFromString('README.md',$markdown);
+            $zip->addFromString('README.md', $markdown);
 
-            foreach($problem->testCases()->with(['inputfile','outputfile'])->lazy() as $testCase){
+            foreach ($problem->testCases()->with(['inputfile', 'outputfile'])->lazy() as $testCase) {
                 $inFile = $testCase->inputFile;
                 $outFile = $testCase->outputFile;
-                
-                $zip->addFromString('input/'.$testCase->name,$inFile->get());
-                $zip->addFromString('output/'.$testCase->name,$outFile->get());
+
+                $zip->addFromString('input/' . $testCase->name, $inFile->get());
+                $zip->addFromString('output/' . $testCase->name, $outFile->get());
             }
 
             $zip->close();

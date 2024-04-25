@@ -22,21 +22,21 @@ class StoreTestCaseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'input' =>[
+            'input' => [
                 'array'
             ],
-            'output' =>[
+            'output' => [
                 'array'
             ],
             'input[]' => [
                 'file',
                 // 100 MB
-                'size:102400',
+                'max:102400',
             ],
             'output[]' => [
                 'file',
                 // 100 MB
-                'size:102400',
+                'max:102400',
             ],
             recaptchaFieldName() => recaptchaRuleName()
         ];
