@@ -225,6 +225,11 @@
             aria-hidden="true">
             <div class="modal-dialog" role="document" style="max-width:80%">
                 <div class="modal-content" style="padding: 10px;">
+                    <div style="margin-bottom: 4px">
+                        <button style="float:right" type="button" class="copy" aria-label="copy" onclick="copyCode()">
+                            Copy
+                        </button>
+                    </div>
                     <pre id="code" style="border: 1px black solid">Código na linguagem</pre>
                 </div>
             </div>
@@ -232,6 +237,14 @@
     @endsection
     @section('script')
         <script>
+            const copyCode = function() {
+                var range = document.createRange();
+                range.selectNode(document.getElementById("code"));
+                window.getSelection().removeAllRanges(); // clear current selection
+                window.getSelection().addRange(range); // to select text
+                document.execCommand("copy");
+            }
+
             function failed() {
                 var scalar = 12;
                 var sadFace = confetti.shapeFromText({
@@ -356,8 +369,8 @@
 
                 openModal = function(id) {
                     var url = '{{ route('api.submitRun.code', ['submitRun' => -1]) }}'.replace('-1', id)
-                    $('.codeModal').modal("show")
-                    $('.codeModal').find('#code').html(`
+                    $('#codeModal').modal("show")
+                    $('#codeModal').find('#code').html(`
                 <div class="d-flex justify-content-center">
                     <div class="spinner-grow" role="status">
                         <span class="sr-only">Loading...</span>
@@ -366,7 +379,7 @@
             `)
                     $.get(url, function(data) {
                         if (data.code)
-                            $('.codeModal').find('#code').text(data.code)
+                            $('#codeModal').find('#code').text(data.code)
                     });
                 }
                 $('.notJudged').each(function(_, obj) {
