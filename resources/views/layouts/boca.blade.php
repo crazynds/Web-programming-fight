@@ -30,6 +30,7 @@
             margin-bottom: -10px;
         }
     </style>
+    @livewireStyles
     @yield('head')
 </head>
 
@@ -48,17 +49,21 @@
                     <a href="{{ route('submitRun.index') }}">Runs</a> |
                     {{-- <a href="./Statistics.html">Ranking</a> | --}}
                     <div class="dropdown me-2" style="float:right">
-                        <a class="dropdown-toggle" type="button" id="dropdown-headbar"
-                            data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="dropdown-toggle" type="button" id="dropdown-headbar" data-bs-toggle="dropdown"
+                            aria-expanded="false">
                             Options
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="dropdown-headbar">
                             <li><a class="dropdown-item" href="{{ route('user.index') }}">Users</a></li>
                             <li><a class="dropdown-item" href="{{ route('team.index') }}">Teams</a></li>
                             <li><a class="dropdown-item" href="#">Contests</a></li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li><a class="dropdown-item" href="{{ route('submitRun.global') }}">Global Runs</a></li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li><a class="dropdown-item" href="#">FAQ</a></li>
                             <li><a class="dropdown-item" href="#">About</a></li>
 
@@ -88,7 +93,7 @@
         <br>
         @yield('content')
     </div>
-
+    @livewireScripts
     @yield('script')
 </body>
 

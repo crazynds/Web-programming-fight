@@ -15,6 +15,7 @@
         "laravel/tinker": "^2.8",
         "league/flysystem-aws-s3-v3": "^3.0",
         "league/flysystem-ziparchive": "^3.16",
+        "livewire/livewire": "^3.4",
         "sysatom/php-bloom-filter": "^1.0"
     },
     "require-dev": {

@@ -52,18 +52,7 @@ class SubmitRunController extends Controller
      */
     public function index()
     {
-        return view('pages.run.index', [
-            'submitRuns' => $this->user()
-                ->submissions()
-                ->with('user', function ($query) {
-                    $query->select('id', 'name');
-                })
-                ->with('problem', function ($query) {
-                    $query->select('id', 'title');
-                })
-                ->orderBy('id', 'desc')->get(),
-            'limit' => \Illuminate\Support\Facades\RateLimiter::remaining('resubmission:' . Auth::user()->id, 5)
-        ]);
+        return view('pages.run.index');
     }
 
     /**
