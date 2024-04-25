@@ -62,6 +62,6 @@
         </div>
     @endif
 
-    <livewire:runs-table-component :global="false" />
+    <livewire:runs-table-component :global="$global" />
 
 @endsection

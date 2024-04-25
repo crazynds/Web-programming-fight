@@ -28,22 +28,8 @@ class SubmitRunController extends Controller
 
     public function global()
     {
-        $runs = SubmitRun::whereHas('problem', function ($query) {
-            // Hide not visible problems to global
-            $query->where('problems.visible', true);
-        })
-            ->with('user', function ($query) {
-                $query->select('id', 'name');
-            })
-            ->with('problem', function ($query) {
-                $query->select('id', 'title');
-            })
-            ->orderByDesc('id')->limit(100)->get();
-
-
         return view('pages.run.index', [
-            'submitRuns' => $runs,
-            'limit' => \Illuminate\Support\Facades\RateLimiter::remaining('resubmission:' . Auth::user()->id, 5)
+            'global' => true,
         ]);
     }
 
@@ -52,7 +38,9 @@ class SubmitRunController extends Controller
      */
     public function index()
     {
-        return view('pages.run.index');
+        return view('pages.run.index', [
+            'global' => false,
+        ]);
     }
 
     /**
