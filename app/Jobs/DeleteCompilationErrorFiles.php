@@ -11,7 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class DeleteUnnecessaryFiles implements ShouldQueue
+class DeleteCompilationErrorFiles implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -28,10 +28,9 @@ class DeleteUnnecessaryFiles implements ShouldQueue
      */
     public function handle(): void
     {
-        foreach(SubmitRun::where('result',SubmitResult::CompilationError)->whereNotNull('file')->with('file')->lazy() as $run){
+        foreach (SubmitRun::where('result', SubmitResult::CompilationError)->whereNotNull('file_id')->with('file')->lazy() as $run) {
             $file = $run->file;
             $run->file_id = null;
-            dd($file);
             $run->save();
             $file->delete();
         }

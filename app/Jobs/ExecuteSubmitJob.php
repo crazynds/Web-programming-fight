@@ -106,6 +106,8 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
                         $num += 1;
                         $testCase->validated = true;
                         $testCase->save();
+                        // Dispatch Job to check submissions
+                        CheckSubmissionsOnProblem::dispatch($this->submit->problem)->afterResponse();
                     }
                 }
             } catch (LockTimeoutException $e) {

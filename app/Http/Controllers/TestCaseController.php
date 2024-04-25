@@ -7,6 +7,7 @@ use App\Enums\SubmitStatus;
 use App\Enums\TestCaseType;
 use App\Http\Requests\StoreTestCaseRequest;
 use App\Http\Requests\UpdateTestCaseRequest;
+use App\Jobs\CheckSubmissionsOnProblem;
 use App\Jobs\ExecuteSubmitJob;
 use App\Models\File;
 use App\Models\Problem;
@@ -173,6 +174,7 @@ class TestCaseController extends Controller
                 }
             }
         });
+        CheckSubmissionsOnProblem::dispatch($problem)->afterResponse();
         foreach (File::whereIn('id', $filesToDelete)->lazy() as $file) {
             $file->delete();
         }
@@ -197,6 +199,9 @@ class TestCaseController extends Controller
                 ->where('position', '>', $testCase->position)
                 ->decrement('position');
         });
+
+        // Dispatch Job to check submissions
+        CheckSubmissionsOnProblem::dispatch($problem)->afterResponse();
         return redirect()->route('problem.testCase.index', ['problem' => $problem->id]);
     }
 }
