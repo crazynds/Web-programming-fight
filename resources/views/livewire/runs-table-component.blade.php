@@ -40,7 +40,7 @@
                         {{ $submitRun->user->name }}
                     </td>
                     <td class="px-1">
-                        <a href="{{ route('problem.show', ['problem' => $submitRun->problem->id]) }}">
+                        <a href="{{ route('problem.show', ['problem' => $submitRun->problem->id], false) }}">
                             {{ $submitRun->problem->title }}
                         </a>
                     </td>
@@ -137,7 +137,7 @@
                             @if ($submitRun->status == 'Judged' || $submitRun->status == 'Error')
                                 @if ($submitRun->can_update)
                                     @if ($limit && $submitRun->status != 'Compilation error')
-                                        <a href="{{ route('submitRun.rejudge', ['submitRun' => $submitRun->id]) }}"
+                                        <a href="{{ route('submitRun.rejudge', ['submitRun' => $submitRun->id], false) }}"
                                             class="d-flex action-btn">
                                             <i class="las la-redo-alt"></i>
                                         </a>
@@ -145,7 +145,7 @@
                                 @endif
                                 @if ($submitRun->can_view)
                                     @if (isset($submitRun->output))
-                                        <a href="{{ route('submitRun.show', ['submitRun' => $submitRun->id]) }}"
+                                        <a href="{{ route('submitRun.show', ['submitRun' => $submitRun->id], false) }}"
                                             class="d-flex action-btn">
                                             <i class="las la-poll-h"></i>
                                         </a>
@@ -155,7 +155,7 @@
                             @if ($submitRun->can_view)
                                 @if ($submitRun->file_id != null)
                                     <a target="_blank"
-                                        href="{{ route('submitRun.download', ['submitRun' => $submitRun->id]) }}"
+                                        href="{{ route('submitRun.download', ['submitRun' => $submitRun->id], false) }}"
                                         class="d-flex action-btn">
                                         <i class="las la-file-download"></i>
                                     </a>
