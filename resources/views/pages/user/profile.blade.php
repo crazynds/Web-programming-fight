@@ -18,9 +18,21 @@
                     <div class="mt-3 mb-4">
                         <img src="{{ $user->avatar }}" class="rounded-circle img-fluid" style="width: 100px;" />
                     </div>
-                    <h4 class="mb-2">{{ $user->name }}</h4>
-                    <p class="text-muted mb-4">@Github <span class="mx-2">|</span> <a
-                            href="mailto:{{ $user->email }}">{{ $user->email }}</a></p>
+                    <h4 class="mb-2">
+                        {{ $user->name }}
+                    </h4>
+                    </a>
+
+
+                    <p class="text-muted mb-4">
+                        @if ($user->url != null)
+                            <a href="{{ $user->url }}" target="_blank">
+                                @Github</a>
+                            <span class="mx-2">|</span>
+                        @endif
+
+                        <a href="mailto:{{ $user->email }}">{{ $user->email }}</a>
+                    </p>
                     <div class="d-flex justify-content-between text-center mt-5 mb-2">
                         <div>
                             <p class="mb-2 h5">{{ $problems_count }}</p>
