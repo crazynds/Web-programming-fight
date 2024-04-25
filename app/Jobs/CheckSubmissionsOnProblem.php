@@ -11,7 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class CheckProblemTestCasesAndSubmits implements ShouldQueue,ShouldBeUnique
+class CheckSubmissionsOnProblem implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -20,7 +20,8 @@ class CheckProblemTestCasesAndSubmits implements ShouldQueue,ShouldBeUnique
      */
     public function __construct(
         public Problem $problem
-    ){
+    ) {
+        $this->onQueue('low')->delay(now()->addMinutes(60));
         //
     }
 
@@ -34,9 +35,9 @@ class CheckProblemTestCasesAndSubmits implements ShouldQueue,ShouldBeUnique
      */
     public function handle(): void
     {
-        $testCases_count = $this->problem->testCases()->where('validated',true)->count();
-        foreach($this->problem->submissions()->where('result',SubmitResult::Accepted)->where('num_test_cases','!=',$testCases_count)->lazy() as $run){
-            // Para cada submição que deu accepted
+        $testCases_count = $this->problem->testCases()->where('validated', true)->count();
+        foreach ($this->problem->submissions()->where('result', SubmitResult::Accepted)->where('num_test_cases', '!=', $testCases_count)->lazy() as $run) {
+            // Para cada submição que deu accepted mas não bate o número de testes passados com a quantidade de testes validados
             ExecuteSubmitJob::dispatch($run)->onQueue('submit');
         }
     }
