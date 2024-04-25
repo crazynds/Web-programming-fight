@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('submit_runs', function (Blueprint $table) {
-            $table->dropColumn(["execution_time","execution_memory"]);
+            $table->dropColumn(["execution_time", "execution_memory"]);
         });
     }
 };

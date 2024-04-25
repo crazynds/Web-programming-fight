@@ -1,7 +1,7 @@
 @extends('layouts.boca')
 
 @section('head')
-{!! htmlScriptTagJsApi() !!}
+    {!! htmlScriptTagJsApi() !!}
 @endsection
 
 
@@ -14,11 +14,12 @@
             </b>
         </div>
         <div class="col text-end">
-            <a href="{{route('problem.testCase.index',['problem' => $problem->id ])}}">Go Back</a>
+            <a href="{{ route('problem.testCase.index', ['problem' => $problem->id]) }}">Go Back</a>
         </div>
     </div>
 
-    <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data" action="{{route('problem.testCase.store',['problem'=>$problem->id])}}" id="form">
+    <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data"
+        action="{{ route('problem.testCase.store', ['problem' => $problem->id]) }}" id="form">
         @csrf
 
         <div class="row">
@@ -60,40 +61,40 @@
         </div>
 
         <p class="mt-3">
-           {!! htmlFormButton('Submit', [
-            'class' => "btn btn-primary"
-           ]) !!}
+            {!! htmlFormButton('Submit', [
+                'class' => 'btn btn-primary',
+            ]) !!}
         </p>
     </form>
 @endsection
 
 @section('script')
-<script>
-window.addEventListener("load",function(){
-    const preview = function(input, append) {
+    <script>
+        window.addEventListener("load", function() {
+            const preview = function(input, append) {
 
-        $(append).html('');
-        if (input.files) {
-            const files = []
-            for (i = 0; i < input.files.length; i++) {
-                files.push(input.files.item(i).name)
-            }
-            files.sort();
-            for (i = 0; i < files.length; i++) {
-                $(append).append(
-                    '<li class="list-group-item py-1">'+files[i]+'</li>'
-                );
-            }
-        }
-        };
+                $(append).html('');
+                if (input.files) {
+                    const files = []
+                    for (i = 0; i < input.files.length; i++) {
+                        files.push(input.files.item(i).name)
+                    }
+                    files.sort();
+                    for (i = 0; i < files.length; i++) {
+                        $(append).append(
+                            '<li class="list-group-item py-1">' + files[i] + '</li>'
+                        );
+                    }
+                }
+            };
 
-        $('#files1').on('change', function(e) {
-            preview(this, '.input-preview');
-        });
-        $('#files2').on('change', function(e) {
-            preview(this, '.output-preview');
-        });
+            $('#files1').on('change', function(e) {
+                preview(this, '.input-preview');
+            });
+            $('#files2').on('change', function(e) {
+                preview(this, '.output-preview');
+            });
 
-})
-</script>
+        })
+    </script>
 @endsection

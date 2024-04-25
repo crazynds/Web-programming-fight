@@ -30,23 +30,6 @@ services:
             - redis
             - minio
 
-    scheduler:
-        build:
-            context: .
-            dockerfile: ./docker/Dockerfile
-            target: php_schedule
-            args:
-                WWWGROUP: '${WWWGROUP}'
-        restart: unless-stopped
-        volumes_from:
-            - laravel.test
-        networks:
-            - sail
-        depends_on:
-            - mysql
-            - redis
-            - minio
-
     worker:
         build:
             context: .
