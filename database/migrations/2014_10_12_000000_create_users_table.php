@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('provider_id');
 
             $table->index(['provider_id']);
-            
-            $table->unique(['name','email']);
+
+            $table->unique(['name', 'email']);
             $table->rememberToken();
             $table->timestamps();
         });
