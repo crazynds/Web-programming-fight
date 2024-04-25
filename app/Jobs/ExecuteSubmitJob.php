@@ -9,6 +9,7 @@ use App\Models\SubmitRun;
 use App\Models\TestCase;
 use App\Services\ExecutorService;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -89,19 +90,28 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
                 break;
             }
         }
-        if ($this->submit->result == 'Accepted' || $testCases->count() == 0) {
-
+        if (($this->submit->result == 'Accepted' || $testCases->count() == 0) &&
+            $this->submit->problem->testCases()->where('validated', '=', false)->exists()
+        ) {
             // Tenta validar os casos de testes não validados até então...
-            foreach ($this->submit->problem->testCases()->where('validated', '=', false)->with(['inputfile', 'outputfile'])->get() as $testCase) {
-                $result = $this->executeTestCase($executor, $testCase);
-                $testCasesRel[$testCase->id] = [
-                    'result' => $result
-                ];
-                if ($result == SubmitResult::Accepted) {
-                    $num += 1;
-                    $testCase->validated = true;
-                    $testCase->save();
+            try {
+                $lock = Cache::lock('validate-testcases-' . $this->submit->problem->id, 60);
+                $lock->block(5);
+                foreach ($this->submit->problem->testCases()->where('validated', '=', false)->with(['inputfile', 'outputfile'])->get() as $testCase) {
+                    $result = $this->executeTestCase($executor, $testCase);
+                    $testCasesRel[$testCase->id] = [
+                        'result' => $result
+                    ];
+                    if ($result == SubmitResult::Accepted) {
+                        $num += 1;
+                        $testCase->validated = true;
+                        $testCase->save();
+                    }
                 }
+            } catch (LockTimeoutException $e) {
+                // Unable to acquire lock...
+            } finally {
+                $lock?->release();
             }
             if ($num > 0)
                 $this->submit->result = SubmitResult::Accepted;
