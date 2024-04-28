@@ -18,7 +18,11 @@ class SubmitRunResultResource extends JsonResource
             'result' => $this->result,
             'status' => $this->status,
             'testCases' => $this->num_test_cases + 1,
-            'suspense' => $this->when($this->status=='Judged',($this->num_test_cases + 1) / ($this->problem->testCases()->count()+1)),
+            'suspense' => $this->when($this->status == 'Judged', ($this->num_test_cases + 1) / ($this->problem->testCases()->count() + 1)),
+            'execution' => [
+                'time' => $this->execution_time,
+                'memory' => $this->execution_memory
+            ],
         ];
     }
 }

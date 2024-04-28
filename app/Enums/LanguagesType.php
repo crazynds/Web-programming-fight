@@ -30,8 +30,8 @@ final class LanguagesType extends Enum
         // 1 => memory
         return [
             'C++' => [1, 1],
-            'PyPy3.10' => [1.8, 2], // 2x more time for python and 2 x more memory
-            'Python3.11' => [1.8, 2], // 2x more time for python and 2 x more memory
+            'PyPy3.10' => [1.2, 2], // 1.2 more time for pypy and 2 x more memory
+            'Python3.11' => [1.5, 2], // 1.5x more time for python and 2 x more memory
         ];
     }
 
