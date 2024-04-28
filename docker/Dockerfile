@@ -63,7 +63,6 @@ RUN chmod +x /usr/local/bin/start-container
 
 ENTRYPOINT [ "start-container" ]
 
-
 FROM php_base AS php_worker
 
 RUN apt-get install -y \

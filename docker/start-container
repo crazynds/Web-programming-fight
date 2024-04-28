@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo '!Starting container!'
+
 if [ ! -z "$WWWUSER" ]; then
     usermod -u $WWWUSER sail
 fi
@@ -10,11 +12,13 @@ fi
 
 chmod -R ugo+rw /.composer
 
-
+echo '!Copping vendor!'
 git config --global --add safe.directory /var/www/html
 cd /var/www/html
 cp /var/www/vendor/* /var/www/html/vendor -R
 
+
+echo '!Starting container!'
 if [ $# -gt 0 ]; then
     exec gosu $WWWUSER "$@"
 else

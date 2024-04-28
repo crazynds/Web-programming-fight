@@ -10,7 +10,9 @@
         "@types/bootstrap": "^5.2.9",
         "axios": "^1.1.2",
         "bootstrap": "^5.2.3",
+        "laravel-echo": "^1.16.1",
         "laravel-vite-plugin": "^1.0",
+        "pusher-js": "^8.4.0-rc2",
         "sass": "^1.56.1",
         "vite": "^5.0.0"
     },
