@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
+use App\Events\NewSubmission;
+use App\Events\NewSubmissionEvent;
 use App\Http\Requests\StoreSubmitRunRequest;
 use App\Http\Resources\SubmitRunResultResource;
 use App\Jobs\ExecuteSubmitJob;
@@ -71,7 +73,7 @@ class SubmitRunController extends Controller
         }
         // 1 Hour
         RateLimiter::hit('submission:' . $user->id, 60 * 60);
-        DB::transaction(function () use ($request, $user) {
+        $run = DB::transaction(function () use ($request, $user) {
 
             $originalFile = $request->file('code');
 
@@ -94,10 +96,13 @@ class SubmitRunController extends Controller
                 $run->user()->associate($user);
                 $run->status = SubmitStatus::WaitingInLine;
                 $run->save();
-
                 ExecuteSubmitJob::dispatch($run)->onQueue('submit')->afterCommit();
             }
+            return $run;
         });
+        // Dispatch event
+        NewSubmissionEvent::dispatch($run);
+
         return redirect()->route('submitRun.index');
     }
 
@@ -124,6 +129,8 @@ class SubmitRunController extends Controller
     public function rejudge(SubmitRun $submitRun)
     {
         $this->authorize('update', $submitRun);
+        NewSubmissionEvent::dispatch($submitRun);
+        return redirect()->back();
         /** @var User */
         $user = Auth::user();
         if (RateLimiter::tooManyAttempts('resubmission:' . $user->id, 5)) {
@@ -139,6 +146,7 @@ class SubmitRunController extends Controller
             $submitRun->save();
             ExecuteSubmitJob::dispatch($submitRun)->onQueue('submit')->afterCommit();
         }
+        broadcast(new NewSubmissionEvent($submitRun));
         return redirect()->back();
     }
 

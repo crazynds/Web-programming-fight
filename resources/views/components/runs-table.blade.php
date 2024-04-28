@@ -424,5 +424,10 @@
             };
             setTimeout(func, 1000)
         });
+        window.Echo.channel('submissions')
+            .listenToAll((event, data) => {
+                // do what you need to do based on the event name and data
+                console.log(event, data)
+            })
     })
 </script>
