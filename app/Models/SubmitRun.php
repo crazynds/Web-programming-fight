@@ -23,6 +23,12 @@ class SubmitRun extends Model
             get: fn (string $value) => LanguagesType::name(intval($value)),
         );
     }
+    protected function languageRaw(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($vl, $attributes) => intval($attributes['language']),
+        );
+    }
     protected function status(): Attribute
     {
         return Attribute::make(
@@ -34,9 +40,9 @@ class SubmitRun extends Model
         return Attribute::make(
             set: function (?string $value) {
                 $limit = 1024 * 4;
-                $value = (isset($value) && strlen($value) > $limit) ? substr($value,0,$limit).'(...)' : $value;
-                if(is_string($value)){
-                    $value = mb_convert_encoding($value,"UTF-8");
+                $value = (isset($value) && strlen($value) > $limit) ? substr($value, 0, $limit) . '(...)' : $value;
+                if (is_string($value)) {
+                    $value = mb_convert_encoding($value, "UTF-8");
                 }
                 return $value;
             },
@@ -50,20 +56,23 @@ class SubmitRun extends Model
         );
     }
 
-    public function problem(){
-        return $this->belongsTo(Problem::class);
+    public function problem()
+    {
+        return $this->belongsTo(Problem::class)->withTrashed();
     }
 
-    public function file(){
+    public function file()
+    {
         return $this->belongsTo(File::class);
     }
 
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function testCases(){
+    public function testCases()
+    {
         return $this->belongsToMany(TestCase::class);
     }
-
 }

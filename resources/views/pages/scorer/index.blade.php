@@ -17,6 +17,10 @@
             <a style="float:right" href="{{ route('problem.scorer.create', ['problem' => $problem->id]) }}">
                 <button>New +</button>
             </a>
+            <a style="float:right; margin-right: 10px;"
+                href="{{ route('problem.scorer.reavaliate', ['problem' => $problem->id]) }}">
+                <button>Reavaliate All Scorers</button>
+            </a>
         </div>
     </div>
 
@@ -59,8 +63,6 @@
                     </td>
                     <td class="px-2">
                         <div class="hstack gap-1">
-                            Recalc
-                            <div class="vr"></div>
                             <form
                                 action="{{ route('problem.scorer.destroy', ['problem' => $problem->id, 'scorer' => $scorer->id]) }}"
                                 method="POST">

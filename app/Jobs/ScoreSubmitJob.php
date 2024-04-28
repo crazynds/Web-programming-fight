@@ -50,15 +50,29 @@ class ScoreSubmitJob implements ShouldQueue, ShouldBeUnique
                 $result = $executor->executeScorer($scorer);
                 if ($result) {
                     $categories = null;
-                    foreach ($result as $category => $value) {
+                    //dump($result);
+                    foreach ($result as $category => $arr) {
+                        $value = $arr['value'];
+                        $reference = $arr['reference'];
                         if ($categories == null) $categories = $category;
                         else $categories .= ", " . $category;
-                        Rank::upsert([
+                        $rank = Rank::firstOrCreate([
                             'problem_id' => $problem->id,
-                            'submit_run_id' => $this->submit->id,
+                            'user_id' => $this->submit->user_id,
                             'category' => $category,
+                            'language' => $this->submit->languageRaw,
+                            'scorer_id' => $scorer->id,
+                        ], [
+                            'submit_run_id' => $this->submit->id,
                             'value' => $value,
-                        ], uniqueBy: ['problem_id', 'category', 'submit_run_id'], update: ['value']);
+                            'reference' => $reference,
+                        ]);
+                        if ($rank->value < $value) {
+                            $rank->value = $value;
+                            $rank->submit_run_id = $this->submit->id;
+                            $rank->reference = $reference;
+                            $rank->save();
+                        }
                     }
                     if (strlen($scorer->categories) < strlen($categories)) {
                         $scorer->categories = $categories;

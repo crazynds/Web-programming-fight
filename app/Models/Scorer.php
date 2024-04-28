@@ -19,6 +19,11 @@ class Scorer extends Model
             get: fn (string $value) => LanguagesType::name(intval($value)),
         );
     }
+    public function input()
+    {
+        return $this->belongsTo(File::class, 'input_id');
+    }
+
 
     public function file()
     {

@@ -36,17 +36,20 @@ class ProblemObserver
     {
         //
     }
-    
+
     /**
      * Handle the SubmitRun "force deleted" event.
      */
     public function forceDeleting(Problem $problem): void
     {
-        foreach($problem->submissions()->lazy() as $submit){
+        foreach ($problem->submissions()->lazy() as $submit) {
             $submit->delete();
         }
-        foreach($problem->testCases()->lazy() as $testCase){
+        foreach ($problem->testCases()->lazy() as $testCase) {
             $testCase->delete();
+        }
+        foreach ($problem->scorers()->lazy() as $scorer) {
+            $scorer->delete();
         }
     }
 }

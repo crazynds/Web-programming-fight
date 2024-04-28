@@ -87,6 +87,7 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
                 'result' => $result
             ];
             $this->submit->result = $result;
+            dump($this->submit->result);
             if ($result == SubmitResult::Accepted) {
                 $num += 1;
             } else {
