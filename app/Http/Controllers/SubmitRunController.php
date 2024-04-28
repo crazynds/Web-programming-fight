@@ -129,8 +129,6 @@ class SubmitRunController extends Controller
     public function rejudge(SubmitRun $submitRun)
     {
         $this->authorize('update', $submitRun);
-        NewSubmissionEvent::dispatch($submitRun);
-        return redirect()->back();
         /** @var User */
         $user = Auth::user();
         if (RateLimiter::tooManyAttempts('resubmission:' . $user->id, 5)) {
@@ -146,7 +144,6 @@ class SubmitRunController extends Controller
             $submitRun->save();
             ExecuteSubmitJob::dispatch($submitRun)->onQueue('submit')->afterCommit();
         }
-        broadcast(new NewSubmissionEvent($submitRun));
         return redirect()->back();
     }
 

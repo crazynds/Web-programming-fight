@@ -1,6 +1,5 @@
 <?php
 
-use App\Broadcasting\SubmissionsChannel;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
