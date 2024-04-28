@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Enums\LanguagesType;
 use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
+use App\Events\NewSubmissionEvent;
 use App\Models\SubmitRun;
 use App\Models\TestCase;
 use App\Services\ExecutorService;
