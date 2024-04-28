@@ -10,18 +10,20 @@
         "@types/bootstrap": "^5.2.9",
         "axios": "^1.1.2",
         "bootstrap": "^5.2.3",
-        "laravel-vite-plugin": "^0.8.0",
+        "laravel-vite-plugin": "^1.0",
         "sass": "^1.56.1",
-        "vite": "^4.0.0"
+        "vite": "^5.0.0"
     },
     "dependencies": {
         "@types/jquery": "^3.5.27",
+        "@vitejs/plugin-vue": "^5.0.4",
         "@yaireo/tagify": "^4.17.9",
         "canvas-confetti": "^1.9.2",
         "easymde": "^2.18.0",
         "fine-uploader": "^5.16.2",
         "jquery": "^3.7.1",
         "line-awesome": "^1.3.0",
-        "mathjax": "^3.2.2"
+        "mathjax": "^3.2.2",
+        "vue": "^3.4.25"
     }
 }
