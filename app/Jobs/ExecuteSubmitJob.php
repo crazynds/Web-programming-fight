@@ -39,24 +39,27 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
         return $this->submit->id;
     }
 
-    private function executeTestCase(ExecutorService $executor, TestCase $testCase)
+    private function executeTestCase(ExecutorService $executor, TestCase $testCase, $modifiers)
     {
-        $executor->executeTestCase($testCase, $this->submit->problem->time_limit, $this->submit->problem->memory_limit);
+        $timeLimit = $this->submit->problem->time_limit * $modifiers[0];
+        $memoryLimit = $this->submit->problem->memory_limit * $modifiers[1];
+        $executor->executeTestCase($testCase, $timeLimit, $memoryLimit);
 
         if ($testCase->validated) {
-            $this->submit->execution_time = max($this->submit->execution_time | 0, $executor->execution_time);
-            $this->submit->execution_memory = max($this->submit->execution_memory | 0, $executor->execution_memory);
+            $this->submit->execution_time = max($this->submit->execution_time ?? 0, $executor->execution_time);
+            $this->submit->execution_memory = max($this->submit->execution_memory ?? 0, $executor->execution_memory);
         }
-        // 3 MB is the margin to work
-        if ($executor->execution_memory > $this->submit->problem->memory_limit + 3) {
+        // 16 MB is the margin to work
+        if ($executor->execution_memory > $timeLimit + 16) {
             return SubmitResult::MemoryLimit;
         }
-        if ($executor->execution_time > $this->submit->problem->time_limit) {
+        if ($executor->execution_time > $timeLimit) {
             return SubmitResult::TimeLimit;
         }
         if ($executor->retval != 0) {
             // TODO: Um RuntimeError pode ser causado por memory limit, mas não tem como saber nesses casos
             // Buscar solução alternativa
+            // Por enquanto funciona em python ok.
             return SubmitResult::RuntimeError;
         } else {
 
@@ -77,9 +80,9 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
         $num = 0;
         $testCasesRel = [];
         $testCases = $this->submit->problem->testCases()->where('validated', '=', true)->with(['inputfile', 'outputfile'])->get();
-
+        $modifiers = LanguagesType::modifiers()[$this->submit->language];
         foreach ($testCases as $testCase) {
-            $result = $this->executeTestCase($executor, $testCase);
+            $result = $this->executeTestCase($executor, $testCase, $modifiers);
             $testCasesRel[$testCase->id] = [
                 'result' => $result
             ];
@@ -98,7 +101,7 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
                 $lock = Cache::lock('validate-testcases-' . $this->submit->problem->id, 60);
                 $lock->block(5);
                 foreach ($this->submit->problem->testCases()->where('validated', '=', false)->with(['inputfile', 'outputfile'])->get() as $testCase) {
-                    $result = $this->executeTestCase($executor, $testCase);
+                    $result = $this->executeTestCase($executor, $testCase, $modifiers);
                     $testCasesRel[$testCase->id] = [
                         'result' => $result
                     ];
@@ -148,7 +151,10 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
         $this->submit->status = SubmitStatus::Judged;
         $this->submit->save();
 
-        if ($this->submit->result == SubmitResult::fromValue(SubmitResult::Accepted)->description) {
+        if (
+            $this->submit->result == SubmitResult::fromValue(SubmitResult::Accepted)->description &&
+            $this->submit->problem->scorers()->exists()
+        ) {
             ScoreSubmitJob::dispatch($this->submit)->onQueue('rank');
         }
     }

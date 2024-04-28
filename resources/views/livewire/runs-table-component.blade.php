@@ -120,13 +120,13 @@
                         </small>
                     </td>
                     <td class="px-2" style="font-size: 0.9em">
-                        @if (isset($submitRun->execution_time) && $submitRun->status == 'Judged')
+                        @if (isset($submitRun->execution_time) && !isset($waitingToBeJudged[$submitRun->id]) && $submitRun->status == 'Judged')
                             {{ number_format($submitRun->execution_time / 1000, 2, '.', ',') }}s
                         @else
                             --
                         @endif
                         |
-                        @if (isset($submitRun->execution_memory) && $submitRun->status == 'Judged')
+                        @if (isset($submitRun->execution_memory) && !isset($waitingToBeJudged[$submitRun->id]) && $submitRun->status == 'Judged')
                             {{ $submitRun->execution_memory }} MB
                         @else
                             --
