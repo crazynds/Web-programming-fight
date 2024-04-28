@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\LanguagesType;
 use App\Enums\SubmitResult;
 use App\Models\File;
 use App\Models\Scorer;
@@ -188,8 +189,11 @@ class ExecutorService
         $this->buildProgram($scorer->file, $scorer->language);
 
         Storage::disk('nsjail')->put('problems/input', $inputData);
-        $this->execute($scorer->time_limit, $scorer->memory_limit);
 
+        $modifiers = LanguagesType::modifiers()[$scorer->language];
+        $timeLimit = $scorer->time_limit * $modifiers[0];
+        $memoryLimit = $scorer->time_limit * $modifiers[1];
+        $this->execute($timeLimit, $memoryLimit);
 
         $output = Storage::disk('nsjail')->get('output');
 
