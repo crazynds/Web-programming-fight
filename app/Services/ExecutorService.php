@@ -6,14 +6,7 @@ use App\Enums\LanguagesType;
 use App\Enums\SubmitResult;
 use App\Models\File;
 use App\Models\Scorer;
-use App\Models\SubmitRun;
 use App\Models\TestCase;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
@@ -112,6 +105,7 @@ class ExecutorService
         $command = 'command time -v --output=/var/work/time -p nsjail ' . $this->currentConfig . ' --max_cpus 1 --log /var/work/nsjail_out --time_limit=' . $time_limit . ' --rlimit_as=' . $memory_limit . ' < ' . $finput . ' 2> /dev/null | head -c ' . $limitOutput . ' > /var/work/output';
 
         dump($command);
+        exec("rm /var/work/nsjail_out 2> /dev/null", $this->output, $this->retval);
         exec($command, $this->output, $this->retval);
 
 
@@ -207,9 +201,13 @@ class ExecutorService
         $categories = [];
         foreach ($output as $line) {
             $arr = explode(' ', $line);
-            $category = implode(' ', array_slice($arr, 0, -1));
+            if (sizeof($arr) != 3) continue;
+            $category = str_replace('_', ' ', $arr[0]);
             if (empty($category)) continue;
-            $categories[$category] = floatval($arr[count($arr) - 1]);
+            $categories[$category] = [
+                'value' => floatval($arr[1]),
+                'reference' => str_replace('_', ' ', $arr[2])
+            ];
         }
 
         return $categories;

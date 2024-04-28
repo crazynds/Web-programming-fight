@@ -42,6 +42,9 @@ Route::middleware('auth')->group(function () {
         ->except(['edit', 'update']);
     Route::resource('problem.scorer', ScorerController::class)
         ->except(['edit', 'update']);
+    Route::get('/problem/{problem}/scorer/all/reavaliate', [ScorerController::class, 'reavaliate'])
+        ->name('problem.scorer.reavaliate');
+
     Route::get('/problem/{problem}/public', [ProblemController::class, 'publicChange'])
         ->name('problem.public');
     Route::get('/problem/{problem}/download', [ProblemController::class, 'download'])

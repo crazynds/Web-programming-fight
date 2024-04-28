@@ -3,8 +3,14 @@
 namespace App\Providers;
 
 use App\Models\File;
+use App\Models\Problem;
+use App\Models\Scorer;
+use App\Models\SubmitRun;
 use App\Models\TestCase;
 use App\Observers\FileObserver;
+use App\Observers\ProblemObserver;
+use App\Observers\ScorerObserver;
+use App\Observers\SubmitRunObserver;
 use App\Observers\TestCaseObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -19,8 +25,7 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
-        Registered::class => [
-        ],
+        Registered::class => [],
     ];
 
     /**
@@ -30,6 +35,9 @@ class EventServiceProvider extends ServiceProvider
     {
         File::observe(FileObserver::class);
         TestCase::observe(TestCaseObserver::class);
+        Scorer::observe(ScorerObserver::class);
+        Problem::observe(ProblemObserver::class);
+        SubmitRun::observe(SubmitRunObserver::class);
     }
 
     /**

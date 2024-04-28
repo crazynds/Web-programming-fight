@@ -109,5 +109,5 @@ COPY ./docker/config/ /var/nsjail/
 RUN chmod +x /var/nsjail/runPypy3.10.sh
 RUN chmod +x /var/nsjail/runPython3.11.sh
 
-ENTRYPOINT ["php", "/var/www/html/artisan", "queue:work", "--queue=rank,submit","--sleep=2","--tries=2","--backoff=15,30,60","--max-jobs=300"]
+ENTRYPOINT ["php", "/var/www/html/artisan", "queue:work", "--queue=high,contest,submit,low,rank","--sleep=2","--tries=2","--backoff=15,30,60","--max-jobs=300"]
 

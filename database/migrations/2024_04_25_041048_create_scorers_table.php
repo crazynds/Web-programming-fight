@@ -14,12 +14,17 @@ return new class extends Migration
      */
     public function up(): void
     {
+        /**
+         *  Dont add on delete cascade in this file because this need to be deleted by laravel
+         * because this table is linked with files table, and to delete files this must delete from
+         * disk before.
+         */
         Schema::create('scorers', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Problem::class)->constrained();
             $table->foreignIdFor(File::class)->constrained();
             $table->foreignIdFor(File::class, 'input_id')->constrained('files');
-            $table->smallInteger('language');
+            $table->unsignedSmallInteger('language');
 
             $table->unsignedInteger('time_limit');
             $table->unsignedInteger('memory_limit');

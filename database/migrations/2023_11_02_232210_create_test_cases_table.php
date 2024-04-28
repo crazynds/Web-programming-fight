@@ -14,6 +14,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        /**
+         *  Dont add on delete cascade in this file because this need to be deleted by laravel
+         * because this table is linked with files table, and to delete files this must delete from
+         * disk before.
+         */
+
         Schema::create('test_cases', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Problem::class)->constrained();
@@ -21,15 +27,15 @@ return new class extends Migration
 
             $table->tinyInteger("type")->default(TestCaseType::FileDiff);
 
-            $table->foreignIdFor(File::class,'input_file')->constrained('files');
-            $table->foreignIdFor(File::class,'output_file')->constrained('files');
+            $table->foreignIdFor(File::class, 'input_file')->constrained('files');
+            $table->foreignIdFor(File::class, 'output_file')->constrained('files');
 
             # If this test case should be used to rank the time
             $table->boolean('rankeable')->default(false);
             $table->boolean('public')->default(false);
             $table->boolean('validated')->default(false);
 
-            $table->index(['problem_id','position']);
+            $table->index(['problem_id', 'position']);
         });
     }
 

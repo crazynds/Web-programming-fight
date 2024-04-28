@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\SubmitResult;
 use App\Http\Requests\StoreScorerRequest;
+use App\Jobs\ScoreSubmitJob;
 use App\Models\File;
 use App\Models\Problem;
 use App\Models\Scorer;
 use App\Policies\ScorerPolicy;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Redirect;
 
 class ScorerController extends Controller
 {
@@ -38,6 +43,19 @@ class ScorerController extends Controller
         ]);
     }
 
+    public function reavaliate(Problem $problem)
+    {
+        $user = Auth::user();
+        if (RateLimiter::tooManyAttempts('reavaliate-scorers:' . $user->id, 3)) {
+            return Redirect::back()->withErrors(['msg' => 'Too many attempts! Wait a moment and try again!']);
+        }
+        RateLimiter::hit('reavaliate-scorers:' . $user->id, $problem->submissions()->where('result', '=', SubmitResult::Accepted)->count() * 60);
+        foreach ($problem->submissions()->where('result', '=', SubmitResult::Accepted)->lazy() as $submit) {
+            ScoreSubmitJob::dispatch($submit)->onQueue('low');
+        }
+        return redirect()->back();
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -58,6 +76,9 @@ class ScorerController extends Controller
                 'time_limit' => $data['time_limit'],
                 'memory_limit' => $data['memory_limit'],
             ]);
+            foreach ($problem->submissions()->where('result', '=', SubmitResult::Accepted)->lazy() as $submit) {
+                ScoreSubmitJob::dispatch($submit)->onQueue('low')->afterCommit();
+            }
         });
         return redirect()->route('problem.scorer.index', ['problem' => $problem->id]);
         //

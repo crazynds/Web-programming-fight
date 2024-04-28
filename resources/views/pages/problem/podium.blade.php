@@ -38,7 +38,7 @@
     </div>
     <div class="row">
         @foreach ($categories as $category)
-            <div class="col-4">
+            <div class="col-4" style="width: fit-content; !important">
                 <h4>{{ $category }}</h4>
                 <table>
                     <table border="1">
@@ -48,6 +48,7 @@
                                 <th class="text-center"><b>User</b></th>
                                 <th class="text-center"><b>Points</b></th>
                                 <th class="text-center"><b>Submission</b></th>
+                                <th class="text-center"><b>Reference</b></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -65,7 +66,10 @@
                                         {{ $ranking->value }}
                                     </td>
                                     <td class="px-2 text-center">
-                                        #{{ $ranking->submit_run_id }}
+                                        {{ $ranking->language }}#{{ $ranking->submit_run_id }}
+                                    </td>
+                                    <td class="px-2 text-center">
+                                        {{ $ranking->reference }}
                                     </td>
                                 </tr>
                             @endforeach
