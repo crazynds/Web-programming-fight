@@ -67,7 +67,7 @@ ENTRYPOINT [ "start-container" ]
 FROM php_base AS php_worker
 
 RUN apt-get install -y \
-    nano time \
+    nano time wget \
     autoconf \
     bison \
     flex \
@@ -79,18 +79,35 @@ RUN apt-get install -y \
     make \
     pkg-config \
     protobuf-compiler \
+    python3.11 \
     && apt-get -y autoremove \
     && apt-get clean 
 
-RUN git clone https://github.com/google/nsjail.git  /nsjail
+RUN mkdir /langs
 
+# Download and install pypy
+RUN wget https://downloads.python.org/pypy/pypy3.10-v7.3.16-linux64.tar.bz2 -P /langs
+RUN tar -xf /langs/pypy3.10-v7.3.16-linux64.tar.bz2 -C /langs
+RUN mv /langs/pypy3.10-v7.3.16-linux64 /langs/pypy3.10
+RUN rm /langs/pypy3.10-v7.3.16-linux64.tar.bz2
+RUN cp /langs/pypy3.10/bin/* /usr/bin -r
+RUN cp /langs/pypy3.10/lib/* /usr/lib -r
+RUN cp /langs/pypy3.10/include/* /usr/include -r
+
+
+# Download and install NSJail
+RUN git clone https://github.com/google/nsjail.git  /nsjail
 RUN cd /nsjail && make && mv /nsjail/nsjail /bin && rm -rf -- /nsjail
 
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# Copy nsjail config
 RUN mkdir /var/nsjail
 RUN chmod 0777 /var/nsjail
+
 COPY ./docker/config/ /var/nsjail/
+RUN chmod +x /var/nsjail/runPypy3.10.sh
+RUN chmod +x /var/nsjail/runPython3.11.sh
 
 ENTRYPOINT ["php", "/var/www/html/artisan", "queue:work", "--queue=rank,submit","--sleep=2","--tries=2","--backoff=15,30,60","--max-jobs=300"]
 

@@ -76,8 +76,8 @@
                                     class="d-flex action-btn">
                                     <i class="las la-search"></i>
                                 </a>
-                                <div class="vr"></div>
                                 @if ($problem->ranks_count > 0)
+                                    <div class="vr"></div>
                                     <a href="{{ route('problem.podium', ['problem' => $problem->id]) }}" title="Ranking"
                                         class="d-flex action-btn">
                                         <i class="las la-trophy"></i>

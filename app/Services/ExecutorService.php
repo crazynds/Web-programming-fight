@@ -52,10 +52,14 @@ class ExecutorService
     {
         switch ($language) {
             case "C++":
-                return '/var/nsjail/basic.conf';
+                return '--conf /var/nsjail/basic.conf';
+            case "PyPy3.10":
+                return '--user 99999 --group 99999 -Mo -R /bin/ -R /lib -R /lib64/ -R /usr/ -R /sbin/ -T /dev -R /dev/urandom -R /var/nsjail/runPypy3.10.sh -R /var/nsjail/b.py --exec_file /var/nsjail/runPypy3.10.sh';
+            case "Python3.11":
+                return '--user 99999 --group 99999 -Mo -R /bin/ -R /lib -R /lib64/ -R /usr/ -R /sbin/ -T /dev -R /dev/urandom -R /var/nsjail/runPython3.11.sh -R /var/nsjail/b.py --exec_file /var/nsjail/runPython3.11.sh';
             default:
                 // USE C++
-                return '/var/nsjail/basic.conf';
+                return '--conf /var/nsjail/basic.conf';
         }
     }
 
@@ -104,10 +108,11 @@ class ExecutorService
         $time_limit = round((1500 + $timeLimit) / 1000);
         $memory_limit = $memoryLimit + 256;
 
-        $command = 'time -v --output=/var/work/time -p nsjail --conf ' . $this->currentConfig . ' --time_limit=' . $time_limit . ' --rlimit_as=' . $memory_limit . ' < ' . $finput . ' 2>/dev/null | head -c ' . $limitOutput . ' > /var/work/output';
+        $command = 'command time -v --output=/var/work/time -p nsjail ' . $this->currentConfig . ' --max_cpus 1 --log /var/work/nsjail_out --time_limit=' . $time_limit . ' --rlimit_as=' . $memory_limit . ' < ' . $finput . ' 2> /dev/null | head -c ' . $limitOutput . ' > /var/work/output';
 
-        //dump($command);
+        dump($command);
         exec($command, $this->output, $this->retval);
+
 
         //dump($this->output);
         $exectime = 0;
@@ -123,7 +128,15 @@ class ExecutorService
                     $memoryPeak = floatval($arr[1]) / 1024 - 6;
                     break;
                 case 'Exit status':
-                    $retval = intval($arr[1]);
+                    $this->retval = intval($arr[1]);
+                    if ($this->retval != 0) {
+                        $nsjailOut = Storage::disk('nsjail')->get('nsjail_out');
+                        if (str_contains($nsjailOut, 'Killing it')) {
+                            if (str_contains($nsjailOut, 'run time >= time limit')) {
+                                $exectime = $timeLimit + 1500;
+                            }
+                        }
+                    }
                     break;
                 default:
             }
@@ -139,6 +152,7 @@ class ExecutorService
         $input_file = 'problems/input';
 
         // Carrega o arquivo input para a pasta tmpfs
+        dump('Testcase: ' . $testCase->name);
         $this->loadFile($testCase->input_file, $input_file);
 
         $this->execute($timeLimit, $memoryLimit);
@@ -160,7 +174,14 @@ class ExecutorService
             default:
                 $program = 'a.bin';
                 break;
+            case "Python3.11":
+            case "Pypy3.10":
+                $program = 'b.py';
+                break;
         }
+        // Delete old backup
+        exec("rm /var/nsjail/'$bkp'", $this->output, $this->retval);
+
         // Backup old program
         exec("mv /var/nsjail/'$program' /var/nsjail/'$bkp'", $this->output, $this->retval);
         $oldConfig = $this->currentConfig;
@@ -168,6 +189,7 @@ class ExecutorService
 
         Storage::disk('nsjail')->put('problems/input', $inputData);
         $this->execute($scorer->time_limit, $scorer->memory_limit);
+
 
         $output = Storage::disk('nsjail')->get('output');
 
@@ -202,8 +224,11 @@ class ExecutorService
                     return SubmitResult::CompilationError;
                 }
                 break;
-            case "Python":
-                return SubmitResult::Error;
+            case "PyPy3.10":
+            case "Python3.11":
+                $outputName = 'b.py';
+                Storage::disk('nsjail')->writeStream($outputName, $code->readStream());
+                exec('mv /var/work/' . $outputName . ' /var/nsjail/' . $outputName, $this->output, $this->retval);
                 break;
             default:
                 return SubmitResult::Error;
