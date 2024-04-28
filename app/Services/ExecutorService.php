@@ -192,7 +192,7 @@ class ExecutorService
 
         $modifiers = LanguagesType::modifiers()[$scorer->language];
         $timeLimit = $scorer->time_limit * $modifiers[0];
-        $memoryLimit = $scorer->time_limit * $modifiers[1];
+        $memoryLimit = $scorer->memory_limit * $modifiers[1];
         $this->execute($timeLimit, $memoryLimit);
 
         $output = Storage::disk('nsjail')->get('output');
