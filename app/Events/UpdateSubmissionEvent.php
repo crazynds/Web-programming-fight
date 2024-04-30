@@ -24,6 +24,7 @@ class UpdateSubmissionEvent implements ShouldBroadcast
         $this->data = [
             'id' => $submitRun->id,
             'datetime' => \Carbon\Carbon::parse($submitRun->created_at)->format('H:i:s'),
+            'user_id' => $submitRun->user->id,
             'user' => $submitRun->user->name,
             'problem' => [
                 'title' => $submitRun->problem->title,
