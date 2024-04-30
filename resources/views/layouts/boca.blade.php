@@ -38,9 +38,11 @@
     <table border="1" width="100%">
         <tbody>
             <tr>
-                <td nowrap="" bgcolor="#ffa020" align="center">
+                <td nowrap="" bgcolor="#ffa020" align="center" class="px-2">
                     <x-ballon />
-                    <font color="#000000">{{ config('app.name') }}</font>
+                    <a href="{{ route('home') }}" style="font-size: 1em; text-decoration: none">
+                        <font color="#000000">{{ config('app.name') }}</font>
+                    </a>
                 </td>
                 <td bgcolor="#ffa020" width="99%" style="padding-left:6px;overflow: unset;">
                     {{ now()->year }} |
