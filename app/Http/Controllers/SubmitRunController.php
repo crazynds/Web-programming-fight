@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
-use App\Events\NewSubmission;
-use App\Events\NewSubmissionEvent;
 use App\Http\Requests\StoreSubmitRunRequest;
 use App\Http\Resources\SubmitRunResultResource;
 use App\Jobs\ExecuteSubmitJob;
@@ -18,7 +16,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 
 class SubmitRunController extends Controller
 {
@@ -96,12 +93,10 @@ class SubmitRunController extends Controller
                 $run->user()->associate($user);
                 $run->status = SubmitStatus::WaitingInLine;
                 $run->save();
-                ExecuteSubmitJob::dispatch($run)->onQueue('submit')->afterCommit();
+                ExecuteSubmitJob::dispatch($run)->afterCommit();
             }
             return $run;
         });
-        // Dispatch event
-        NewSubmissionEvent::dispatch($run);
 
         return redirect()->route('submitRun.index');
     }
@@ -142,7 +137,8 @@ class SubmitRunController extends Controller
             $submitRun->status = SubmitStatus::WaitingInLine;
             $submitRun->result = SubmitResult::NoResult;
             $submitRun->save();
-            ExecuteSubmitJob::dispatch($submitRun)->onQueue('submit')->afterCommit();
+            // Put this run in the low priority queue
+            ExecuteSubmitJob::dispatch($submitRun)->onQueue('low')->afterCommit();
         }
         return redirect()->back();
     }

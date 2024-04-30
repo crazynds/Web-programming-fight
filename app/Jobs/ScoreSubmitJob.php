@@ -23,7 +23,7 @@ class ScoreSubmitJob implements ShouldQueue, ShouldBeUnique
     public function __construct(
         protected SubmitRun $submit
     ) {
-        //
+        $this->onQueue('rank');
     }
 
     public function uniqueId(): string

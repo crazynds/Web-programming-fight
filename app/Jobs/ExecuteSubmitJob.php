@@ -5,7 +5,6 @@ namespace App\Jobs;
 use App\Enums\LanguagesType;
 use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
-use App\Events\NewSubmissionEvent;
 use App\Models\SubmitRun;
 use App\Models\TestCase;
 use App\Services\ExecutorService;
@@ -17,7 +16,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
@@ -32,7 +30,7 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
     public function __construct(
         protected SubmitRun $submit
     ) {
-        //
+        $this->onQueue('submit');
     }
 
     public function uniqueId(): string
@@ -112,7 +110,7 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
                         $testCase->validated = true;
                         $testCase->save();
                         // Dispatch Job to check submissions
-                        CheckSubmissionsOnProblem::dispatch($this->submit->problem)->afterResponse();
+                        CheckSubmissionsOnProblem::dispatch($this->submit->problem)->delay(now()->addMinutes(60))->afterResponse();
                     }
                 }
             } catch (LockTimeoutException $e) {
@@ -157,7 +155,7 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
             $this->submit->result == SubmitResult::fromValue(SubmitResult::Accepted)->description &&
             $this->submit->problem->scorers()->exists()
         ) {
-            ScoreSubmitJob::dispatch($this->submit)->onQueue('rank');
+            ScoreSubmitJob::dispatch($this->submit);
         }
     }
 
