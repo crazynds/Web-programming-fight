@@ -21,7 +21,7 @@ class CheckSubmissionsOnProblem implements ShouldQueue, ShouldBeUnique
     public function __construct(
         public Problem $problem
     ) {
-        $this->onQueue('low')->delay(now()->addMinutes(60));
+        $this->onQueue('low');
         //
     }
 
@@ -38,7 +38,7 @@ class CheckSubmissionsOnProblem implements ShouldQueue, ShouldBeUnique
         $testCases_count = $this->problem->testCases()->where('validated', true)->count();
         foreach ($this->problem->submissions()->where('result', SubmitResult::Accepted)->where('num_test_cases', '!=', $testCases_count)->lazy() as $run) {
             // Para cada submição que deu accepted mas não bate o número de testes passados com a quantidade de testes validados
-            ExecuteSubmitJob::dispatch($run)->onQueue('submit');
+            ExecuteSubmitJob::dispatch($run);
         }
     }
 }

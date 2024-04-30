@@ -15,7 +15,7 @@ chmod -R ugo+rw /.composer
 echo '!Copping vendor!'
 git config --global --add safe.directory /var/www/html
 cd /var/www/html
-cp /var/www/vendor/* /var/www/html/vendor -R
+composer install || cp /var/www/vendor/* /var/www/html/vendor -R
 
 echo '!Migrating!'
 

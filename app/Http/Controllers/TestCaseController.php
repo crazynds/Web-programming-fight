@@ -6,18 +6,14 @@ use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
 use App\Enums\TestCaseType;
 use App\Http\Requests\StoreTestCaseRequest;
-use App\Http\Requests\UpdateTestCaseRequest;
 use App\Jobs\CheckSubmissionsOnProblem;
 use App\Jobs\ExecuteSubmitJob;
 use App\Models\File;
 use App\Models\Problem;
 use App\Models\TestCase;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use ZipArchive;
 
 class TestCaseController extends Controller
 {
@@ -174,7 +170,7 @@ class TestCaseController extends Controller
                 }
             }
         });
-        CheckSubmissionsOnProblem::dispatch($problem)->afterResponse();
+        CheckSubmissionsOnProblem::dispatch($problem)->delay(now()->addMinutes(60))->afterResponse();
         foreach (File::whereIn('id', $filesToDelete)->lazy() as $file) {
             $file->delete();
         }
@@ -192,7 +188,7 @@ class TestCaseController extends Controller
                 $run->status = SubmitStatus::WaitingInLine;
                 $run->result = SubmitResult::NoResult;
                 $run->save();
-                ExecuteSubmitJob::dispatch($run)->onQueue('submit')->afterCommit();
+                ExecuteSubmitJob::dispatch($run)->afterCommit();
             }
             $testCase->delete();
             $problem->testCases()
@@ -201,7 +197,7 @@ class TestCaseController extends Controller
         });
 
         // Dispatch Job to check submissions
-        CheckSubmissionsOnProblem::dispatch($problem)->afterResponse();
+        CheckSubmissionsOnProblem::dispatch($problem)->delay(now()->addMinutes(60))->afterResponse();
         return redirect()->route('problem.testCase.index', ['problem' => $problem->id]);
     }
 }

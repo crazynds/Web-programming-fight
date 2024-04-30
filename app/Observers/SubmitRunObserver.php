@@ -2,6 +2,8 @@
 
 namespace App\Observers;
 
+use App\Events\NewSubmissionEvent;
+use App\Events\UpdateSubmissionEvent;
 use App\Models\SubmitRun;
 
 class SubmitRunObserver
@@ -11,7 +13,8 @@ class SubmitRunObserver
      */
     public function created(SubmitRun $submitRun): void
     {
-        //
+        //Broadcast event to all connected clients
+        NewSubmissionEvent::dispatch($submitRun);
     }
 
     /**
@@ -19,7 +22,8 @@ class SubmitRunObserver
      */
     public function updated(SubmitRun $submitRun): void
     {
-        //
+        //Broadcast event to all connected clients
+        UpdateSubmissionEvent::dispatch($submitRun);
     }
 
     /**
@@ -27,7 +31,7 @@ class SubmitRunObserver
      */
     public function deleted(SubmitRun $submitRun): void
     {
-        if(!!$submitRun->file_id)
+        if (!!$submitRun->file_id)
             $submitRun->file->delete();
     }
 

@@ -14,9 +14,54 @@
                 <th style="text-align: end;"><b>Actions</b></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="table-body">
+            <tr id="template-row" style="display: none;">
+                <td id="id">
+                    #id
+                </td>
+                <td class="px-1 text-center">
+                    <small id="datetime">
+                        H:i:s
+                    </small>
+                </td>
+                <td class="px-1" id="user">
+                    username
+                </td>
+                <td class="px-1">
+                    <a href="" id="title">
+                        title
+                    </a>
+                </td>
+                <td class="px-1" id="lang">
+                    lang
+                </td>
+                <td class="px-2">
+                    <strong id="status">
+                        status
+                    </strong>
+                </td>
+                <td class="px-2">
+                    <span id="result">
+                        Result
+                    </span>
+                </td>
+                <td class="px-2 text-center">
+                    <small id="testCases">
+                        cases
+                    </small>
+                </td>
+                <td class="px-2" style="font-size: 0.9em" id="resources">
+                    resources
+                </td>
+                <td class="px-2">
+                    <div class="hstack gap-1">
+                    </div>
+                </td>
+            </tr>
+
             @foreach ($submitRuns as $submitRun)
-                <tr data-id="{{ $submitRun->id }}" @if ($submitRun->status != 'Judged' && $submitRun->status != 'Error') class="notJudged blink" @endif>
+                <tr id="row{{ $submitRun->id }}" data-id="{{ $submitRun->id }}"
+                    @if ($submitRun->status != 'Judged' && $submitRun->status != 'Error') class="notJudged blink" @endif>
                     <td>
                         @can('view', $submitRun)
                             <a href="#" onclick="openModal({{ $submitRun->id }})">
@@ -79,53 +124,47 @@
                     </td>
                     <td class="px-2 text-center">
                         <small id="testCases">
-                            @isset($waitingToBeJudged[$submitRun->id])
-                                @for ($i = 1; $i < $waitingToBeJudged[$submitRun->id] && $i < 4; $i++)
-                                    🥁
-                                @endfor
-                            @else
-                                @switch($submitRun->result)
-                                    @case('Accepted')
-                                        <span style="color:#0a0">
-                                            All
-                                        </span>
-                                    @break
+                            @switch($submitRun->result)
+                                @case('Accepted')
+                                    <span style="color:#0a0">
+                                        All
+                                    </span>
+                                @break
 
-                                    @case('Wrong answer')
-                                        <span style="color:#a00">
-                                            {{ $submitRun->num_test_cases + 1 }}
-                                        </span>
-                                    @break
+                                @case('Wrong answer')
+                                    <span style="color:#a00">
+                                        {{ $submitRun->num_test_cases + 1 }}
+                                    </span>
+                                @break
 
-                                    @case('Runtime error')
-                                    @case('Time limit')
+                                @case('Runtime error')
+                                @case('Time limit')
 
-                                    @case('Memory limit')
-                                        <span style="color:#00a">
-                                            {{ $submitRun->num_test_cases + 1 }}
-                                        </span>
-                                    @break
+                                @case('Memory limit')
+                                    <span style="color:#00a">
+                                        {{ $submitRun->num_test_cases + 1 }}
+                                    </span>
+                                @break
 
-                                    @case('Error')
-                                    @case('Compilation error')
-                                        ---
-                                    @break
+                                @case('Error')
+                                @case('Compilation error')
+                                    ---
+                                @break
 
-                                    @default
-                                        ---
-                                    @break
-                                @endswitch
-                            @endisset
+                                @default
+                                    ---
+                                @break
+                            @endswitch
                         </small>
                     </td>
                     <td class="px-2" style="font-size: 0.9em" id="resources">
-                        @if (isset($submitRun->execution_time) && !isset($waitingToBeJudged[$submitRun->id]) && $submitRun->status == 'Judged')
+                        @if (isset($submitRun->execution_time) && $submitRun->status == 'Judged')
                             {{ number_format($submitRun->execution_time / 1000, 2, '.', ',') }}s
                         @else
                             --
                         @endif
                         |
-                        @if (isset($submitRun->execution_memory) && !isset($waitingToBeJudged[$submitRun->id]) && $submitRun->status == 'Judged')
+                        @if (isset($submitRun->execution_memory) && $submitRun->status == 'Judged')
                             {{ $submitRun->execution_memory }} MB
                         @else
                             --
@@ -309,125 +348,162 @@
             startVelocity: 45,
         });
     }
-    var openModal = function() {}
-    window.addEventListener("load", function() {
-
-        openModal = function(id) {
-            var url = '{{ route('api.submitRun.code', ['submitRun' => -1]) }}'.replace('-1', id)
-            $('#codeModal').modal("show")
-            $('#codeModal').find('#code').html(`
+    const openModal = function(id) {
+        var url = '{{ route('api.submitRun.code', ['submitRun' => -1]) }}'.replace('-1', id)
+        $('#codeModal').modal("show")
+        $('#codeModal').find('#code').html(`
                 <div class="d-flex justify-content-center">
                     <div class="spinner-grow" role="status">
                         <span class="sr-only">Loading...</span>
                     </div>
                 </div>
             `)
-            $.get(url, function(data) {
-                if (data.code)
-                    $('#codeModal').find('#code').text(data.code)
-            });
+        $.get(url, function(data) {
+            if (data.code)
+                $('#codeModal').find('#code').text(data.code)
+        });
+    }
+    const updateRow = function(row, data) {
+        const idtag = row.find('#id');
+        const datetimetag = row.find('#datetime');
+        const usertag = row.find('#user');
+        const titletag = row.find('#title');
+        const langtag = row.find('#lang');
+        const statustag = row.find('#status');
+        const resulttag = row.find('#result');
+        const testCasestag = row.find('#testCases');
+        const resourcestag = row.find('#resources');
+        idtag.text('#' + data.id);
+        datetimetag.text(data.datetime);
+        usertag.text(data.user);
+        titletag.text(data.problem.title);
+        langtag.text(data.language);
+        statustag.text(data.status);
+        resulttag.text(data.result);
+        testCasestag.text(data.testCases ?? '---');
+        resourcestag.text(data.resources);
+        titletag.attr('href', "{{ route('problem.show', ['problem' => -1], false) }}".replace('-1', data.problem
+            .id));
 
+        let style;
+
+        switch (data.result) {
+            case 'Accepted':
+                style = "#0a0"
+                break;
+
+            case 'Error':
+                style = "#f00"
+                break;
+
+            case 'Wrong answer':
+                style = "#a00"
+                break;
+
+            case 'Compilation error':
+            case 'Runtime error':
+                style = "#aa0"
+                break;
+
+            case 'Time limit':
+            case 'Memory limit':
+                style = "#00a"
+                break;
+
+            default:
+                style = "grey"
         }
-        $('.notJudged').each(function(_, obj) {
-            const func = function() {
-                $.get('{{ route('api.submitRun.result', ['submitRun' => -1]) }}'.replace(
-                    '-1', $(
-                        obj)
-                    .data('id')), function(data) {
-                    if (data.data)
-                        data = data.data
-                    $(obj).find("#status").text(data.status);
+        console.log(style)
+        resulttag.css('color', style);
+        testCasestag.css('color', style);
 
-                    if (data.status != 'Judged' && data.status != 'Error') {
-                        setTimeout(func, 1000)
-                        $(obj).find("#result").text(data.result);
-                    } else {
-                        $(obj).removeClass('blink')
+        row.data('id', data.id);
+        row.css('display', 'table-row');
+        row.attr('id', 'row' + data.id);
+        if (data.status != 'Judged' && data.status != 'Error')
+            row.addClass('notJudged blink');
+        else
+            row.removeClass('notJudged blink');
+    }
+    window.addEventListener("load", function() {
+        window.Echo.private('submissions')
+            .listen('NewSubmissionEvent', (data) => {
+                data = data.data
+                var row = $('#row' + data.id);
+                if (row.length == 0) {
+                    row = $('#template-row').clone();
+                    $('#table-body').prepend(row);
+                }
+                updateRow(row, data);
+            })
+
+        window.Echo.private('submissions')
+            .listen('UpdateSubmissionEvent', (data) => {
+                data = data.data
+                var row = $('#row' + data.id);
+                if (row.length == 0) {
+                    row = $('#template-row').clone();
+                    $('#table-body').prepend(row);
+                }
+                if (data.status != 'Judged' && data.status != 'Error') {
+                    updateRow(row, data);
+                } else {
+                    row.removeClass('blink')
+                    row.find('#status').text(data.status);
+                    switch (data.result) {
+                        case 'Wrong answer':
+                        case 'Time limit':
+                        case 'Memory limit':
+                        case 'Runtime error':
+                        case 'Accepted':
+                            suspense = data.suspense;
+                            break;
+                        case 'Compilation error':
+                        case 'Error':
+                        default:
+                            failed()
+                            suspense = false;
+                            break;
+                    }
+
+                    const geraResultado = function() {
+                        updateRow(row, data);
                         switch (data.result) {
+                            case 'Compilation error':
+                            case 'Runtime error':
+                            case 'Error':
                             case 'Wrong answer':
                             case 'Time limit':
                             case 'Memory limit':
-                            case 'Runtime error':
-                            case 'Accepted':
-                                suspense = data.suspense >= 0.4;
-                                break;
-                            case 'Compilation error':
-                            case 'Error':
                             default:
                                 failed()
-                                suspense = false;
+                                break;
+                            case 'Accepted':
+                                confeti();
                                 break;
                         }
-
-                        const geraResultado = function() {
-                            $(obj).find("#result").text(data.result);
-                            $(obj).find("#resources").text(
-                                (data.execution.time / 1000).toFixed(2) + 's | ' +
-                                data.execution.memory + ' MB'
-                            );
-                            console.log(data)
-                            switch (data.result) {
-                                case 'Compilation error':
-                                case 'Runtime error':
-                                    $(obj).find("#result").css('color', '#aa0')
-                                    break;
-                                case 'Error':
-                                    $(obj).find("#result").css('color', '#f00')
-                                    break;
-                                case 'Wrong answer':
-                                    $(obj).find("#result").css('color', '#a00')
-                                    $(obj).find("#testCases").text(data
-                                        .testCases)
-                                    $(obj).find("#testCases").css('color',
-                                        '#a00')
-                                    break;
-                                case 'Time limit':
-                                case 'Memory limit':
-                                    $(obj).find("#result").css('color', '#00a')
-                                    $(obj).find("#testCases").text(data
-                                        .testCases)
-                                    $(obj).find("#testCases").css('color',
-                                        '#00a')
-                                    break;
-                                case 'Accepted':
-                                    $(obj).find("#result").css('color', '#0a0')
-                                    confeti();
-                                    $(obj).find("#testCases").text('All');
-                                    $(obj).find("#testCases").css('color',
-                                        '#0a0')
-                                    break;
-                                default:
-                            }
-                        }
-                        const bateria = function() {
-                            const text = $(obj).find("#result").text();
-                            if (text.length < 5) {
-                                $(obj).find("#result").text(text + '🥁')
-                                setTimeout(bateria, 800 + text.length * 100)
-                            } else {
-                                if (data.result != 'Accepted') {
-                                    setTimeout(() => failed(), 400)
-                                }
-                                setTimeout(geraResultado, 1000)
-                            }
-                        }
-
-
-                        if (suspense) {
-                            $(obj).find("#result").text('');
-                            setTimeout(bateria, 500)
+                    }
+                    const bateria = function() {
+                        const text = row.find("#result").text();
+                        if (text.length < 5) {
+                            row.find("#result").text(text + '🥁')
+                            setTimeout(bateria, 800 + text.length * 100)
                         } else {
-                            geraResultado();
+                            if (data.result != 'Accepted') {
+                                setTimeout(() => failed(), 400)
+                            }
+                            setTimeout(geraResultado, 1000)
                         }
                     }
-                });
-            };
-            setTimeout(func, 1000)
-        });
-        window.Echo.channel('submissions')
-            .listenToAll((event, data) => {
-                // do what you need to do based on the event name and data
-                console.log(event, data)
-            })
+
+
+                    if (suspense) {
+                        row.find("#result").text('');
+                        setTimeout(bateria, 500)
+                    } else {
+                        geraResultado();
+                    }
+                }
+            });
     })
 </script>
