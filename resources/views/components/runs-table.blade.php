@@ -221,6 +221,8 @@
 </div>
 
 <script>
+    const userId = {{ $global ? null : \Auth::user()->id }}
+
     function copyCode() {
         var range = document.createRange();
         range.selectNode(document.getElementById("code"));
@@ -373,7 +375,16 @@
         const resulttag = row.find('#result');
         const testCasestag = row.find('#testCases');
         const resourcestag = row.find('#resources');
-        idtag.text('#' + data.id);
+
+        if (data.user_id == userId) {
+            idtag.html(`
+                <a href="#" onclick="openModal(${data.id})">
+                    #${data.id}
+                </a>
+            `)
+        } else {
+            idtag.text('#' + data.id);
+        }
         datetimetag.text(data.datetime);
         usertag.text(data.user);
         titletag.text(data.problem.title);
@@ -390,6 +401,7 @@
         switch (data.result) {
             case 'Accepted':
                 style = "#0a0"
+                testCasestag.text('All');
                 break;
 
             case 'Error':
@@ -431,10 +443,13 @@
                 data = data.data
                 var row = $('#row' + data.id);
                 if (row.length == 0) {
+                    if (userId != null && userId != data.user_id) return
                     row = $('#template-row').clone();
+                    updateRow(row, data);
                     $('#table-body').prepend(row);
+                } else {
+                    updateRow(row, data);
                 }
-                updateRow(row, data);
             })
 
         window.Echo.private('submissions')
@@ -442,8 +457,11 @@
                 data = data.data
                 var row = $('#row' + data.id);
                 if (row.length == 0) {
+                    if (userId != null && userId != data.user_id) return
                     row = $('#template-row').clone();
+                    updateRow(row, data);
                     $('#table-body').prepend(row);
+                    return;
                 }
                 if (data.status != 'Judged' && data.status != 'Error') {
                     updateRow(row, data);
