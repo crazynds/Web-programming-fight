@@ -1,62 +1,92 @@
-FROM ubuntu:22.04 as php_prod
+FROM dunglas/frankenphp:1.1-php8.3 AS php_base
 
-ARG WWWGROUP
-
-WORKDIR /var/www/html
+LABEL maintainer="Crazynds"
 
 ENV DEBIAN_FRONTEND noninteractive
-ENV TZ=UTC
+ENV TZ=UTC-3
+ENV NODE_VERSION=18
 
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# Install necessary libs
+#RUN apk add --no-cache tzdata dos2unix npm bash
 
-RUN apt-get update \
-    && mkdir -p /etc/apt/keyrings \
-    && apt-get install -y gnupg gosu curl ca-certificates git zip unzip libcap2-bin librsvg2-bin fswatch \
-    && curl -sS 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x14aa40ec0831756756d7f66c4f4ea0aae5267a6c' | gpg --dearmor | tee /etc/apt/keyrings/ppa_ondrej_php.gpg > /dev/null \
-    && echo "deb [signed-by=/etc/apt/keyrings/ppa_ondrej_php.gpg] https://ppa.launchpadcontent.net/ondrej/php/ubuntu jammy main" > /etc/apt/sources.list.d/ppa_ondrej_php.list
-
-RUN apt-get update \
-    && apt-get install -y php8.2-cli php8.2-dev \
-    php8.2-gd \
-    php8.2-curl \
-    php8.2-imap php8.2-mysql php8.2-mbstring \
-    php8.2-zip \
-    php8.2-intl php8.2-readline \
-    php8.2-ldap \
-    php8.2-redis php8.2-swoole \
-    && curl -sLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
-
+# Install node UBUNTU
+RUN curl -fsSL https://deb.nodesource.com/setup_21.x | tap | bash
 RUN apt-get update
-RUN apt-get install nodejs dos2unix -y
+RUN apt-get install -y tzdata dos2unix npm bash
 
 
-RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.2
 
-RUN groupadd --force -g $WWWGROUP sail
-RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
+# Add php additional extensions 
+RUN install-php-extensions redis pdo_mysql pdo_pgsql mbstring exif pcntl curl zip intl sockets xml
 
-COPY . /var/www/html/
+# Install Composer
+RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer 
 
-RUN composer install --no-interaction --optimize-autoloader --no-scripts
+# Set timezone
+#RUN ln -s /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+RUN cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
 
-RUN git config --global --add safe.directory /var/www/html
+# Copy code to /app
+RUN mkdir -p /app
+RUN mkdir /.npm
+RUN chmod 0777 /.npm
+RUN mkdir /.composer
+RUN chmod 0777 /.composer
+RUN chmod 0777 /root
+COPY composer.json /app/
+COPY package.json /app/
+COPY package-lock.json /app/
 
+# Setup the libraries
+RUN composer install --no-interaction --no-dev --optimize-autoloader --no-scripts
+RUN npm install
 
-FROM php_prod as php_schedule 
+# Copy php config
+COPY ./docker/prod/php.ini /usr/local/etc/php/conf.d/local.ini
 
-#Copy Starter
-COPY ./docker/start-container-scheduler /usr/local/bin/start-container
-
-# Set permissions in folders
+# Copy startup
+COPY ./docker/prod/start-container /usr/local/bin/start-container
 RUN dos2unix /usr/local/bin/start-container
+RUN chmod 0777 /usr/local/bin/start-container
 RUN chmod +x /usr/local/bin/start-container
 
-ENTRYPOINT [ "start-container" ]
+# Copy src code
+COPY . /app/
+RUN rm -rf /app/{.devcontainer,.github,.vscode,doc,docker}/
+
+# Build frontend
+RUN npm run build
+
+# Clear apt and tmp files
+#RUN apk del --no-cache nodejs npm
+#RUN rm -rf /var/cache/apk/*
+RUN apt-get clean autoclean
+RUN apt-get autoremove --yes
+RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
+
+# Delete not used code
+RUN rm -rf /app/{client,node_modules,stubs}/
 
 
-FROM php_prod AS php_worker
+ENTRYPOINT ["start-container"]
 
-RUN apt-get install -y \
+FROM php_base AS php_reverb
+
+RUN apt-get update && apt-get install -y supervisor
+
+# Clean APT
+RUN apt-get clean autoclean
+RUN apt-get autoremove --yes
+RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
+
+COPY docker/prod/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+ENV FUNCTION=reveb
+
+
+FROM php_base AS php_worker
+
+RUN apt-get update && apt-get install -y \
     nano time wget \
     autoconf \
     bison \
@@ -89,7 +119,10 @@ RUN cp /langs/pypy3.10/include/* /usr/include -r
 RUN git clone https://github.com/google/nsjail.git  /nsjail
 RUN cd /nsjail && make && mv /nsjail/nsjail /bin && rm -rf -- /nsjail
 
-RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# Clean APT
+RUN apt-get clean autoclean
+RUN apt-get autoremove --yes
+RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 # Copy nsjail config
 RUN mkdir /var/nsjail
@@ -99,5 +132,5 @@ COPY ./docker/config/ /var/nsjail/
 RUN chmod +x /var/nsjail/runPypy3.10.sh
 RUN chmod +x /var/nsjail/runPython3.11.sh
 
-ENTRYPOINT ["php", "/var/www/html/artisan", "queue:work", "--queue=high,contest,submit,low,rank","--sleep=2","--tries=1","--max-jobs=1000"]
+ENV FUNCTION=worker
 
