@@ -1,12 +1,11 @@
 services:
-    laravel.test:
+    app:
         build:
             context: .
             dockerfile: ./docker/Dockerfile
             target: php_supervisor
             args:
                 WWWGROUP: '${WWWGROUP}'
-        image: sail-8.2/app
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
@@ -15,9 +14,6 @@ services:
             - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
         environment:
             WWWUSER: '${WWWUSER}'
-            LARAVEL_SAIL: 1
-            XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
-            XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
         tmpfs:
             - /var/www/html/vendor
@@ -25,7 +21,7 @@ services:
             - './vendor:/var/www/vendor'
             - '.:/var/www/html'
         networks:
-            - sail
+            - app-network
         depends_on:
             - mysql
             - redis
@@ -47,7 +43,7 @@ services:
         volumes:
             - '.:/var/www/html'
         networks:
-            - sail
+            - app-network
         depends_on:
             - mysql
             - redis
@@ -64,10 +60,10 @@ services:
             MYSQL_PASSWORD: '${DB_PASSWORD}'
             MYSQL_ALLOW_EMPTY_PASSWORD: 1
         volumes:
-            - 'sail-mysql:/var/lib/mysql'
+            - 'db:/var/lib/mysql'
             - './vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
         networks:
-            - sail
+            - app-network
         healthcheck:
             test:
                 - CMD
@@ -83,7 +79,7 @@ services:
         tmpfs:
             - /data
         networks:
-            - sail
+            - app-network
         healthcheck:
             test:
                 - CMD
@@ -101,9 +97,9 @@ services:
             MINIO_ROOT_USER: sail
             MINIO_ROOT_PASSWORD: password
         volumes:
-            - 'sail-minio:/data/minio'
+            - 'minio:/data/minio'
         networks:
-            - sail
+            - app-network
         entrypoint: sh
         command: -c 'mkdir -p /data/minio/${AWS_BUCKET} && minio server /data/minio --console-address ":8900"'
         healthcheck:
@@ -115,10 +111,10 @@ services:
             retries: 3
             timeout: 5s
 networks:
-    sail:
+    app-network:
         driver: bridge
 volumes:
-    sail-mysql:
+    db:
         driver: local
-    sail-minio:
+    minio:
         driver: local

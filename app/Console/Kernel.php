@@ -18,7 +18,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(new ClearUnusedFiles(), 'low')->weekly()->days([1])->dailyAt('05:00');
 
         $schedule->job(new DeleteCompilationErrorFiles(), 'low')->weekly()->days([6])->dailyAt('05:00');
-        $schedule->job(new FindBrokenSubmissionsAndFixJob(), 'low')->everyMinute();
+        $schedule->job(new FindBrokenSubmissionsAndFixJob(), 'low')->hourly();
     }
 
     /**
