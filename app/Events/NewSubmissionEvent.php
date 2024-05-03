@@ -35,7 +35,7 @@ class NewSubmissionEvent implements ShouldBroadcast
             'language' => $submitRun->language,
             'status' => $submitRun->status,
             'result' => $submitRun->result,
-            'testCases' => $submitRun->num_test_cases,
+            'testCases' => $submitRun->num_test_cases + 1,
             'resources' => ((isset($submitRun->execution_time) && $submitRun->status == 'Judged') ? number_format($submitRun->execution_time / 1000, 2, '.', ',') . 's' : '--') . ' | ' . ((isset($submitRun->execution_memory) && $submitRun->status == 'Judged') ? $submitRun->execution_memory . ' MB' : '--'),
         ];
     }
