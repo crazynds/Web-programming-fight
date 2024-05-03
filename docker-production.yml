@@ -3,7 +3,6 @@ services:
     build:
       context: .
       dockerfile: ./docker/prod/Dockerfile
-      target: php_base
     environment:
       FUNCTION: "scheduler"
     restart: unless-stopped
@@ -24,7 +23,6 @@ services:
     build:
       context: .
       dockerfile: ./docker/prod/Dockerfile
-      target: php_base
     environment:
       FUNCTION: "webserver"
       WEB_THREADS: 2
@@ -42,7 +40,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/prod/Dockerfile
-      target: php_reverb
+    environment:
+      FUNCTION: "reverb"
     restart: unless-stopped
     ports:
       - "${REVERB_PORT:-8080}:${REVERB_PORT:-8080}"
@@ -59,7 +58,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/prod/Dockerfile
-      target: php_worker
+    environment:
+      FUNCTION: "worker"
     restart: unless-stopped
     networks:
       - app_network

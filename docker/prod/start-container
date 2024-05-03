@@ -37,7 +37,7 @@ elif [ "$FUNCTION" == "pulse" ]; then
 elif [ "$FUNCTION" == "mailler" ]; then
     # Start mailer
     php artisan queue:work --queue=email --rest=2 --sleep=4 --tries=5 --backoff=10,60,300 --max-time=3600 --timeout=0
-elif [ "$FUNCTION" == "reveb" ]; then
+elif [ "$FUNCTION" == "reverb" ]; then
     # Start supervisor (reverb+default worker)
     exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
 elif [ "$FUNCTION" == "webserver" ]; then

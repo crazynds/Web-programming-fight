@@ -12,8 +12,47 @@ ENV NODE_VERSION=18
 # Install node UBUNTU
 RUN curl -fsSL https://deb.nodesource.com/setup_21.x | tap | bash
 RUN apt-get update
-RUN apt-get install -y tzdata dos2unix npm bash
+RUN apt-get install -y tzdata dos2unix npm bash supervisor
 
+RUN apt-get install -y \
+    nano time wget \
+    autoconf \
+    bison \
+    flex \
+    gcc \
+    g++ \
+    libprotobuf-dev \
+    libnl-route-3-dev \
+    libtool \
+    make \
+    pkg-config \
+    protobuf-compiler \
+    python3.11
+
+RUN mkdir /langs
+
+# Download and install pypy
+RUN wget https://downloads.python.org/pypy/pypy3.10-v7.3.16-linux64.tar.bz2 -P /langs
+RUN tar -xf /langs/pypy3.10-v7.3.16-linux64.tar.bz2 -C /langs && \
+    mv /langs/pypy3.10-v7.3.16-linux64 /langs/pypy3.10 && \
+    rm /langs/pypy3.10-v7.3.16-linux64.tar.bz2 && \
+    rm /langs/pypy3.10/bin/python* && \
+    cp /langs/pypy3.10/bin/* /usr/bin -r && \
+    cp /langs/pypy3.10/lib/* /usr/lib -r && \
+    cp /langs/pypy3.10/include/* /usr/include -r
+
+
+# Download and install NSJail
+RUN git clone https://github.com/google/nsjail.git  /nsjail
+RUN cd /nsjail && make && mv /nsjail/nsjail /bin && rm -rf -- /nsjail
+
+# Copy nsjail config
+RUN mkdir /var/nsjail
+RUN chmod 0777 /var/nsjail
+
+COPY ./docker/config/ /var/nsjail/
+RUN chmod +x /var/nsjail/runPypy3.10.sh
+RUN chmod +x /var/nsjail/runPython3.11.sh
 
 
 # Add php additional extensions 
@@ -41,8 +80,12 @@ COPY package-lock.json /app/
 RUN composer install --no-interaction --no-dev --optimize-autoloader --no-scripts
 RUN npm install
 
+
 # Copy php config
 COPY ./docker/prod/php.ini /usr/local/etc/php/conf.d/local.ini
+
+# Copy supervisord config
+COPY docker/prod/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Copy startup
 COPY ./docker/prod/start-container /usr/local/bin/start-container
@@ -67,70 +110,4 @@ RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
 # Delete not used code
 RUN rm -rf /app/{client,node_modules,stubs}/
 
-
 ENTRYPOINT ["start-container"]
-
-FROM php_base AS php_reverb
-
-RUN apt-get update && apt-get install -y supervisor
-
-# Clean APT
-RUN apt-get clean autoclean
-RUN apt-get autoremove --yes
-RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
-
-COPY docker/prod/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
-ENV FUNCTION=reveb
-
-
-FROM php_base AS php_worker
-
-RUN apt-get update && apt-get install -y \
-    nano time wget \
-    autoconf \
-    bison \
-    flex \
-    gcc \
-    g++ \
-    libprotobuf-dev \
-    libnl-route-3-dev \
-    libtool \
-    make \
-    pkg-config \
-    protobuf-compiler \
-    python3.11 \
-    && apt-get -y autoremove \
-    && apt-get clean 
-
-RUN mkdir /langs
-
-# Download and install pypy
-RUN wget https://downloads.python.org/pypy/pypy3.10-v7.3.16-linux64.tar.bz2 -P /langs
-RUN tar -xf /langs/pypy3.10-v7.3.16-linux64.tar.bz2 -C /langs
-RUN mv /langs/pypy3.10-v7.3.16-linux64 /langs/pypy3.10
-RUN rm /langs/pypy3.10-v7.3.16-linux64.tar.bz2
-RUN cp /langs/pypy3.10/bin/* /usr/bin -r
-RUN cp /langs/pypy3.10/lib/* /usr/lib -r
-RUN cp /langs/pypy3.10/include/* /usr/include -r
-
-
-# Download and install NSJail
-RUN git clone https://github.com/google/nsjail.git  /nsjail
-RUN cd /nsjail && make && mv /nsjail/nsjail /bin && rm -rf -- /nsjail
-
-# Clean APT
-RUN apt-get clean autoclean
-RUN apt-get autoremove --yes
-RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
-
-# Copy nsjail config
-RUN mkdir /var/nsjail
-RUN chmod 0777 /var/nsjail
-
-COPY ./docker/config/ /var/nsjail/
-RUN chmod +x /var/nsjail/runPypy3.10.sh
-RUN chmod +x /var/nsjail/runPython3.11.sh
-
-ENV FUNCTION=worker
-
