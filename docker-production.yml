@@ -44,7 +44,7 @@ services:
       FUNCTION: "reverb"
     restart: unless-stopped
     ports:
-      - "${REVERB_PORT:-8080}:${REVERB_PORT:-8080}"
+      - "${REVERB_PORT:-8080}:8080"
     networks:
       - app_network
     volumes_from:
