@@ -59,6 +59,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/prod/Dockerfile
+    privileged: true
+    restart: unless-stopped
     environment:
       FUNCTION: "worker"
     restart: unless-stopped
