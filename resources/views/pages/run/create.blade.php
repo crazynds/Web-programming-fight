@@ -1,7 +1,7 @@
 @extends('layouts.boca')
 
 @section('head')
-{!! htmlScriptTagJsApi() !!}
+    {!! htmlScriptTagJsApi() !!}
 @endsection
 
 @section('content')
@@ -14,14 +14,15 @@
         </div>
     </div>
 
-    <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data" action="{{route('submitRun.store')}}">
+    <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data" action="{{ route('submitRun.store') }}">
         @csrf
         <div class="row">
             <div class="col">
                 <label for="problem" class="form-label">Problem: </label><br />
                 <select name="problem" class="form-select" required>
                     @foreach ($problems as $problem)
-                        <option value="{{ $problem->id }}" @if(isset($selected) && $problem->id==$selected) selected @endif >#{{ $problem->id }} - {{ $problem->title }}</option>
+                        <option value="{{ $problem->id }}" @if (isset($selected) && $problem->id == $selected) selected @endif>
+                            #{{ $problem->id }} - {{ $problem->title }}</option>
                     @endforeach
                 </select>
             </div>
@@ -55,9 +56,9 @@
 
 
         <p class="mt-3">
-           {!! htmlFormButton('Submit', [
-            'class' => "btn btn-primary"
-           ]) !!}
+            {!! htmlFormButton('Submit', [
+                'class' => 'btn btn-primary',
+            ]) !!}
         </p>
     </form>
 

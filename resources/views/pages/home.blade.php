@@ -50,6 +50,7 @@
                     Fixes 🐛
                 <ul>
                     <li>Increased area size of Home button.</li>
+                    <li>Added 'Go Back' buttons in some forgotten areas.</li>
                 </ul>
                 </p>
             </div>

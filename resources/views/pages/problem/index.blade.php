@@ -12,6 +12,11 @@
             <a style="float:right" href="{{ route('problem.create') }}">
                 <button>New +</button>
             </a>
+            @if (Auth::user()->isAdmin())
+                <a style="float:right; margin-right: 5px;" href="">
+                    <button>Import +</button>
+                </a>
+            @endif
         </div>
     </div>
 
