@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Enums\SubmitResult;
 use App\Http\Requests\StoreProblemRequest;
+use App\Models\File;
 use App\Models\Problem;
 use Illuminate\Support\Facades\Auth;
 use ZipArchive;
+use Zip;
 
 class ProblemController extends Controller
 {
@@ -139,21 +141,15 @@ class ProblemController extends Controller
     public function download(Problem $problem)
     {
         $this->authorize('update', $problem);
-
-        $zip = new ZipArchive();
         $zipFileName = 'problem_' . $problem->id . '.zip';
 
-        if ($zip->open(public_path($zipFileName), ZipArchive::CREATE) === TRUE) {
+        $zip = Zip::create($zipFileName);
+        $titulo = $problem->title;
+        $description = $problem->description;
+        $input_description = $problem->input_description;
+        $output_description = $problem->output_description;
 
-            $zip->addEmptyDir('input');
-            $zip->addEmptyDir('output');
-
-            $titulo = $problem->title;
-            $description = $problem->description;
-            $input_description = $problem->input_description;
-            $output_description = $problem->output_description;
-
-            $markdown = "# {$titulo}
+        $markdown = "# {$titulo}
 
 {$description}
 
@@ -164,22 +160,47 @@ class ProblemController extends Controller
 ## Output
 
 {$output_description}";
+        $p = Problem::select([
+            'title',
+            'author',
+            'time_limit',
+            'memory_limit',
+            'description',
+            'input_description',
+            'output_description',
+        ])->find($problem->id);
+        $zip->addRaw($markdown, 'README.md')
+            ->addRaw(json_encode($p->toArray()), 'config.json');
 
-            $zip->addFromString('README.md', $markdown);
+        foreach ($problem->testCases()->with(['inputFile', 'outputFile'])->lazy() as $testCase) {
+            /** @var File $inFile */
+            $inFile = $testCase->inputFile;
+            /** @var File $outFile */
+            $outFile = $testCase->outputFile;
 
-            foreach ($problem->testCases()->with(['inputfile', 'outputfile'])->lazy() as $testCase) {
-                $inFile = $testCase->inputFile;
-                $outFile = $testCase->outputFile;
-
-                $zip->addFromString('input/' . $testCase->name, $inFile->get());
-                $zip->addFromString('output/' . $testCase->name, $outFile->get());
-            }
-
-            $zip->close();
-
-            return response()->download(public_path($zipFileName))->deleteFileAfterSend(true);
-        } else {
-            return "Failed to create the zip file.";
+            $inFile->addToZip($zip, 'input/' . $testCase->name);
+            $outFile->addToZip($zip, 'output/' . $testCase->name);
         }
+        $testCases = $problem->testCases()->select([
+            'position',
+            'type',
+            'public',
+            'name'
+        ])->get()->each->toArray();
+        $zip->addRaw(json_encode($testCases->toArray()), 'testCases.json');
+
+
+
+        foreach ($problem->scorers()->with(['input', 'file'])->lazy() as $scorer) {
+            $file = $scorer->file;
+            $input = $scorer->input;
+
+            $folderName = 'scorers/' . $scorer->name . '#' . $scorer->id;
+
+            $file->addToZip($zip, $folderName . '/code');
+            $input->addToZip($zip, $folderName . '/input');
+        }
+
+        return $zip;
     }
 }

@@ -36,13 +36,14 @@
                 <p>
                     Features ✨
                 <ul>
+                    <li>Load problems using ZIP.</li>
                     <li>Created contest page!</li>
                 </ul>
                 </p>
                 <p>
                     Changes ⚙️
                 <ul>
-                    <li></li>
+                    <li>Best algorithm to download problems in ZIP format.</li>
                 </ul>
                 </p>
                 <p>
