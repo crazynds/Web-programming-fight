@@ -9,6 +9,7 @@
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     @vite(['resources/css/boca.css'])
+    @vite(['resources/css/custom.css'])
 
     <style>
         .sm-github {
@@ -39,8 +40,9 @@
         <tbody>
             <tr>
                 <td nowrap="" bgcolor="#ffa020" align="center" class="px-2">
-                    <x-ballon />
-                    <a href="{{ route('home') }}" style="font-size: 1em; text-decoration: none">
+                    <a href="{{ route('home') }}"
+                        style="font-size: 1em; text-decoration: none;height: 100%;display: block;width: 100%;">
+                        <x-ballon />
                         <font color="#000000">{{ config('app.name') }}</font>
                     </a>
                 </td>
