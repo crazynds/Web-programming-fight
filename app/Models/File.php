@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use \Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use STS\ZipStream\ZipStream;
 
 class File extends Model
 {
@@ -13,52 +15,80 @@ class File extends Model
     public $guarded = [];
 
 
-    public static function createFile(UploadedFile $upfile,string $path,bool $forceDisk = false){
+    public static function createFile(UploadedFile $upfile, string $path, bool $forceDisk = false)
+    {
         $file = new File();
 
         // less than 2KB
-        if($upfile->getSize()< 1024*2 && !$forceDisk){
-            $file->path = $path.'/'.$upfile->hashName().'_db';
+        if ($upfile->getSize() < 1024 * 2 && !$forceDisk) {
+            $file->path = $path . '/' . $upfile->hashName() . '_db';
             $file->content = $upfile->get();
-        }else{
+        } else {
             $file->path = $upfile->store($path);
             $file->content = null;
         }
 
         $file->size = $upfile->getSize();
         $file->type = $upfile->getClientOriginalExtension();
-        $file->hash = hash_file("sha256",$upfile->getPathname());
+        $file->hash = hash_file("sha256", $upfile->getPathname());
         $file->save();
         return $file;
     }
 
-    public function download(string $title){
-        if(is_null($this->content)){
-            return Storage::download($this->path,$title);
-        }else{
+    public function download(string $title)
+    {
+        if (is_null($this->content)) {
+            return Storage::download($this->path, $title);
+        } else {
             return response()->streamDownload(function () {
                 echo $this->content;
             }, $title);
         }
     }
 
-    public function get(){
-        if(is_null($this->content)){
+    public function get()
+    {
+        if (is_null($this->content)) {
             return Storage::get($this->path);
-        }else{
+        } else {
             return $this->content;
         }
     }
 
-    public function readStream(){
-        if(is_null($this->content)){
+    public function readStream()
+    {
+        if (is_null($this->content)) {
             return Storage::readStream($this->path);
-        }else{
-            $stream = fopen('php://memory','r+');
+        } else {
+            $stream = fopen('php://memory', 'r+');
             fwrite($stream, $this->content);
             rewind($stream);
             return $stream;
         }
     }
 
+    public function addToZip(ZipStream $zip, $pathName = null)
+    {
+        if (is_null($pathName)) $pathName = $this->path;
+
+        if (!is_null($this->content)) {
+            $zip->addRaw($this->content, $pathName);
+        } else {
+            $zip->add($this->url(), $pathName);
+        }
+    }
+
+    public function url()
+    {
+        $bucket = Storage::getAdapter();
+        switch (config('filesystems.default')) {
+            case 's3':
+                $bucket = config('filesystems.disks.s3.bucket');
+                $url = "s3://{$bucket}/{$this->path}";
+                break;
+            case 'local':
+                $url = Storage::url($this->path);
+        }
+        return $url;
+    }
 }

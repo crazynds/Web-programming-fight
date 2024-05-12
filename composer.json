@@ -19,6 +19,7 @@
         "league/flysystem-ziparchive": "^3.16",
         "livewire/livewire": "^3.4",
         "predis/predis": "^2.2",
+        "stechstudio/laravel-zipstream": "^4.14",
         "sysatom/php-bloom-filter": "^1.0"
     },
     "require-dev": {
