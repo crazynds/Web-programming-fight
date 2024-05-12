@@ -19,7 +19,7 @@
     </div>
 
     <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data"
-        action="{{ route('problem.testCase.store', ['problem' => $problem->id]) }}" id="form">
+        action="{{ route('problem.testCase.store', ['problem' => $problem->id]) }}">
         @csrf
 
         <div class="row">

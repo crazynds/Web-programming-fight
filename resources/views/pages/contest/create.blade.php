@@ -12,6 +12,9 @@
                 Contest:
             </b>
         </div>
+        <div class="col text-end">
+            <a href="{{ route('contest.index') }}">Go Back</a>
+        </div>
     </div>
 
     <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data" action="{{ route('contest.store') }}">
