@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ContestController;
 use App\Http\Controllers\ProblemController;
 use App\Http\Controllers\ScorerController;
 use App\Http\Controllers\SubmitRunController;
@@ -95,6 +96,10 @@ Route::middleware('auth')->group(function () {
         ->name('team.deny');
     Route::get('/team/{team}/leave', [TeamController::class, 'leave'])
         ->name('team.leave');
+
+
+    Route::resource('contest', ContestController::class)
+        ->only(['index', 'store', 'create', 'edit', 'update', 'destroy']);
 });
 
 

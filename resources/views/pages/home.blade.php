@@ -1,5 +1,9 @@
 @extends('layouts.boca')
 
+
+@section('head')
+@endsection
+
 @section('content')
     <div class="row mb-4">
         <div class="col">
@@ -21,7 +25,38 @@
     @auth
 
         <div class="row">
-            <div class="col-6">
+            <div class="col-8">
+                <h3>
+                    v1.0.1 - !
+                </h3>
+                <p>
+                    Date: ----
+                    By: Crazynds
+                </p>
+                <p>
+                    Features ✨
+                <ul>
+                    <li>Created contest page!</li>
+                </ul>
+                </p>
+                <p>
+                    Changes ⚙️
+                <ul>
+                    <li></li>
+                </ul>
+                </p>
+                <p>
+                    Fixes 🐛
+                <ul>
+                    <li>Increased area size of Home button.</li>
+                </ul>
+                </p>
+            </div>
+        </div>
+        <hr>
+
+        <div class="row">
+            <div class="col-8">
                 <h3>
                     v1.0.0 - Lets the party begin! 🎉🎉🎉
                 </h3>
@@ -44,7 +79,7 @@
                     Changes ⚙️
                 <ul>
                     <li>Enchanced Profile page and added a list of all solved problems by the user</li>
-                    <li>Change runs table to use livewire to automatically update</li>
+                    <li>Change submissions page to automatically update using sockets and broadcast messages</li>
                 </ul>
                 </p>
                 <p>

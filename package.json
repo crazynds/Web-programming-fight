@@ -24,8 +24,10 @@
         "easymde": "^2.18.0",
         "fine-uploader": "^5.16.2",
         "jquery": "^3.7.1",
+        "jquery.quicksearch": "^2.4.0",
         "line-awesome": "^1.3.0",
         "mathjax": "^3.2.2",
+        "multiselect": "^0.9.12",
         "vue": "^3.4.25"
     }
 }

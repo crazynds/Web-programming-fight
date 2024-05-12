@@ -60,7 +60,7 @@
                         <ul class="dropdown-menu" aria-labelledby="dropdown-headbar">
                             <li><a class="dropdown-item" href="{{ route('user.index') }}">Users</a></li>
                             <li><a class="dropdown-item" href="{{ route('team.index') }}">Teams</a></li>
-                            <li><a class="dropdown-item" href="#">Contests</a></li>
+                            <li><a class="dropdown-item" href="{{ route('contest.index') }}">Contests</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
