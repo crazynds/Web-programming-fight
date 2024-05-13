@@ -14,13 +14,16 @@ class File extends Model
     public $timestamps = false;
     public $guarded = [];
 
+    // Save at max 2KB in database of content
+    const MAX_DB_CONTENT = 2 * 1024;
+
 
     public static function createFile(UploadedFile $upfile, string $path, bool $forceDisk = false)
     {
         $file = new File();
 
         // less than 2KB
-        if ($upfile->getSize() < 1024 * 2 && !$forceDisk) {
+        if ($upfile->getSize() < self::MAX_DB_CONTENT && !$forceDisk) {
             $file->path = $path . '/' . $upfile->hashName() . '_db';
             $file->content = $upfile->get();
         } else {
@@ -34,6 +37,32 @@ class File extends Model
         $file->save();
         return $file;
     }
+
+
+
+    public static function createFileByStream($stream, int $size, string $hash, string $path, bool $forceDisk = false)
+    {
+        $file = new File();
+
+        $hashName = sha1($hash . '-' . $size . '-' . random_bytes(4));
+        // less than 2KB
+        if ($size < self::MAX_DB_CONTENT && !$forceDisk) {
+            $file->path = $path . '/' . $hashName . '_streamed_db';
+            $file->content = fread($stream, $size);
+            fclose($stream);
+        } else {
+            Storage::put($path . '/' . $hashName, $stream);
+            $file->path = $path . '/' . $hashName;
+            $file->content = null;
+        }
+
+        $file->size = $size;
+        $file->type = '';
+        $file->hash = $hash;
+        $file->save();
+        return $file;
+    }
+
 
     public function download(string $title)
     {

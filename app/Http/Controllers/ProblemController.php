@@ -7,6 +7,7 @@ use App\Http\Requests\StoreProblemRequest;
 use App\Models\File;
 use App\Models\Problem;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use ZipArchive;
 use Zip;
 
@@ -136,71 +137,5 @@ class ProblemController extends Controller
     {
         $problem->delete();
         return $this->index();
-    }
-
-    public function download(Problem $problem)
-    {
-        $this->authorize('update', $problem);
-        $zipFileName = 'problem_' . $problem->id . '.zip';
-
-        $zip = Zip::create($zipFileName);
-        $titulo = $problem->title;
-        $description = $problem->description;
-        $input_description = $problem->input_description;
-        $output_description = $problem->output_description;
-
-        $markdown = "# {$titulo}
-
-{$description}
-
-## Input
-
-{$input_description}
-
-## Output
-
-{$output_description}";
-        $p = Problem::select([
-            'title',
-            'author',
-            'time_limit',
-            'memory_limit',
-            'description',
-            'input_description',
-            'output_description',
-        ])->find($problem->id);
-        $zip->addRaw($markdown, 'README.md')
-            ->addRaw(json_encode($p->toArray()), 'config.json');
-
-        foreach ($problem->testCases()->with(['inputFile', 'outputFile'])->lazy() as $testCase) {
-            /** @var File $inFile */
-            $inFile = $testCase->inputFile;
-            /** @var File $outFile */
-            $outFile = $testCase->outputFile;
-
-            $inFile->addToZip($zip, 'input/' . $testCase->name);
-            $outFile->addToZip($zip, 'output/' . $testCase->name);
-        }
-        $testCases = $problem->testCases()->select([
-            'position',
-            'type',
-            'public',
-            'name'
-        ])->get()->each->toArray();
-        $zip->addRaw(json_encode($testCases->toArray()), 'testCases.json');
-
-
-
-        foreach ($problem->scorers()->with(['input', 'file'])->lazy() as $scorer) {
-            $file = $scorer->file;
-            $input = $scorer->input;
-
-            $folderName = 'scorers/' . $scorer->name . '#' . $scorer->id;
-
-            $file->addToZip($zip, $folderName . '/code');
-            $input->addToZip($zip, $folderName . '/input');
-        }
-
-        return $zip;
     }
 }

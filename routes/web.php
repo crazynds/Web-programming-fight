@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContestController;
+use App\Http\Controllers\IOProblemController;
 use App\Http\Controllers\ProblemController;
 use App\Http\Controllers\ScorerController;
 use App\Http\Controllers\SubmitRunController;
@@ -43,18 +44,25 @@ Route::middleware('auth')->group(function () {
         ->except(['edit', 'update']);
     Route::resource('problem.scorer', ScorerController::class)
         ->except(['edit', 'update']);
-    Route::get('/problem/{problem}/scorer/all/reavaliate', [ScorerController::class, 'reavaliate'])
-        ->name('problem.scorer.reavaliate');
 
-    Route::get('/problem/{problem}/public', [ProblemController::class, 'publicChange'])
-        ->name('problem.public');
-    Route::get('/problem/{problem}/download', [ProblemController::class, 'download'])
-        ->name('problem.download');
-    Route::get('/problem/{problem}/podium', [ProblemController::class, 'podium'])
-        ->name('problem.podium');
+    Route::get('/problem_import', [IOProblemController::class, 'import'])
+        ->name('problem.import');
+    Route::post('/problem_upload', [IOProblemController::class, 'upload'])
+        ->name('problem.upload');
+
     Route::controller(TestCaseController::class)
         ->name('problem.')->prefix('problem/{problem}')
         ->group(function () {
+            Route::get('public', [ProblemController::class, 'publicChange'])
+                ->name('public');
+            Route::get('download', [ProblemController::class, 'download'])
+                ->name('download');
+            Route::get('podium', [ProblemController::class, 'podium'])
+                ->name('podium');
+            Route::get('download', [IOProblemController::class, 'download'])
+                ->name('download');
+
+
             Route::get('testCase/{testCase}/input', 'downloadInput')
                 ->name('testCase.input');
             Route::get('testCase/{testCase}/output', 'downloadOutput')
@@ -65,6 +73,10 @@ Route::middleware('auth')->group(function () {
                 ->name('testCase.down');
             Route::get('testCase/{testCase}/public', 'publicChange')
                 ->name('testCase.edit.public');
+
+
+            Route::get('scorer/all/reavaliate', [ScorerController::class, 'reavaliate'])
+                ->name('scorer.reavaliate');
         });
 
     // Todo fazer polices para submissions, somente o dono pode gerenciar
