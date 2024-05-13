@@ -1,18 +1,6 @@
 @extends('layouts.boca')
 
 @section('head')
-    <script>
-        window.MathJax = {
-            processClass: "mathjax",
-            ignoreClass: "no-mathjax",
-            tex: {
-                inlineMath: [
-                    ['$', '$']
-                ]
-            }
-        }
-    </script>
-    <script id="MathJax-script" async src="{{ asset('js/mathjax/tex-chtml.js') }}"></script>
     {!! htmlScriptTagJsApi() !!}
 @endsection
 
@@ -29,7 +17,7 @@
         </div>
     </div>
 
-    <form id="{{ getFormId() }}" method="post" action="{{ route('problem.import') }}">
+    <form id="{{ getFormId() }}" enctype="multipart/form-data" method="post" action="{{ route('problem.upload') }}">
         @csrf
 
         <div class="row">
@@ -37,7 +25,7 @@
                 <h3>
                     Zip Problem:
                 </h3>
-                <input type="file" id="files1" name="problem" style="max-width:100%" />
+                <input type="file" id="file" name="file" style="max-width:100%" />
             </div>
         </div>
 

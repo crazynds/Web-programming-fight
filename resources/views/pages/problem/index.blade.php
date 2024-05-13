@@ -13,7 +13,7 @@
                 <button>New +</button>
             </a>
             @if (Auth::user()->isAdmin())
-                <a style="float:right; margin-right: 5px;" href="">
+                <a style="float:right; margin-right: 5px;" href="{{ route('problem.import') }}">
                     <button>Import +</button>
                 </a>
             @endif

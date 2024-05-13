@@ -36,7 +36,7 @@
                 <p>
                     Features ✨
                 <ul>
-                    <li>Import problems using ZIP.</li>
+                    <li>Created fast problem import using ZIP files.</li>
                     <li>Created contest page!</li>
                 </ul>
                 </p>
@@ -48,7 +48,7 @@
                 <p>
                     Styles 🎨
                 <ul>
-                    <li>Add a custom style to scroll bar.</li>
+                    <li>Added a custom style to scroll bar.</li>
                     <li>Added 'Go Back' buttons in some forgotten areas.</li>
                     <li>Increased area size of Home button.</li>
                 </ul>
