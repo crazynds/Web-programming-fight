@@ -10,7 +10,7 @@ window.onload = function(){
             autosave: {
                 enabled: true,
                 delay: 3000,
-                uniqueId: markdowns[i].name,
+                uniqueId: markdowns[i].id,
                 timeFormat:{
                     locale: 'pt-BR',
                     format: 'hour:minute:second'
