@@ -17,8 +17,12 @@
         </div>
     </div>
 
-    <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data" action="{{ route('contest.store') }}">
+    <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data"
+        action="@if (isset($contest->id)) {{ route('contest.update', ['contest' => $contest->id]) }}@else{{ route('contest.store') }} @endif">
         @csrf
+        @if (isset($contest->id))
+            @method('PUT')
+        @endif
 
         <div class="row">
             <div class="col">
@@ -56,7 +60,7 @@
                 </select>
             </div>
             <div class="col-3">
-                <label for="penality" class="form-label">Penalty: </label><br />
+                <label for="penality" class="form-label">Penality: </label><br />
                 <input type="number" class="form-control" id="penality" name="penality"
                     value="{{ old('penality', $contest->penality) ?? 0 }}" min="0" required />
             </div>
@@ -77,6 +81,13 @@
 
         <div class="row">
             <div class="col">
+                <label for="description" class="form-label">Description: </label><br />
+                <textarea class="markdown" id="contest_description" name="description" style="width: 100%">{{ old('description', $contest->description) }}</textarea>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
                 <h4>Rules:</h4>
 
                 <ul>
@@ -92,7 +103,8 @@
                         <input type='hidden' id="hidden_show_wrong_answer" value='0' name='show_wrong_answer'>
                         <input type="checkbox" id="show_wrong_answer" value='1' name="show_wrong_answer"
                             @if (old('show_wrong_answer', $contest->show_wrong_answer)) checked @endif />
-                        <label for="show_wrong_answer" class="form-label" style="cursor: help;text-decoration: underline;"
+                        <label for="show_wrong_answer" class="form-label"
+                            style="cursor: help;text-decoration: underline;"
                             title="Show difference output in Wrong Answer between the correct output and your solution output.">
                             Show difference output in Wrong Answer.
                         </label>
@@ -106,7 +118,7 @@
                 <h4 class="text-center">Problems</h4>
                 <select multiple="multiple" id="problems" name="problems[]">
                     @foreach ($problems as $problem)
-                        <option value="{{ $problem->id }}">
+                        <option value="{{ $problem->id }}" @if (in_array($problem->id, old('problems', $contest->problems()->pluck('problems.id')->toArray() ?? []))) selected @endif>
                             #{{ $problem->id }} - {{ $problem->title }}</option>
                     @endforeach
                 </select>
@@ -115,7 +127,8 @@
                 <h4 class="text-center">Languages</h4>
                 <select multiple="multiple" id="languages" name="languages[]">
                     @foreach (App\Enums\LanguagesType::list() as $name => $code)
-                        <option value="{{ $code }}">{{ $name }}</option>
+                        <option value="{{ $code }}" @if (in_array($code, old('languages', $contest->langs ?? []))) selected @endif>
+                            {{ $name }}</option>
                     @endforeach
                 </select>
             </div>

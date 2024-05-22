@@ -12,19 +12,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('contest', function (Blueprint $table) {
+        Schema::create('contests', function (Blueprint $table) {
             $table->id();
 
             $table->foreignIdFor(User::class)->nullable()->constrained()->onDelete('set null');
             $table->string('title', 255);
+            $table->text('description');
 
             $table->boolean('is_private');
             $table->string('password', 255)->nullable();
+            $table->json('langs');
 
             $table->timestamp('start_time');
             $table->unsignedInteger('duration');
             $table->unsignedInteger('blind_time');
-            $table->unsignedInteger('penalty'); // Penalidade por errar
+            $table->unsignedInteger('penality'); // Penalidade por errar
 
             // Custom Rules
             $table->boolean('parcial_solution')->default(false); // Solução parcial? 0-80%
@@ -45,6 +47,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('contest');
+        Schema::dropIfExists('contests');
     }
 };

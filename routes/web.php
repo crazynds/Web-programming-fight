@@ -110,8 +110,7 @@ Route::middleware('auth')->group(function () {
         ->name('team.leave');
 
 
-    Route::resource('contest', ContestController::class)
-        ->only(['index', 'store', 'create', 'edit', 'update', 'destroy']);
+    Route::resource('contest', ContestController::class);
 });
 
 
