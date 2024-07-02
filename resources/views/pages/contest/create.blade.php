@@ -17,8 +17,12 @@
         </div>
     </div>
 
-    <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data" action="{{ route('contest.store') }}">
+    <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data"
+        action="@if (isset($contest->id)) {{ route('contest.update', ['contest' => $contest->id]) }}@else{{ route('contest.store') }} @endif">
         @csrf
+        @if (isset($contest->id))
+            @method('PUT')
+        @endif
 
         <div class="row">
             <div class="col">
@@ -97,7 +101,33 @@
                             Show difference output in Wrong Answer.
                         </label>
                     </li>
+                    <li>
+                        <input type='hidden' id="hidden_individual" value='0' name='individual'>
+                        <input type="checkbox" id="individual" value='1' name="individual"
+                            @if (old('individual', $contest->individual)) checked @endif />
+                        <label for="individual" class="form-label" style="cursor: help;text-decoration: underline;"
+                            title="Teams are not allowed, only individual participators.">
+                            Individual participation.
+                        </label>
+                    </li>
+                    <li>
+                        <input type='hidden' id="hidden_time_based_points" value='0' name='time_based_points'>
+                        <input type="checkbox" id="time_based_points" value='1' name="time_based_points"
+                            @if (old('time_based_points', $contest->time_based_points)) checked @endif />
+                        <label for="time_based_points" class="form-label"
+                            style="cursor: help;text-decoration: underline;"
+                            title="Over time, the points for every question will be decreased from 1000 points in the start of the contest to 700 points in the end.">
+                            Points based in time. (100% - 70%)
+                        </label>
+                    </li>
                 </ul>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <label for="contestDescription" class="form-label">Description: </label><br />
+                <textarea class="markdown" id="contestDescription" name="description" style="width: 100%">{{ old('description', $contest->description) }}</textarea>
             </div>
         </div>
 
@@ -182,7 +212,7 @@
                 afterDeselect: function() {
                     this.qs1.cache();
                     this.qs2.cache();
-                }
+                },
             })
             $('#languages').multiSelect({
                 selectableHeader: "<label>Avaliable</label><input type='text' class='search-input' autocomplete='off' placeholder='Search'>",
@@ -221,6 +251,9 @@
                     this.qs2.cache();
                 }
             })
+
+            $('#languages').multiSelect('select', @json(old('languages', $contest->languages ?? [])));
+            $('#problems').multiSelect('select', @json(old('problems', $contest->problems->pluck('id') ?? [])).map(x => String(x)));
         });
 
         $('#is_private').change(function() {
