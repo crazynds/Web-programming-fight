@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\LanguagesType;
+use BenSampo\Enum\Rules\EnumValue;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreContestRequest extends FormRequest
@@ -25,17 +27,28 @@ class StoreContestRequest extends FormRequest
             'title' => 'required|string|max:255|min:5',
             'is_private' => 'required|boolean',
             'password' => 'sometimes|nullable|string|min:8|max:255',
-            'start_time' => 'required|date_format:Y-m-d H:i:s|after:now',
+            'start_time' => 'required|date|after:yesterday',
             'duration' => 'required|integer|min:0|max:43200',
             'blind_time' => 'required|integer|min:0|max:20160',
-            'penalty' => 'required|integer|min:0|max:60000',
+            'penality' => 'required|integer|min:0|max:60000',
 
             // Rules
             'parcial_solution' => 'required|boolean',
             'show_wrong_answer' => 'required|boolean',
+            'individual' => 'required|boolean',
+            'time_based_points' => 'required|boolean',
 
-            'problems' => 'required|array|min:1',
-            'problems.*' => 'required|integer|exists:problem,id',
+            'description' => 'required|string|max:65000',
+
+            'languages' => 'required|array|min:1|max:20',
+            'languages.*' => [
+                'required',
+                new EnumValue(LanguagesType::class, false)
+            ],
+
+            'problems' => 'required|array|min:1|max:32',
+            'problems.*' => 'required|integer|exists:problems,id',
+            recaptchaFieldName() => recaptchaRuleName()
         ];
     }
 }

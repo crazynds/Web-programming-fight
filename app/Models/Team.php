@@ -11,23 +11,28 @@ class Team extends Model
     public $guarded = [];
 
 
-    public function related(){
+    public function related()
+    {
         return $this->belongsToMany(User::class);
     }
 
-    public function members() {
-        return $this->related()->where('accepted',true);
+    public function members()
+    {
+        return $this->related()->where('accepted', true);
     }
-    public function owner(){
-        return $this->related()->where('owner',true)->first();
+    public function owner()
+    {
+        return $this->related()->where('owner', true);
     }
-    public function invited() {
-        return $this->related()->where('accepted',false);
+    public function invited()
+    {
+        return $this->related()->where('accepted', false);
     }
 
-    public function membersjson(){
+    public function membersjson()
+    {
         $arr = [];
-        foreach($this->members()->where('owner',false)->get() as $member){
+        foreach ($this->members()->where('owner', false)->get() as $member) {
             $m = [
                 'value' => $member->name,
                 'color' => 'green',
@@ -35,7 +40,7 @@ class Team extends Model
             ];
             $arr[] = $m;
         }
-        foreach($this->invited as $member){
+        foreach ($this->invited as $member) {
             $m = [
                 'value' => $member->name,
             ];

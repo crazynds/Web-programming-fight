@@ -111,7 +111,9 @@ Route::middleware('auth')->group(function () {
 
 
     Route::resource('contest', ContestController::class)
-        ->only(['index', 'store', 'create', 'edit', 'update', 'destroy']);
+        ->only(['index', 'show', 'store', 'create', 'edit', 'update', 'destroy']);
+    Route::post('/contest/{contest}/join', [ContestController::class, 'join'])
+        ->name('contest.join');
 });
 
 
