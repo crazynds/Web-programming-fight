@@ -25,9 +25,10 @@ class StoreContestRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255|min:5',
+            'description' => 'required|string|max:65000',
             'is_private' => 'required|boolean',
             'password' => 'sometimes|nullable|string|min:8|max:255',
-            'start_time' => 'required|date|after:yesterday',
+            'start_time' => 'required|date|after:today',
             'duration' => 'required|integer|min:0|max:43200',
             'blind_time' => 'required|integer|min:0|max:20160',
             'penality' => 'required|integer|min:0|max:60000',
@@ -37,8 +38,6 @@ class StoreContestRequest extends FormRequest
             'show_wrong_answer' => 'required|boolean',
             'individual' => 'required|boolean',
             'time_based_points' => 'required|boolean',
-
-            'description' => 'required|string|max:65000',
 
             'languages' => 'required|array|min:1|max:20',
             'languages.*' => [

@@ -24,10 +24,12 @@
             <tr>
                 <th><b>#</b></th>
                 <th class="text-center"><b>Title</b></th>
-                <th class="text-center"><b>Start Time</b></th>
-                <th class="text-center"><b>Duration</b></th>
-                <th class="text-center"><b>Role</b></th>
-                <th style="text-align: end;"><b>Actions</b></th>
+                <th class="text-center px-2"><b>Problems</b></th>
+                <th class="text-center px-2"><b>Competitors</b></th>
+                <th class="text-center px-2"><b>Start At</b></th>
+                <th class="text-center px-2"><b>Duration</b></th>
+                <th class="text-center px-2"><b>Role</b></th>
+                <th style="text-align: end; px-2"><b>Actions</b></th>
             </tr>
         </thead>
         <tbody>
@@ -36,21 +38,27 @@
                     <td class="pr-2">
                         #{{ $contest->id }}
                     </td>
-                    <td class="px-2">
+                    <td class="px-2 text-center">
                         {{ $contest->title }}
+                    </td>
+                    <td class="px-2 text-center">
+                        {{ $contest->problems()->count() }}
+                    </td>
+                    <td class="px-2 text-center">
+                        {{ $contest->competitors()->count() }}
                     </td>
                     <td class="px-2">
                         @if ($contest->start_time->gt(now()))
                             <span style="color: green">
-                                {{ $contest->start_time }}
+                                {{ $contest->start_time->format('Y-m-d H:i') }}
                             </span>
                         @elseif ($contest->start_time->addMinutes($contest->duration)->gt(now()))
                             <span style="color: #bf7c00">
-                                {{ $contest->start_time }}
+                                {{ $contest->start_time->format('Y-m-d H:i') }}
                             </span>
                         @else
                             <span style="color: red">
-                                {{ $contest->start_time }}
+                                {{ $contest->start_time->format('Y-m-d H:i') }}
                             </span>
                         @endif
                     </td>
@@ -62,7 +70,8 @@
                             <span title="Owner of the contest" style="cursor:help">
                                 👑
                             </span>
-                        @elseif (false)
+                        @endif
+                        @if ($contest->checkCompetitor(Auth::user()))
                             <span title="You are a Competitor" style="cursor:help">
                                 @if ($contest->individual)
                                     👤
@@ -97,7 +106,7 @@
                             @endcan
                             @can('update', $contest)
                                 <div class="vr"></div>
-                                <a href="{{ route('contest.edit', ['contest' => $contest->id]) }}" title="Edit this problem"
+                                <a href="{{ route('contest.edit', ['contest' => $contest->id]) }}" title="Edit this contest"
                                     class="d-flex action-btn">
                                     <i class="las la-edit"></i>
                                 </a>
@@ -107,7 +116,8 @@
                                 <form action="{{ route('contest.destroy', ['contest' => $contest->id]) }}" method="POST">
                                     @method('DELETE')
                                     @csrf
-                                    <button type="submit" class="d-flex bg-transparent" style="border:0; padding:0;">
+                                    <button type="submit" class="d-flex bg-transparent" style="border:0; padding:0;"
+                                        title="Delete this contest">
                                         <i class="las la-trash"></i>
                                     </button>
                                 </form>

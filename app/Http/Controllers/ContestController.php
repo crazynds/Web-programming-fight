@@ -120,7 +120,6 @@ class ContestController extends Controller
      */
     public function edit(Contest $contest)
     {
-
         /** @var User $user */
         $user = Auth::user();
         if ($user->isAdmin()) {
