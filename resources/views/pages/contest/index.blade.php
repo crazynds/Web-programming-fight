@@ -66,11 +66,6 @@
                         {{ $contest->duration }} mins
                     </td>
                     <td class="px-2">
-                        @if ($contest->user_id == Auth::user()->id)
-                            <span title="Owner of the contest" style="cursor:help">
-                                👑
-                            </span>
-                        @endif
                         @if ($contest->checkCompetitor(Auth::user()))
                             <span title="You are a Competitor" style="cursor:help">
                                 @if ($contest->individual)
@@ -78,6 +73,15 @@
                                 @else
                                     👥
                                 @endif
+                            </span>
+                            @if ($contest->user_id == Auth::user()->id)
+                                <span title="Owner of the contest" style="cursor:help">
+                                    👑
+                                </span>
+                            @endif
+                        @elseif ($contest->user_id == Auth::user()->id)
+                            <span title="Owner of the contest" style="cursor:help">
+                                👑
                             </span>
                         @elseif ($contest->is_private)
                             <span title="Private Contest" style="cursor:help">
