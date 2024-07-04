@@ -68,9 +68,8 @@
                                 @endforeach
                             </select>
                         @endif
-                        {!! htmlFormButton('Submit', [
+                        {!! htmlFormButton('Join', [
                             'style' => 'padding: 0px 20px;margin-bottom: 8px;',
-                            'class' => 'btn btn-primary',
                         ]) !!}
                     </form>
                 </div>
