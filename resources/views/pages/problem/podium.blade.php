@@ -44,7 +44,7 @@
                     <table border="1">
                         <thead>
                             <tr>
-                                <th><b>#</b></th>
+                                <th class="px-1"><b>#</b></th>
                                 <th class="text-center"><b>User</b></th>
                                 <th class="text-center"><b>Points</b></th>
                                 <th class="text-center"><b>Submission</b></th>

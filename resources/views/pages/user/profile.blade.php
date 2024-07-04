@@ -58,7 +58,7 @@
     <table border="1" style="margin: auto;margin-top: 10px;">
         <thead>
             <tr>
-                <th><b>#</b></th>
+                <th class="px-1"><b>#</b></th>
                 <th class="text-center"><b>When</b></th>
                 <th class="text-center"><b>Problem</b></th>
                 <th class="text-center"><b>Lang</b></th>

@@ -41,6 +41,21 @@
             <div class="hstack gap-2 justify-content-center">
             </div>
         </div>
+        @if (
+            $competitor &&
+                $contest->start_time->subMinutes(10)->lt(now()) &&
+                $contest->start_time->addMinutes($contest->duration)->gt(now()))
+            <hr />
+            <form class="d-flex justify-content-center" method="post"
+                action="{{ route('contest.enter', ['contest' => $contest->id]) }}">
+                @csrf
+                <b>
+                    > > > > > > > > > > > >
+                    <button type="submit" style="font-weight: 600;width: 200px;">Enter in contest</button>
+                    < < < < < < < < < < < < </b>
+            </form>
+        @endif
+
         <hr />
         <div class="row mathjax">
             {{ Illuminate\Mail\Markdown::parse($contest->description) }}
@@ -140,9 +155,11 @@
 
                 // If the count down is finished, write some text
                 if (distance < 0) {
-                    document.getElementById("clock").innerHTML = "Entering Contest...";
+                    document.getElementById("clock").innerHTML = "Starting Contest...";
                     location.reload()
                     clearInterval(x);
+                } else if (minutes == 10 && seconds == 0) {
+                    location.reload()
                 }
             };
 

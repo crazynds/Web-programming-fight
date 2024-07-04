@@ -39,7 +39,7 @@
     <table border="1">
         <thead>
             <tr>
-                <th><b>#</b></th>
+                <th class="px-1"><b>#</b></th>
                 <th class="text-center"><b>Name</b></th>
                 <th class="text-center"><b>Limits</b></th>
                 <th class="text-center"><b>Categories</b></th>

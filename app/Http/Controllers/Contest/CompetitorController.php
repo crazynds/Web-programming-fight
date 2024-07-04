@@ -1,19 +1,29 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Contest;
 
+use App\Http\Controllers\Controller;
 use App\Models\Competitor;
 use App\Http\Requests\StoreCompetitorRequest;
 use App\Http\Requests\UpdateCompetitorRequest;
+use App\Services\ContestService;
 
 class CompetitorController extends Controller
 {
+
+    public function __construct(protected ContestService $contestService)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $contest = $this->contestService->contest;
+        return view('pages.contest.competitor.index', [
+            'competitors' => $contest->competitors
+        ]);
     }
 
     /**

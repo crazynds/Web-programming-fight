@@ -57,3 +57,15 @@ input.search-input {
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
+
+
+
+/* Contest css */
+
+body.contest {
+    background-color: #e0e0c0;
+}
+
+body.contest #headerTab td{
+    background-color: #fffb46;
+}

@@ -35,7 +35,7 @@
     <table border="1">
         <thead>
             <tr>
-                <th><b>#</b></th>
+                <th class="px-1"><b>#</b></th>
                 <th class="text-center"><b>Name</b></th>
                 @can('update', $problem)
                     <th class="text-center"><b></b></th>

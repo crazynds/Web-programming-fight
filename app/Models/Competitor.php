@@ -37,4 +37,9 @@ class Competitor extends Model
     {
         return $this->belongsTo(Contest::class);
     }
+
+    public function submissions()
+    {
+        return $this->hasManyThrough(SubmitRun::class, CompetitorSubmitRun::class);
+    }
 }

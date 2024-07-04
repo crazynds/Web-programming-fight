@@ -6,6 +6,7 @@ use App\Enums\SubmitResult;
 use App\Http\Requests\StoreProblemRequest;
 use App\Models\File;
 use App\Models\Problem;
+use App\Services\ContestService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use ZipArchive;
@@ -14,7 +15,7 @@ use Zip;
 class ProblemController extends Controller
 {
 
-    public function __construct()
+    public function __construct(protected ContestService $contestService)
     {
         $this->authorizeResource(Problem::class, 'problem');
     }
@@ -22,13 +23,13 @@ class ProblemController extends Controller
     public function publicChange(Problem $problem)
     {
         $this->authorize('update', $problem);
-        $MINIMUN = 5;
-        if ($problem->testCases()->where('validated', true)->count() < $MINIMUN) {
+        $mininun = 5;
+        if ($problem->testCases()->where('validated', true)->count() < $mininun) {
             $problem->visible = false;
             $problem->save();
             return redirect()->route('problem.testCase.index', [
                 'problem' => $problem->id
-            ])->withErrors(['msg' => 'To enable a problem, you need to validate at least ' . $MINIMUN . ' test cases']);
+            ])->withErrors(['msg' => 'To enable a problem, you need to validate at least ' . $mininun . ' test cases']);
         }
         $problem->visible = !$problem->visible;
         $problem->save();
@@ -41,25 +42,29 @@ class ProblemController extends Controller
      */
     public function index()
     {
-        $problems = Problem::withCount([
-            'submissions',
-            'submissions as accepted_submissions' => function ($query) {
-                $query->where('submit_runs.result', '=', SubmitResult::Accepted);
-            },
-            'submissions as my_accepted_submissions' => function ($query) {
-                $query->where('submit_runs.result', '=', SubmitResult::Accepted)
-                    ->where('submit_runs.user_id', '=', Auth::user()->id);
-            },
-            'ranks'
-        ])
-            ->where(function ($query) {
-                /** @var User */
-                $user = Auth::user();
-                if (!$user->isAdmin())
-                    $query->where('user_id', $user->id)
-                        ->orWhere('visible', true);
-            })
-            ->orderBy('id')->get();
+        if ($this->contestService->inContest) {
+            $problems = $this->contestService->contest->problems()->orderBy('id')->get();
+        } else {
+            $problems = Problem::withCount([
+                'submissions',
+                'submissions as accepted_submissions' => function ($query) {
+                    $query->where('submit_runs.result', '=', SubmitResult::Accepted);
+                },
+                'submissions as my_accepted_submissions' => function ($query) {
+                    $query->where('submit_runs.result', '=', SubmitResult::Accepted)
+                        ->where('submit_runs.user_id', '=', Auth::user()->id);
+                },
+                'ranks'
+            ])
+                ->where(function ($query) {
+                    /** @var User */
+                    $user = Auth::user();
+                    if (!$user->isAdmin())
+                        $query->where('user_id', $user->id)
+                            ->orWhere('visible', true);
+                })
+                ->orderBy('id')->get();
+        }
         return view('pages.problem.index', [
             'problems' => $problems,
         ]);
@@ -104,6 +109,9 @@ class ProblemController extends Controller
      */
     public function show(Problem $problem)
     {
+        if ($this->contestService->inContest && !$this->contestService->contest->problems()->where('id', $problem->id)->exists()) {
+            return redirect()->route('home');
+        }
         return view('pages.problem.show', [
             'problem' => $problem,
             'testCases' => $problem->testCases()->orderBy('position')->where('public', true)->where('validated', true)->get()

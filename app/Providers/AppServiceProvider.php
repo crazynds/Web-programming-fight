@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Services\ContestService;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -43,6 +44,9 @@ class AppServiceProvider extends ServiceProvider
             return $user->isAdmin()
                 ? Response::allow()
                 : Response::deny('You must be an administrator.');
+        });
+        $this->app->singleton(ContestService::class, function () {
+            return new ContestService();
         });
     }
 }

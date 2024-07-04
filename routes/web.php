@@ -9,6 +9,8 @@ use App\Http\Controllers\SubmitRunController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TestCaseController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\AccessOnlyDuringContest;
+use App\Http\Middleware\PreventAccessDuringContest;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,12 +35,10 @@ Route::get('/auth/{provider}/redirect', [AuthController::class, 'redirect'])->na
 Route::get('/auth/{provider}/callback', [AuthController::class, 'callback'])->name('auth.callback');
 Route::get('/auth/logout', [AuthController::class, 'logout'])->middleware('auth')->name('auth.logout');
 
+Route::name('contest.')->prefix('contest/')->middleware('auth')->group(base_path('routes/contest.php'));
 
-
-Route::middleware('auth')->group(function () {
-    // problem routes
-    // TODO: fazer o problema estar vinculado a um usuario
-    // TODO: somente os donos podem editar seus problemas e etc..
+// Rotas do sistema como um todo
+Route::middleware(['auth', PreventAccessDuringContest::class])->group(function () {
     Route::resource('problem', ProblemController::class);
     Route::resource('problem.testCase', TestCaseController::class)
         ->except(['edit', 'update']);
@@ -114,9 +114,9 @@ Route::middleware('auth')->group(function () {
         ->only(['index', 'show', 'store', 'create', 'edit', 'update', 'destroy']);
     Route::post('/contest/{contest}/join', [ContestController::class, 'join'])
         ->name('contest.join');
+    Route::post('/constes/{contest}/enter', [ContestController::class, 'enter'])
+        ->name('contest.enter');
 });
-
-
 
 Route::get('/', function () {
     return redirect()->route('home');

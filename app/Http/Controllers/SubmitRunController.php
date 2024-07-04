@@ -11,6 +11,7 @@ use App\Models\SubmitRun;
 use App\Models\File;
 use App\Models\Problem;
 use App\Models\User;
+use App\Services\ContestService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
@@ -20,7 +21,7 @@ use Illuminate\Support\Str;
 class SubmitRunController extends Controller
 {
 
-    public function __construct()
+    public function __construct(protected ContestService $contestService)
     {
         $this->authorizeResource(SubmitRun::class, 'submitRun');
     }
@@ -49,7 +50,9 @@ class SubmitRunController extends Controller
     {
         /** @var $user */
         $user = Auth::user();
-        if ($user->isAdmin()) {
+        if ($this->contestService->inContest) {
+            $problems = $this->contestService->contest->problems()->get();
+        } else if ($user->isAdmin()) {
             $problems = Problem::all();
         } else {
             $problems = Problem::where('visible', true)->orWhere('user_id', $user->id)->get();

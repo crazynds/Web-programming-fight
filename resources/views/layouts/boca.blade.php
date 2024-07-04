@@ -35,22 +35,36 @@
     @yield('head')
 </head>
 
-<body class="no-mathjax">
+<body class="no-mathjax @if ($contestService->inContest) contest @endif">
     <table border="1" width="100%">
-        <tbody>
+        <tbody id="headerTab">
             <tr>
-                <td nowrap="" bgcolor="#ffa020" align="center" class="px-2">
+                <td nowrap="" align="center" class="px-2">
                     <a href="{{ route('home') }}"
                         style="font-size: 1em; text-decoration: none;height: 100%;display: block;width: 100%;">
                         <x-ballon />
-                        <font color="#000000">{{ config('app.name') }}</font>
+                        <font color="#000000">
+                            @if ($contestService->inContest)
+                                <b>
+                                    Contest Mode!
+                                </b>
+                            @else
+                                {{ config('app.name') }}
+                            @endif
+                        </font>
                     </a>
                 </td>
-                <td bgcolor="#ffa020" width="99%" style="padding-left:6px;overflow: unset;">
+                <td width="99%" style="padding-left:6px;overflow: unset;">
                     {{ now()->year }} |
-                    <a href="{{ route('problem.index') }}">Problems</a> |
-                    <a href="{{ route('submitRun.create') }}">Submit</a> |
-                    <a href="{{ route('submitRun.index') }}">Runs</a> |
+                    @if (!$contestService->inContest || $contestService->started)
+                        <a href="{{ route('problem.index') }}">Problems</a> |
+                        <a href="{{ route('submitRun.create') }}">Submit</a> |
+                        <a href="{{ route('submitRun.index') }}">Runs</a> |
+                    @else
+                        <span style="font-size: 12pt;">
+                            Waiting for contest to start...
+                        </span>
+                    @endif
                     {{-- <a href="./Statistics.html">Ranking</a> | --}}
                     <div class="dropdown me-2" style="float:right">
                         <a class="dropdown-toggle" type="button" id="dropdown-headbar" data-bs-toggle="dropdown"
@@ -58,23 +72,33 @@
                             Options
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="dropdown-headbar">
-                            <li><a class="dropdown-item" href="{{ route('user.index') }}">Users</a></li>
-                            <li><a class="dropdown-item" href="{{ route('team.index') }}">Teams</a></li>
-                            <li><a class="dropdown-item" href="{{ route('contest.index') }}">Contests</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="{{ route('submitRun.global') }}">Global Runs</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="#">FAQ</a></li>
-                            <li><a class="dropdown-item" href="#">About</a></li>
-
+                            @if ($contestService->inContest)
+                                <li><a class="dropdown-item"
+                                        href="{{ route('contest.competitor.index') }}">Competitors</a>
+                                </li>
+                                <li><a class="dropdown-item" href="">Leaderboard</a></li>
+                            @else
+                                <li><a class="dropdown-item" href="{{ route('user.index') }}">Users</a></li>
+                                <li><a class="dropdown-item" href="{{ route('team.index') }}">Teams</a></li>
+                                <li><a class="dropdown-item" href="{{ route('contest.index') }}">Contests</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="{{ route('submitRun.global') }}">Global Runs</a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="#">FAQ</a></li>
+                                <li><a class="dropdown-item" href="#">About</a></li>
+                            @endif
                         </ul>
                     </div>
                 </td>
-                <td bgcolor="#ffa020" align="center" class="px-2" nowrap="">
+                <td nowrap="" align="center" class="px-2">
+                    Timer
+                </td>
+                <td align="center" class="px-2" nowrap="">
                     @auth
                         <a href="{{ route('user.me') }}">{{ Auth()->user()->name }}</a>
                         <img src="{{ Auth()->user()->avatar }}" class="rounded-circle" style="width: 33px;height:33px;"
@@ -86,8 +110,13 @@
                     @endauth
                 </td>
                 @auth
-                    <td bgcolor="#ffa020" align="center" class="px-2" nowrap="">
-                        <a href="{{ route('auth.logout') }}">Logout</a>
+                    <td align="center" class="px-2" nowrap="">
+                        @if ($contestService->inContest)
+                            <a href="" style="font-size:1.6em" title="Leave the contest!"><i
+                                    class="las la-door-open"></i></a>
+                        @else
+                            <a href="{{ route('auth.logout') }}">Logout</a>
+                        @endif
                     </td>
                 @endauth
             </tr>
