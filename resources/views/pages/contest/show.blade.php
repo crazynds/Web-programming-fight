@@ -140,14 +140,14 @@
 
                 // If the count down is finished, write some text
                 if (distance < 0) {
-                    clearInterval(x);
                     document.getElementById("clock").innerHTML = "Entering Contest...";
                     location.reload()
+                    clearInterval(x);
                 }
             };
 
             clock();
-            setInterval(clock, 1000);
+            var x = setInterval(clock, 1000);
         </script>
     @endif
 @endsection
