@@ -22,7 +22,7 @@
     <table border="1">
         <thead>
             <tr>
-                <th><b>#</b></th>
+                <th class="px-1"><b>#</b></th>
                 <th class="text-center"><b>Title</b></th>
                 <th class="text-center px-2"><b>Problems</b></th>
                 <th class="text-center px-2"><b>Competitors</b></th>

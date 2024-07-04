@@ -57,6 +57,10 @@ thead, tbody, tfoot, tr, td, th{
   text-overflow: ellipsis;
 }
 
+#headerTab td{
+  background-color: #ffa020;
+}
+
 .action-btn{
   text-decoration:none !important;
 }

@@ -33,6 +33,25 @@ class ContestController extends Controller
         ]);
     }
 
+    public function enter(Contest $contest)
+    {
+        if ($contest->start_time->subMinutes(10)->gt(now())) {
+            return Redirect::back()->withErrors(['contest' => 'Contest has not started yet.']);
+        }
+
+        /** @var User $user */
+        $user = Auth::user();
+        /** @var Competitor $competitor */
+        $competitor = $contest->checkCompetitor($user);
+        if (!$competitor)
+            return Redirect::back()->withErrors(['contest' => 'You are\'nt participating this contest.']);
+        session()->put('contest', [
+            'contest' => $contest->id,
+            'competitor' => $competitor->id,
+        ]);
+        return redirect()->route('home');
+    }
+
     public function join(StoreCompetitorRequest $request, Contest $contest)
     {
         /** @var User $user */

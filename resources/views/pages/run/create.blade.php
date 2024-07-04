@@ -14,15 +14,22 @@
         </div>
     </div>
 
-    <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data" action="{{ route('submitRun.store') }}">
+    <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data"
+        action="{{ route(($contestService->inContest ? 'contest.' : '') . 'submitRun.store') }}">
         @csrf
         <div class="row">
             <div class="col">
                 <label for="problem" class="form-label">Problem: </label><br />
                 <select name="problem" class="form-select" required>
+                    @php($letter = 'A')
                     @foreach ($problems as $problem)
                         <option value="{{ $problem->id }}" @if (isset($selected) && $problem->id == $selected) selected @endif>
-                            #{{ $problem->id }} - {{ $problem->title }}</option>
+                            @if ($contestService->inContest)
+                                {{ $letter++ }} - {{ $problem->title }}
+                            @else
+                                #{{ $problem->id }} - {{ $problem->title }}
+                            @endif
+                        </option>
                     @endforeach
                 </select>
             </div>
@@ -30,7 +37,9 @@
                 <label for="lang" class="form-label">Language: </label><br />
                 <select name="lang" class="form-select" required>
                     @foreach (App\Enums\LanguagesType::list() as $name => $code)
-                        <option value="{{ $code }}">{{ $name }}</option>
+                        @if (!$contestService->inContest || in_array($code, $contestService->contest->languages))
+                            <option value="{{ $code }}">{{ $name }}</option>
+                        @endif
                     @endforeach
                 </select>
             </div>
@@ -61,5 +70,4 @@
             ]) !!}
         </p>
     </form>
-
 @endsection

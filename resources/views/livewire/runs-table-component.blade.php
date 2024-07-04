@@ -2,7 +2,7 @@
     <table border="1">
         <thead>
             <tr>
-                <th><b>#</b></th>
+                <th class="px-1"><b>#</b></th>
                 <th class="text-center"><b>When</b></th>
                 <th class="text-center"><b>Who</b></th>
                 <th class="text-center"><b>Problem</b></th>
