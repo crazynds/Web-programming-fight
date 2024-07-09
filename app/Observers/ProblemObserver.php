@@ -48,7 +48,7 @@ class ProblemObserver
         foreach ($problem->testCases()->lazy() as $testCase) {
             $testCase->delete();
         }
-        foreach ($problem->scorers()->lazy() as $scorer) {
+        foreach ($problem->scores()->lazy() as $scorer) {
             $scorer->delete();
         }
     }

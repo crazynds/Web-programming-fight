@@ -60,6 +60,39 @@
         <div class="row mathjax">
             {{ Illuminate\Mail\Markdown::parse($contest->description) }}
         </div>
+        <hr />
+
+        <div class="row">
+            <div class="col">
+                <ul>
+                    @if ($contest->parcial_solution)
+                        <li style="cursor: help;text-decoration: underline;"
+                            title="You only start earning points if you get at least 30% of the test cases right, with a maximum score of 60% if there is complete acceptance for all cases except one.">
+                            Parcial solution recieve score points too.</li>
+                    @else
+                        <li>Only solutions that pass in all test cases recive score points.</li>
+                    @endif
+                    @if ($contest->show_wrong_answer)
+                        <li style="cursor: help;text-decoration: underline;"
+                            title="Show difference output in Wrong Answer between the correct output and your solution output.">
+                            Wrong answer runs will show the difference in the output.</li>
+                    @else
+                    @endif
+                    @if ($contest->individual)
+                        <li>Indivual participation only.</li>
+                    @else
+                        <li>Team participation onlty.</li>
+                    @endif
+                    @if ($contest->time_based_points)
+                        <li style="cursor: help;text-decoration: underline;"
+                            title="Over time, the points for each question will decrease from 100% of the points at the beginning of the contest to 70% of the points at the end.">
+                            Points are based on time.</li>
+                    @else
+                    @endif
+                </ul>
+            </div>
+        </div>
+
         @if (!$competitor && $contest->start_time->addMinutes($contest->duration)->gt(now()))
             <hr />
             <div class="row">

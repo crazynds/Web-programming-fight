@@ -21,7 +21,7 @@ class SubmitRunPolicy
      */
     public function view(User $user, SubmitRun $submitRun): bool
     {
-        return $user->id==$submitRun->user_id || $user->isAdmin();
+        return $user->id == $submitRun->user_id || $user->isAdmin();
     }
 
     /**
@@ -37,8 +37,8 @@ class SubmitRunPolicy
      */
     public function update(User $user, SubmitRun $submitRun): bool
     {
-        if(!$submitRun->file_id)return false;
-        return $user->id==$submitRun->user_id || $user->isAdmin();
+        if (!$submitRun->file_id) return false;
+        return ($user->id == $submitRun->user_id && $submitRun->contest_id == null) || $user->isAdmin();
     }
 
     /**
@@ -48,5 +48,4 @@ class SubmitRunPolicy
     {
         return $user->isAdmin();
     }
-
 }

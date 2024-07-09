@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\LanguagesType;
 use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
+use App\Models\Pivot\CompetitorSubmitRun;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -74,5 +75,15 @@ class SubmitRun extends Model
     public function testCases()
     {
         return $this->belongsToMany(TestCase::class);
+    }
+
+    public function contest()
+    {
+        return $this->belongsTo(Contest::class);
+    }
+
+    public function competitor()
+    {
+        return $this->hasOneThrough(Competitor::class, CompetitorSubmitRun::class, 'submit_run_id', 'id', 'id', 'competitor_id');
     }
 }

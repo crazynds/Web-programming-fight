@@ -18,7 +18,7 @@ class UpdateSubmissionEvent implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(public SubmitRun $submitRun)
+    public function __construct(SubmitRun $submitRun)
     {
         $submitRun->refresh();
         $this->data = [
@@ -36,6 +36,8 @@ class UpdateSubmissionEvent implements ShouldBroadcast
             'testCases' => $submitRun->status != 'Judged' ? '---' : $submitRun->num_test_cases + 1,
             'resources' => ((isset($submitRun->execution_time) && $submitRun->status == 'Judged') ? number_format($submitRun->execution_time / 1000, 2, '.', ',') . 's' : '--') . ' | ' . ((isset($submitRun->execution_memory) && $submitRun->status == 'Judged') ? $submitRun->execution_memory . ' MB' : '--'),
             'suspense' => ($submitRun->status == 'Judged' ? ($submitRun->num_test_cases + 1) / ($submitRun->problem->testCases()->count() + 1) : 0) > 0.4,
+            'contest_id' => $submitRun->contest_id,
+            'competitor' => $submitRun->contest_id ? $submitRun->competitor?->acronym : null,
         ];
     }
 
@@ -46,6 +48,12 @@ class UpdateSubmissionEvent implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
+        if (isset($this->data['contest_id'])) {
+            return [
+                new PrivateChannel('contest.submissions.' . $this->data['contest_id']),
+                new PrivateChannel('submissions'),
+            ];
+        }
         return [
             new PrivateChannel('submissions'),
         ];

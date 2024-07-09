@@ -7,11 +7,13 @@ use App\Enums\SubmitStatus;
 use App\Http\Requests\StoreSubmitRunRequest;
 use App\Http\Resources\SubmitRunResultResource;
 use App\Jobs\ExecuteSubmitJob;
+use App\Models\Competitor;
 use App\Models\SubmitRun;
 use App\Models\File;
 use App\Models\Problem;
 use App\Models\User;
 use App\Services\ContestService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
@@ -46,10 +48,11 @@ class SubmitRunController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
         /** @var $user */
         $user = Auth::user();
+
         if ($this->contestService->inContest) {
             $problems = $this->contestService->contest->problems()->get();
         } else if ($user->isAdmin()) {
@@ -58,7 +61,8 @@ class SubmitRunController extends Controller
             $problems = Problem::where('visible', true)->orWhere('user_id', $user->id)->get();
         }
         return view('pages.run.create', [
-            'problems' => $problems
+            'problems' => $problems,
+            'selected' => $request->get('problem')
         ]);
     }
 
@@ -71,9 +75,15 @@ class SubmitRunController extends Controller
         if (RateLimiter::tooManyAttempts('submission:' . $user->id, 30)) {
             return Redirect::back()->withErrors(['msg' => 'Too many attempts! Wait a moment and try again!']);
         }
+        $problem = Problem::findOrFail($request->problem);
+        // check if problem exists in the contest
+        if ($this->contestService->inContest && !$this->contestService->contest->problems()->where('problems.id', $problem->id)->exists()) {
+            return Redirect::back()->withErrors(['msg' => 'Problem not found. Are you trying to cheat?']);
+        }
+
         // 1 Hour
         RateLimiter::hit('submission:' . $user->id, 60 * 60);
-        $run = DB::transaction(function () use ($request, $user) {
+        $run = DB::transaction(function () use ($request, $user, $problem) {
 
             $originalFile = $request->file('code');
 
@@ -81,7 +91,7 @@ class SubmitRunController extends Controller
             if ($originalFile->getSize() > 1024 * 1024 * 4) {
                 $run = new SubmitRun();
                 $run->language = $request->input('lang');
-                $run->problem()->associate(Problem::find($request->problem));
+                $run->problem()->associate($problem);
                 $run->user()->associate($user);
                 $run->status = SubmitStatus::Judged;
                 $run->result = SubmitResult::FileTooLarge;
@@ -91,12 +101,18 @@ class SubmitRunController extends Controller
 
                 $run = new SubmitRun();
                 $run->language = $request->input('lang');
-                $run->problem()->associate(Problem::find($request->problem));
+                $run->problem()->associate($problem);
                 $run->file()->associate($file);
                 $run->user()->associate($user);
                 $run->status = SubmitStatus::WaitingInLine;
                 $run->save();
-                ExecuteSubmitJob::dispatch($run)->afterCommit();
+                $job = ExecuteSubmitJob::dispatch($run)->afterCommit();
+            }
+            if ($this->contestService->started && $this->contestService->inContest) {
+                $run->contest()->associate($this->contestService->contest);
+                $run->save();
+                $this->contestService->competitor->submissions()->attach($run);
+                if (isset($job)) $job->onQueue('contest');
             }
             return $run;
         });

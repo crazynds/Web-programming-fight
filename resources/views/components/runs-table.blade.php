@@ -2,7 +2,7 @@
     <table border="1">
         <thead>
             <tr>
-                <th class="px-1"><b>#</b></th>
+                <th class="px-2"><b>#</b></th>
                 <th class="text-center"><b>When</b></th>
                 <th class="text-center"><b>Who</b></th>
                 <th class="text-center"><b>Problem</b></th>
@@ -19,20 +19,20 @@
                 <td id="id">
                     #id
                 </td>
-                <td class="px-1 text-center">
+                <td class="px-2 text-center">
                     <small id="datetime">
                         H:i:s
                     </small>
                 </td>
-                <td class="px-1" id="user">
+                <td class="px-2" id="user">
                     username
                 </td>
-                <td class="px-1">
+                <td class="px-2">
                     <a href="" id="title">
                         title
                     </a>
                 </td>
-                <td class="px-1" id="lang">
+                <td class="px-2" id="lang">
                     lang
                 </td>
                 <td class="px-2">
@@ -71,7 +71,7 @@
                             #{{ $submitRun->id }}
                         @endcan
                     </td>
-                    <td class="px-1 text-center">
+                    <td class="px-2 text-center">
                         <small>
                             @if (\Carbon\Carbon::parse($submitRun->created_at)->format('d/m/Y') != (new DateTime())->format('d/m/Y'))
                                 {{ \Carbon\Carbon::parse($submitRun->created_at)->format('d/m/Y') }}
@@ -80,15 +80,19 @@
                             @endif
                         </small>
                     </td>
-                    <td class="px-1">
-                        {{ $submitRun->user->name }}
+                    <td class="px-2">
+                        @if ($contestService->inContest)
+                            {{ $submitRun->competitor?->acronym }}
+                        @else
+                            {{ $submitRun->user->name }}
+                        @endif
                     </td>
-                    <td class="px-1">
+                    <td class="px-2">
                         <a href="{{ route('problem.show', ['problem' => $submitRun->problem->id], false) }}">
                             {{ $submitRun->problem->title }}
                         </a>
                     </td>
-                    <td class="px-1">
+                    <td class="px-2">
                         {{ $submitRun->language }}
                     </td>
                     <td class="px-2">
@@ -174,7 +178,7 @@
                         <div class="hstack gap-1">
                             @if ($submitRun->status == 'Judged' || $submitRun->status == 'Error')
                                 @can('update', $submitRun)
-                                    @if ($limit && $submitRun->status != 'Compilation error')
+                                    @if ($limit && $submitRun->status != 'Compilation error' && !$contestService->inContest)
                                         <a href="{{ route('submitRun.rejudge', ['submitRun' => $submitRun->id], false) }}"
                                             class="d-flex action-btn">
                                             <i class="las la-redo-alt"></i>
@@ -182,7 +186,7 @@
                                     @endif
                                 @endcan
                                 @can('view', $submitRun)
-                                    @if (isset($submitRun->output))
+                                    @if (isset($submitRun->output) && !$contestService->inContest)
                                         <a href="{{ route('submitRun.show', ['submitRun' => $submitRun->id], false) }}"
                                             class="d-flex action-btn">
                                             <i class="las la-poll-h"></i>
@@ -222,6 +226,8 @@
 
 <script>
     const userId = {{ $global ? null : \Auth::user()->id }}
+    const channel =
+        "{{ $contestService->inContest ? 'contest.submissions.' . $contestService->contest->id : 'submissions' }}";
 
     function copyCode() {
         var range = document.createRange();
@@ -386,7 +392,7 @@
             idtag.text('#' + data.id);
         }
         datetimetag.text(data.datetime);
-        usertag.text(data.user);
+        usertag.text({{ $contestService->inContest ? 'data.competitor' : 'data.user' }});
         titletag.text(data.problem.title);
         langtag.text(data.language);
         statustag.text(data.status);
@@ -438,7 +444,7 @@
             row.removeClass('notJudged blink');
     }
     window.addEventListener("load", function() {
-        window.Echo.private('submissions')
+        window.Echo.private(channel)
             .listen('NewSubmissionEvent', (data) => {
                 data = data.data
                 var row = $('#row' + data.id);
@@ -452,7 +458,7 @@
                 }
             })
 
-        window.Echo.private('submissions')
+        window.Echo.private(channel)
             .listen('UpdateSubmissionEvent', (data) => {
                 data = data.data
                 var row = $('#row' + data.id);

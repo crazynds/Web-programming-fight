@@ -41,7 +41,7 @@ class ScoreSubmitJob implements ShouldQueue, ShouldBeUnique
         $result = $executor->buildProgram($file, $this->submit->language);
         $problem = $this->submit->problem;
         if ($result == SubmitResult::NoResult) {
-            foreach ($problem->scorers as $scorer) {
+            foreach ($problem->scores as $scorer) {
                 $executor->loadFile($scorer->input_id, 'problems/input');
                 $executor->execute($scorer->time_limit, $scorer->memory_limit);
                 if ($executor->execution_memory > $this->submit->problem->memory_limit + 3 || $executor->execution_time > $this->submit->problem->time_limit) {

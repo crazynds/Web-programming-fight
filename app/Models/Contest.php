@@ -36,6 +36,10 @@ class Contest extends Model
     {
         return $this->hasMany(Competitor::class);
     }
+    public function submissions()
+    {
+        return $this->hasMany(SubmitRun::class);
+    }
 
     public function checkCompetitor(User $user)
     {

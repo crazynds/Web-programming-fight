@@ -18,7 +18,7 @@
         <thead>
             <tr>
                 <th class="px-1"><b>#</b></th>
-                <th class="text-center px-2"><b>Name</b></th>
+                <th class="text-center px-2" style="min-width:200px;"><b>Name</b></th>
                 <th class="text-center px-2"><b>Score</b></th>
             </tr>
         </thead>
@@ -28,11 +28,11 @@
                     <td>
                         {{ $competitor->acronym }}
                     </td>
-                    <td class="text-center px-2">
+                    <td class=" px-2">
                         {{ $competitor->name }}
                     </td>
                     <td class="text-center px-2">
-                        0
+                        {{ $competitor->scores_sum_score }}
                     </td>
                 </tr>
             @endforeach

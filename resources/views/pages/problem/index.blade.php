@@ -41,11 +41,8 @@
             @php($number = 'A')
             @foreach ($problems as $problem)
                 <tr
-                    @if ($problem->visible == false) class="bg-black"
-                style="--bs-bg-opacity: 0.125;"
-                @elseif($problem->my_accepted_submissions > 0)
-                class="bg-success"
-                style="--bs-bg-opacity: 0.125;" @endif>
+                    @if ($problem->visible == false && !$contestService->inContest) class="bg-black" style="--bs-bg-opacity: 0.125;"
+                @elseif($problem->my_accepted_submissions > 0) class="bg-success" style="--bs-bg-opacity: 0.125;" @endif>
                     <td class="pr-2">
                         @if ($contestService->inContest)
                             <b class="px-2" style="font-size: 1.6em">
@@ -113,7 +110,7 @@
                                 @can('update', $problem)
                                     <div class="vr"></div>
                                     <a href="{{ route('problem.scorer.index', ['problem' => $problem->id]) }}"
-                                        title="Edit scorers" class="d-flex action-btn">
+                                        title="Edit scores" class="d-flex action-btn">
                                         <i class="las la-star"></i>
                                     </a>
 

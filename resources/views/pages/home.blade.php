@@ -29,6 +29,7 @@
                     <h3>
                         {{ $contestService->contest->title }}
                     </h3>
+                    <hr />
                     <div class="row mathjax">
                         {{ Illuminate\Mail\Markdown::parse($contestService->contest->description) }}
                     </div>
@@ -49,11 +50,13 @@
                     <ul>
                         <li>Created fast problem import using ZIP files.</li>
                         <li>Created contest page!</li>
+                        <li>Created contest mode and all contest related features! 🎉</li>
                     </ul>
                     </p>
                     <p>
                         Changes ⚙️
                     <ul>
+                        <li>FAQ and About options are no longer displayed while the pages do not exist.</li>
                     </ul>
                     </p>
                     <p>
@@ -62,6 +65,7 @@
                         <li>Added a custom style to scroll bar.</li>
                         <li>Added 'Go Back' buttons in some forgotten areas.</li>
                         <li>Increased area size of Home button.</li>
+                        <li>Create a custom style para contest mode!</li>
                     </ul>
                     </p>
 

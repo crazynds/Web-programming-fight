@@ -76,7 +76,16 @@
                                 <li><a class="dropdown-item"
                                         href="{{ route('contest.competitor.index') }}">Competitors</a>
                                 </li>
-                                <li><a class="dropdown-item" href="">Leaderboard</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('submitRun.global') }}">Global Runs</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                        href="{{ route('contest.competitor.leaderboard') }}">Leaderboard</a>
+                                </li>
                             @else
                                 <li><a class="dropdown-item" href="{{ route('user.index') }}">Users</a></li>
                                 <li><a class="dropdown-item" href="{{ route('team.index') }}">Teams</a></li>
@@ -89,25 +98,33 @@
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
-                                <li><a class="dropdown-item" href="#">FAQ</a></li>
-                                <li><a class="dropdown-item" href="#">About</a></li>
+                                {{-- <li><a class="dropdown-item" href="#">FAQ</a></li>
+                                <li><a class="dropdown-item" href="#">About</a></li> --}}
                             @endif
                         </ul>
                     </div>
                 </td>
-                <td nowrap="" align="center" class="px-2">
-                    Timer
-                </td>
+                @if ($contestService->inContest)
+                    <td nowrap align="center" class="px-2" id="headerClock">
+                        <b>
+                            00:00
+                        </b>
+                    </td>
+                @endif
                 <td align="center" class="px-2" nowrap="">
-                    @auth
-                        <a href="{{ route('user.me') }}">{{ Auth()->user()->name }}</a>
-                        <img src="{{ Auth()->user()->avatar }}" class="rounded-circle" style="width: 33px;height:33px;"
-                            alt="Avatar" />
+                    @if ($contestService->inContest)
+                        <b>{{ $contestService->competitor->fullName() }}</b>
                     @else
-                        <span class="social-media-menu">
-                            <a href="{{ route('auth.login', ['provider' => 'github']) }}" class="sm-github"></a>
-                        </span>
-                    @endauth
+                        @auth
+                            <a href="{{ route('user.me') }}">{{ Auth()->user()->name }}</a>
+                            <img src="{{ Auth()->user()->avatar }}" class="rounded-circle" style="width: 33px;height:33px;"
+                                alt="Avatar" />
+                        @else
+                            <span class="social-media-menu">
+                                <a href="{{ route('auth.login', ['provider' => 'github']) }}" class="sm-github"></a>
+                            </span>
+                        @endauth
+                    @endif
                 </td>
                 @auth
                     <td align="center" class="px-2" nowrap="">
@@ -122,12 +139,66 @@
             </tr>
         </tbody>
     </table>
-    <div class="container">
+    <div class="container-fluid px-5">
         <br>
         @yield('content')
     </div>
-    @livewireScripts
+    {{-- @livewireScripts --}}
     @yield('script')
+    @if ($contestService->inContest)
+        <script>
+            // Set the date we're counting down to
+            var countDownDate = new Date(
+                "{{ $contestService->started ? $contestService->contest->start_time->addMinutes($contestService->contest->duration) : $contestService->contest->start_time }}"
+            ).getTime();
+
+            const clock = function() {
+
+                // Get today's date and time
+                var now = new Date().getTime();
+
+                // Find the distance between now and the count down date
+                var distance = countDownDate - now;
+
+                // Time calculations for days, hours, minutes and seconds
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                // Display the result in the element with id="clock"
+                let displayTime = "";
+
+                if (days > 0) {
+                    displayTime += days.toString().padStart(2, '0') + "d ";
+                    displayTime += hours.toString().padStart(2, '0') + ":";
+                    displayTime += minutes.toString().padStart(2, '0') + ":";
+                    displayTime += seconds.toString().padStart(2, '0');
+                } else if (hours > 0) {
+                    displayTime += hours.toString().padStart(2, '0') + ":";
+                    displayTime += minutes.toString().padStart(2, '0') + ":";
+                    displayTime += seconds.toString().padStart(2, '0');
+                } else {
+                    displayTime += minutes.toString().padStart(2, '0') + ":";
+                    displayTime += seconds.toString().padStart(2, '0');
+                }
+                document.getElementById("headerClock").innerHTML = displayTime;
+
+
+                // If the count down is finished, write some text
+                if (distance < 0) {
+                    document.getElementById("headerClock").innerHTML = "Starting Contest...";
+                    location.reload()
+                    clearInterval(x);
+                } else if (minutes == 10 && seconds == 0) {
+                    location.reload()
+                }
+            };
+
+            clock();
+            var x = setInterval(clock, 1000);
+        </script>
+    @endif
 </body>
 
 </html>

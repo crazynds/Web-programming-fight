@@ -10,12 +10,13 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Mockery\Undefined;
 
 class NewSubmissionEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $data = [];
+    public $data;
 
     /**
      * Create a new event instance.
@@ -37,6 +38,8 @@ class NewSubmissionEvent implements ShouldBroadcast
             'result' => $submitRun->result,
             'testCases' => $submitRun->num_test_cases + 1,
             'resources' => ((isset($submitRun->execution_time) && $submitRun->status == 'Judged') ? number_format($submitRun->execution_time / 1000, 2, '.', ',') . 's' : '--') . ' | ' . ((isset($submitRun->execution_memory) && $submitRun->status == 'Judged') ? $submitRun->execution_memory . ' MB' : '--'),
+            'contest_id' => $submitRun->contest_id,
+            'competitor' => $submitRun->contest_id ? $submitRun->competitor?->acronym : null,
         ];
     }
 
@@ -47,6 +50,12 @@ class NewSubmissionEvent implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
+        if (isset($this->data['contest_id'])) {
+            return [
+                new PrivateChannel('contest.submissions.' . $this->data['contest_id']),
+                new PrivateChannel('submissions'),
+            ];
+        }
         return [
             new PrivateChannel('submissions'),
         ];
