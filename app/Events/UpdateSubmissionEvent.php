@@ -21,6 +21,13 @@ class UpdateSubmissionEvent implements ShouldBroadcast
     public function __construct(SubmitRun $submitRun)
     {
         $submitRun->refresh();
+        if ($submitRun->contest_id)
+            $contestData = [
+                'contest_id' => $submitRun->contest_id,
+                'competitor_id' => $submitRun->contest_id ? $submitRun->competitor?->id : null,
+                'competitor' => $submitRun->contest_id ? $submitRun->competitor?->acronym : null,
+                'blind' => $submitRun->contest->blindTime()->lt(now()),
+            ];
         $this->data = [
             'id' => $submitRun->id,
             'datetime' => \Carbon\Carbon::parse($submitRun->created_at)->format('H:i:s'),
@@ -36,8 +43,7 @@ class UpdateSubmissionEvent implements ShouldBroadcast
             'testCases' => $submitRun->status != 'Judged' ? '---' : $submitRun->num_test_cases + 1,
             'resources' => ((isset($submitRun->execution_time) && $submitRun->status == 'Judged') ? number_format($submitRun->execution_time / 1000, 2, '.', ',') . 's' : '--') . ' | ' . ((isset($submitRun->execution_memory) && $submitRun->status == 'Judged') ? $submitRun->execution_memory . ' MB' : '--'),
             'suspense' => ($submitRun->status == 'Judged' ? ($submitRun->num_test_cases + 1) / ($submitRun->problem->testCases()->count() + 1) : 0) > 0.4,
-            'contest_id' => $submitRun->contest_id,
-            'competitor' => $submitRun->contest_id ? $submitRun->competitor?->acronym : null,
+            'contest' => $submitRun->contest_id ? $contestData : null,
         ];
     }
 
@@ -48,11 +54,16 @@ class UpdateSubmissionEvent implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        if (isset($this->data['contest_id'])) {
-            return [
-                new PrivateChannel('contest.submissions.' . $this->data['contest_id']),
-                new PrivateChannel('submissions'),
-            ];
+        if (!is_null($this->data['contest'])) {
+            if ($this->data['contest']['blind'])
+                return [
+                    new PrivateChannel('contest.submissions.' . $this->data['contest']['contest_id'] . '.' . $this->data['contest']['competitor_id']),
+                ];
+            else
+                return [
+                    new PrivateChannel('contest.submissions.' . $this->data['contest']['contest_id']),
+                    new PrivateChannel('contest.submissions.' . $this->data['contest']['contest_id'] . '.' . $this->data['contest']['competitor_id']),
+                ];
         }
         return [
             new PrivateChannel('submissions'),

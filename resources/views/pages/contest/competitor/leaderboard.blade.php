@@ -153,10 +153,13 @@
             </b>
         </div>
         <div class="col">
+            @if ($blind)
+                <h3>Blind Time!!</h3>
+            @endif
         </div>
     </div>
 
-    <table border="1">
+    <table border="1"@if ($blind) style="background-color: #0002" @endif>
         <thead>
             <tr>
                 <th class="px-1"><b>#</b></th>
@@ -178,17 +181,25 @@
                         {{ $competitor->name }}
                     </td>
                     @php($letter = 'A')
+                    @php($questions = 0)
                     @foreach ($problems as $problem)
                         <td class="px-2">
                             @if (isset($competitor->scores[$problem]))
+                                @php($questions++)
                                 @php($score = $competitor->scores[$problem])
                                 <span class="d-flex">
                                     <div style="position:relative; width: 20px; height: 32px">
                                         <div class="balloon balloon-{{ $letter++ }}"></div>
                                         <div class="balloon-shadow"></div>
                                     </div>
-                                    <span style="padding-top: 14px;font-size: smaller">{{ $score->score }}
-                                        ({{ $competitor->__get('sum_submissions_' . $problem) }})
+                                    <span style="padding-top: 14px;font-size: smaller">
+                                        @if ($contest->time_based_points || $contest->parcial_solution)
+                                            {{ $score->score }}
+                                            ({{ $competitor->__get('sum_submissions_' . $problem) }})
+                                        @else
+                                            {{ $competitor->__get('sum_submissions_' . $problem) }} /
+                                            {{ $score->penality }}
+                                        @endif
                                     </span>
                                 </span>
                             @elseif ($competitor->__get('sum_submissions_' . $problem) > 0)
@@ -200,7 +211,11 @@
                     @endforeach
 
                     <td class="text-center px-2">
-                        {{ $competitor->scores_sum_score }} ({{ $competitor->scores_sum_penality }})
+                        @if ($contest->time_based_points || $contest->parcial_solution)
+                            {{ $competitor->scores_sum_score }} ({{ $questions }})
+                        @else
+                            {{ $competitor->scores_sum_score }} ({{ $competitor->scores_sum_penality }})
+                        @endif
                     </td>
                 </tr>
             @endforeach

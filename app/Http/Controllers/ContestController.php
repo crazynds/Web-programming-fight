@@ -9,6 +9,7 @@ use App\Models\Problem;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 
@@ -54,36 +55,53 @@ class ContestController extends Controller
 
     public function leaderboard(Contest $contest)
     {
+        $key = 'contest.leaderboard.' . $contest->id;
         $problems = $contest->problems()->orderBy('id')->pluck('id');
+        $blind = $contest->blindTime()->lt(now()) && $contest->endTime()->addMinutes(10)->gt(now());
+        // If is blind time, get the blind leaderboard. (The latest leaderboard loaded)
+        if ($blind)
+            $competitors = Cache::get($key . '.blind');
+        else
+            $competitors = Cache::get($key);
+        // If any leaderboard could be loaded, retrive it from database.
+        if (!$competitors) {
+            $query = $contest->competitors()
+                ->with('scores')
+                ->withSum('scores', 'score')
+                ->withSum('scores', 'penality');
 
-        $query = $contest->competitors()
-            ->with('scores')
-            ->withSum('scores', 'score')
-            ->withSum('scores', 'penality');
-
-        foreach ($problems as $problem) {
-            $query->withCount([
-                'submissions as sum_submissions_' . $problem => function ($query) use ($problem) {
-                    $query->where('submit_runs.problem_id', $problem);
-                }
-            ]);
-        }
-
-        $competitors = $query->get()->sortBy([
-            ['sum_scores_score', 'desc'],
-            ['sum_scores_penality', 'asc'],
-        ]);
-
-        foreach ($competitors as $competitor) {
-            $scores = [];
-            foreach ($competitor->scores as $score) {
-                $scores[$score->problem_id] = $score;
+            foreach ($problems as $problem) {
+                $query->withCount([
+                    'submissions as sum_submissions_' . $problem => function ($query) use ($problem, $contest, $blind) {
+                        $query->where('submit_runs.problem_id', $problem);
+                        if ($blind) {
+                            $query->where('submit_runs.created_at', '<', $contest->blindTime());
+                        }
+                    }
+                ]);
             }
-            $competitor->scores = $scores;
+
+            $competitors = $query->get()->sortBy([
+                ['sum_scores_score', 'desc'],
+                ['sum_scores_penality', 'asc'],
+            ]);
+
+            foreach ($competitors as $competitor) {
+                $scores = [];
+                foreach ($competitor->scores as $score) {
+                    $scores[$score->problem_id] = $score;
+                }
+                $competitor->scores = $scores;
+            }
+            Cache::put($key, $competitors, now()->addMinutes(5));
+            // Freeze this leaderboard for blind
+            Cache::put($key . '.blind', $competitors, $contest->endTime()->addMinutes(10));
         }
         return view('pages.contest.competitor.leaderboard', [
             'competitors' => $competitors,
+            'contest' => $contest,
             'problems' => $problems,
+            'blind' => $blind
         ]);
     }
 

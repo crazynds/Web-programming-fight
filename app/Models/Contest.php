@@ -6,6 +6,7 @@ use App\Observers\ContestObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 #[ObservedBy(ContestObserver::class)]
 class Contest extends Model
@@ -39,6 +40,16 @@ class Contest extends Model
     public function submissions()
     {
         return $this->hasMany(SubmitRun::class);
+    }
+
+    public function endTime(): Carbon
+    {
+        return $this->start_time->addMinutes($this->duration);
+    }
+
+    public function blindTime(): Carbon
+    {
+        return $this->start_time->addMinutes($this->duration - $this->blind_time);
     }
 
     public function checkCompetitor(User $user)

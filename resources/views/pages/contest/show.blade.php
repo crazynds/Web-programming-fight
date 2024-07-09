@@ -87,7 +87,15 @@
                         <li style="cursor: help;text-decoration: underline;"
                             title="Over time, the points for each question will decrease from 100% of the points at the beginning of the contest to 70% of the points at the end.">
                             Points are based on time.</li>
+                        <li style="cursor: help;text-decoration: underline;"
+                            title="Penality decrease the amount of points recived.">
+                            Penality increase only on non accepted submissions.
+                        </li>
                     @else
+                        <li style="cursor: help;text-decoration: underline;"
+                            title="Penality are used to break a tie if it happens.">
+                            Penality increase with time and with non accepted submissions.
+                        </li>
                     @endif
                 </ul>
             </div>

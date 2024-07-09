@@ -23,7 +23,7 @@ class CompetitorController extends Controller
     public function index()
     {
         $competitors = $this->contestService->contest->competitors()
-            ->withSum('scores', 'score')->get()->sortByDesc('sum_scores_score');
+            ->withSum('scores', 'score')->get();
         return view('pages.contest.competitor.index', [
             'competitors' => $competitors
         ]);
