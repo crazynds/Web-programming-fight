@@ -14,9 +14,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('competitor_submit_run', function (Blueprint $table) {
-            $table->id();
             $table->foreignIdFor(Competitor::class)->constrained()->onDelete('CASCADE');
             $table->foreignIdFor(SubmitRun::class)->constrained()->onDelete('CASCADE');
+
+            $table->primary(['competitor_id', 'submit_run_id']);
         });
     }
 

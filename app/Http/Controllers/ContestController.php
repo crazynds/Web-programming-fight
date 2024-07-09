@@ -52,6 +52,41 @@ class ContestController extends Controller
         return redirect()->route('home');
     }
 
+    public function leaderboard(Contest $contest)
+    {
+        $problems = $contest->problems()->orderBy('id')->pluck('id');
+
+        $query = $contest->competitors()
+            ->with('scores')
+            ->withSum('scores', 'score')
+            ->withSum('scores', 'penality');
+
+        foreach ($problems as $problem) {
+            $query->withCount([
+                'submissions as sum_submissions_' . $problem => function ($query) use ($problem) {
+                    $query->where('submit_runs.problem_id', $problem);
+                }
+            ]);
+        }
+
+        $competitors = $query->get()->sortBy([
+            ['sum_scores_score', 'desc'],
+            ['sum_scores_penality', 'asc'],
+        ]);
+
+        foreach ($competitors as $competitor) {
+            $scores = [];
+            foreach ($competitor->scores as $score) {
+                $scores[$score->problem_id] = $score;
+            }
+            $competitor->scores = $scores;
+        }
+        return view('pages.contest.competitor.leaderboard', [
+            'competitors' => $competitors,
+            'problems' => $problems,
+        ]);
+    }
+
     public function join(StoreCompetitorRequest $request, Contest $contest)
     {
         /** @var User $user */

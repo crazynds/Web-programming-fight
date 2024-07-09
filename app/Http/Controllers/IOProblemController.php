@@ -146,11 +146,11 @@ class IOProblemController extends Controller
 
 
 
-        foreach ($problem->scorers()->with(['input', 'file'])->lazy() as $scorer) {
+        foreach ($problem->scores()->with(['input', 'file'])->lazy() as $scorer) {
             $file = $scorer->file;
             $input = $scorer->input;
 
-            $folderName = 'scorers/' . $scorer->name . '#' . $scorer->id;
+            $folderName = 'scores/' . $scorer->name . '#' . $scorer->id;
 
             $file->addToZip($zip, $folderName . '/code');
             $input->addToZip($zip, $folderName . '/input');

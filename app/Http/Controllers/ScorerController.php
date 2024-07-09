@@ -27,7 +27,7 @@ class ScorerController extends Controller
         $this->authorize('update', $problem);
         return view('pages.scorer.index', [
             'problem' => $problem,
-            'scorers' => $problem->scorers,
+            'scores' => $problem->scores,
         ]);
     }
 
@@ -46,10 +46,10 @@ class ScorerController extends Controller
     public function reavaliate(Problem $problem)
     {
         $user = Auth::user();
-        if (RateLimiter::tooManyAttempts('reavaliate-scorers:' . $user->id, 3)) {
+        if (RateLimiter::tooManyAttempts('reavaliate-scores:' . $user->id, 3)) {
             return Redirect::back()->withErrors(['msg' => 'Too many attempts! Wait a moment and try again!']);
         }
-        RateLimiter::hit('reavaliate-scorers:' . $user->id, $problem->submissions()->where('result', '=', SubmitResult::Accepted)->count() * 60);
+        RateLimiter::hit('reavaliate-scores:' . $user->id, $problem->submissions()->where('result', '=', SubmitResult::Accepted)->count() * 60);
         foreach ($problem->submissions()->where('result', '=', SubmitResult::Accepted)->lazy() as $submit) {
             ScoreSubmitJob::dispatch($submit)->onQueue('low');
         }
@@ -68,7 +68,7 @@ class ScorerController extends Controller
             $scorerFile = File::createFile($data['code'], "problems/{$problem->id}/scorer");
             $inputFile = File::createFile($data['input'], "problems/{$problem->id}/scorer/input");
 
-            $problem->scorers()->create([
+            $problem->scores()->create([
                 'language' => $data['lang'],
                 'input_id' => $inputFile->id,
                 'file_id' => $scorerFile->id,

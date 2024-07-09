@@ -116,6 +116,8 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
         ->name('contest.join');
     Route::post('/constes/{contest}/enter', [ContestController::class, 'enter'])
         ->name('contest.enter');
+    Route::get('/constes/{contest}/leaderboard', [ContestController::class, 'leaderboard'])
+        ->name('contest.leaderboard');
 });
 
 Route::get('/', function () {

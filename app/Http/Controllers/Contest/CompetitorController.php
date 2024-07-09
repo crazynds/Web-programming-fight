@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Contest;
 
+use App\Http\Controllers\ContestController;
 use App\Http\Controllers\Controller;
 use App\Models\Competitor;
 use App\Http\Requests\StoreCompetitorRequest;
 use App\Http\Requests\UpdateCompetitorRequest;
 use App\Services\ContestService;
+use Illuminate\Support\Facades\App;
 
 class CompetitorController extends Controller
 {
@@ -20,10 +22,21 @@ class CompetitorController extends Controller
      */
     public function index()
     {
-        $contest = $this->contestService->contest;
+        $competitors = $this->contestService->contest->competitors()
+            ->withSum('scores', 'score')->get()->sortByDesc('sum_scores_score');
         return view('pages.contest.competitor.index', [
-            'competitors' => $contest->competitors
+            'competitors' => $competitors
         ]);
+    }
+
+    public function leaderboard()
+    {
+        return App::call(
+            ContestController::class . '@leaderboard',
+            [
+                'contest' => $this->contestService->contest
+            ]
+        );
     }
 
     /**

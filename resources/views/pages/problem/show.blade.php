@@ -39,6 +39,11 @@
                 <div>
                     {{ $problem->time_limit / 1000 }}s
                 </div>
+                <div class="vr"></div>
+                <a href="{{ route('submitRun.create', ['problem' => $problem->id]) }}">
+                    Submit
+                </a>
+
             </div>
             <div class="hstack gap-2 justify-content-center">
             </div>

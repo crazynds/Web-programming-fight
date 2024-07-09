@@ -21,7 +21,7 @@ class Problem extends Model
     {
         return $this->hasMany(SubmitRun::class);
     }
-    public function scorers()
+    public function scores()
     {
         return $this->hasMany(Scorer::class);
     }

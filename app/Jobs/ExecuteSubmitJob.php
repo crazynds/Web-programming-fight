@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Enums\LanguagesType;
 use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
+use App\Models\Competitor;
 use App\Models\SubmitRun;
 use App\Models\TestCase;
 use App\Services\ExecutorService;
@@ -153,9 +154,17 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
 
         if (
             $this->submit->result == SubmitResult::fromValue(SubmitResult::Accepted)->description &&
-            $this->submit->problem->scorers()->exists()
+            $this->submit->problem->scores()->exists()
         ) {
             ScoreSubmitJob::dispatch($this->submit);
+        }
+        // If this submit is in a contest, do the things
+        if ($this->submit->contest) {
+            $competidor = Competitor::whereHas('submissions', function ($query) {
+                $query->where('submit_run_id', $this->submit->id);
+            })->first();
+            // Synchronously
+            ContestComputeScore::dispatchSync($this->submit, $this->submit->contest, $competidor);
         }
     }
 

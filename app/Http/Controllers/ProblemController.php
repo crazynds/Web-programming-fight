@@ -43,16 +43,33 @@ class ProblemController extends Controller
     public function index()
     {
         if ($this->contestService->inContest) {
-            $problems = $this->contestService->contest->problems()->orderBy('id')->get();
+            $problems = $this->contestService->contest->problems()
+                ->withCount([
+                    'submissions' => function ($query) {
+                        $query->where('contest_id', $this->contestService->contest->id);
+                    },
+                    'submissions as accepted_submissions' => function ($query) {
+                        $query->where('submit_runs.result', SubmitResult::Accepted)
+                            ->where('contest_id', $this->contestService->contest->id);
+                    },
+                    'submissions as my_accepted_submissions' => function ($query) {
+                        $query->where('submit_runs.result', SubmitResult::Accepted)
+                            ->join('competitor_submit_run', 'submit_runs.id', 'competitor_submit_run.submit_run_id')
+                            ->where('competitor_submit_run.competitor_id', $this->contestService->competitor->id)
+                            ->limit(1);
+                    },
+                ])
+                ->orderBy('id')->get();
         } else {
             $problems = Problem::withCount([
                 'submissions',
                 'submissions as accepted_submissions' => function ($query) {
-                    $query->where('submit_runs.result', '=', SubmitResult::Accepted);
+                    $query->where('submit_runs.result', SubmitResult::Accepted);
                 },
                 'submissions as my_accepted_submissions' => function ($query) {
-                    $query->where('submit_runs.result', '=', SubmitResult::Accepted)
-                        ->where('submit_runs.user_id', '=', Auth::user()->id);
+                    $query->where('submit_runs.result', SubmitResult::Accepted)
+                        ->where('submit_runs.user_id', Auth::user()->id)
+                        ->limit(1);
                 },
                 'ranks'
             ])

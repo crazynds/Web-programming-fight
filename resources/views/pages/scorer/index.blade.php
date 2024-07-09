@@ -5,7 +5,7 @@
         <div class="col">
             <x-ballon />
             <b>
-                Scorers:
+                Scores:
             </b>
         </div>
         <div class="col" style="text-align:center;">
@@ -19,7 +19,7 @@
             </a>
             <a style="float:right; margin-right: 10px;"
                 href="{{ route('problem.scorer.reavaliate', ['problem' => $problem->id]) }}">
-                <button>Reavaliate All Scorers</button>
+                <button>Reavaliate All Scores</button>
             </a>
         </div>
     </div>
@@ -47,7 +47,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($scorers as $scorer)
+            @foreach ($scores as $scorer)
                 <tr>
                     <td class="pr-2">
                         #{{ $scorer->id }}

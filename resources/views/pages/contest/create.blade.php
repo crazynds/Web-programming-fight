@@ -96,7 +96,7 @@
                         <input type="checkbox" id="parcial_solution" value='1' name="parcial_solution"
                             @if (old('parcial_solution', $contest->parcial_solution)) checked @endif />
                         <label for="parcial_solution" class="form-label" style="cursor: help;text-decoration: underline;"
-                            title="You only start earning points if you get at least 30% of the cases correct, with a maximum of 60% of a complete accept for all less one cases.">
+                            title="You only start earning points if you get at least 30% of the test cases right, with a maximum score of 60% if there is complete acceptance for all cases except one.">
                             Partial solutions are allowed. </label>
                     </li>
                     <li>
@@ -124,7 +124,7 @@
                             @if (old('time_based_points', $contest->time_based_points)) checked @endif />
                         <label for="time_based_points" class="form-label"
                             style="cursor: help;text-decoration: underline;"
-                            title="Over time, the points for every question will be decreased from 1000 points in the start of the contest to 700 points in the end.">
+                            title="Over time, the points for each question will decrease from 100% of the points at the beginning of the contest to 70% of the points at the end.">
                             Points based in time. (100% - 70%)
                         </label>
                     </li>

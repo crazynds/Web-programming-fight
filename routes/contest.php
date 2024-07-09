@@ -14,7 +14,6 @@ Route::middleware(AccessOnlyDuringContest::class)->group(function () {
     Route::resource('problem', ProblemController::class)
         ->only(['index', 'show']);
 
-
     Route::resource('submitRun', SubmitRunController::class)
         ->only(['index', 'store', 'create', 'show']);
     Route::get('/submitRun/global/live', [SubmitRunController::class, 'global'])
@@ -23,3 +22,5 @@ Route::middleware(AccessOnlyDuringContest::class)->group(function () {
 
 Route::resource('competitor', CompetitorController::class)
     ->only(['index']);
+Route::get('competitor/leaderboard', [CompetitorController::class, 'leaderboard'])
+    ->name('competitor.leaderboard');

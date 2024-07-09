@@ -38,6 +38,9 @@
             <div class="col">
                 <input id="tags" name="membersjson" placeholder="Members nickname"
                     value="{{ old('membersjson', $team->membersjson()) }}">
+                <small>
+                    Write the member's github nickname and press enter. It is not necessary to add your own
+                    nickname.</small>
             </div>
         </div>
         @if ($errors->any())
