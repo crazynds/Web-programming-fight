@@ -1,5 +1,7 @@
 <?php
 
+use App\Broadcasting\CompetitorContestSubmissionChannel;
+use App\Broadcasting\GlobalContestSubmissionChannel;
 use App\Models\Contest;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Gate;
@@ -22,16 +24,5 @@ use Illuminate\Support\Facades\Gate;
 Broadcast::channel('submissions', function ($user) {
     return true;
 });
-Broadcast::channel('contest.submissions.{id}', function ($user, $id) {
-    $contest = Contest::find($id);
-    if (!$contest) {
-        return false;
-    }
-    // Para contests privados permitir apenas quem está inscrito de visualizar. Talvez?
-    // if($contest->private){
-    //     if(!Gate::allows('view-private-contest', $contest)){
-    //         return false;
-    //     }
-    // }
-    return true;
-});
+Broadcast::channel('contest.submissions.{contest}.{competitor}', CompetitorContestSubmissionChannel::class);
+Broadcast::channel('contest.submissions.{contest}', GlobalContestSubmissionChannel::class);

@@ -24,13 +24,18 @@ class RunsTable extends Component
     {
         if ($this->global) {
             if ($this->contestService->inContest) {
-                $query = $this->contestService->contest
-                    ->submissions()->with('competitor');
+                $contest = $this->contestService->contest;
+                $query = $contest
+                    ->submissions()
+                    ->with('competitor');
+
+                if ($contest->endTime()->addMinutes(5)->gt(now()))
+                    $query->where('submit_runs.created_at', '<', $contest->blindTime());
             } else {
                 $query = SubmitRun::whereHas('problem', function ($query) {
                     // Hide not visible problems to global
                     $query->where('problems.visible', true);
-                });
+                })->where('contest_id', null);
             }
         } else {
             if ($this->contestService->inContest) {
@@ -38,7 +43,7 @@ class RunsTable extends Component
             } else {
                 /** @var User */
                 $user = Auth::user();
-                $query = $user->submissions();
+                $query = $user->submissions()->where('contest_id', null);
             }
         }
         return $query->with('user', function ($query) {
@@ -50,6 +55,17 @@ class RunsTable extends Component
             ->orderByDesc('id')->limit(100);
     }
 
+    private function getChannel()
+    {
+        if ($this->contestService->inContest) {
+            if ($this->global)
+                return 'contest.submissions.' . $this->contestService->contest->id;
+            else
+                return 'contest.submissions.' . $this->contestService->contest->id . '.' . $this->contestService->competitor->id;
+        }
+        return 'submissions';
+    }
+
     /**
      * Get the view / contents that represent the component.
      */
@@ -58,6 +74,7 @@ class RunsTable extends Component
         return view('components.runs-table', [
             'limit' => \Illuminate\Support\Facades\RateLimiter::remaining('resubmission:' . Auth::user()->id, 5),
             'submitRuns' => $this->getQuery()->get(),
+            'channel' => $this->getChannel()
         ]);
     }
 }

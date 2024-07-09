@@ -225,9 +225,8 @@
 </div>
 
 <script>
-    const userId = {{ $global ? null : \Auth::user()->id }}
-    const channel =
-        "{{ $contestService->inContest ? 'contest.submissions.' . $contestService->contest->id : 'submissions' }}";
+    const userId = {{ $global ? 'null' : \Auth::user()->id }}
+    const channel = "{{ $channel }}";
 
     function copyCode() {
         var range = document.createRange();
@@ -392,7 +391,7 @@
             idtag.text('#' + data.id);
         }
         datetimetag.text(data.datetime);
-        usertag.text({{ $contestService->inContest ? 'data.competitor' : 'data.user' }});
+        usertag.text({{ $contestService->inContest ? 'data.contest.competitor' : 'data.user' }});
         titletag.text(data.problem.title);
         langtag.text(data.language);
         statustag.text(data.status);

@@ -36,7 +36,7 @@ class ContestMiddleware
                 // Check if the contest is already finished and throw away all competitors
                 if ($contest->start_time->addMinutes($contest->duration)->lt(now())) {
                     session()->forget('contest');
-                    return redirect()->route('contest.index');
+                    return redirect()->route('contest.leaderboard', ['contest' => $contest->id]);
                 } else {
                     $this->contestService->setContestCompetitor($contest, $competitor);
                 }
