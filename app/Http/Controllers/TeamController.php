@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 
 class TeamController extends Controller
 {
@@ -24,29 +26,31 @@ class TeamController extends Controller
     {
         /** @var User */
         $user = Auth::user();
-        return view('pages.team.index',[
-            'teams' => $user->teams()->withPivot(['accepted','owner'])->withCount(['members','invited'])->get()
+        return view('pages.team.index', [
+            'teams' => $user->teams()->withPivot(['accepted', 'owner'])->withCount(['members', 'invited'])->get()
         ]);
     }
 
-    public function accept(Team $team){
-
+    public function accept(Team $team)
+    {
+        Gate::authorize('modifyMembers', $team);
         $user = Auth::user();
-        $team->related()->updateExistingPivot($user,[
+        $team->related()->updateExistingPivot($user, [
             'accepted' => true
         ]);
         return redirect()->route('team.index');
     }
 
-    public function leave(Team $team){
-
+    public function leave(Team $team)
+    {
+        Gate::authorize('leave', $team);
         $user = Auth::user();
         $team->related()->detach($user);
         return redirect()->route('team.index');
     }
 
-    public function deny(Team $team){
-
+    public function deny(Team $team)
+    {
         $user = Auth::user();
         $team->related()->detach($user);
         return redirect()->route('team.index');
@@ -73,12 +77,12 @@ class TeamController extends Controller
         $user = Auth::user();
         $team = new Team($data);
         $team->save();
-        $team->members()->attach($user,[
+        $team->members()->attach($user, [
             'owner' => true,
             'accepted' => true
         ]);
 
-        return $this->update($request,$team);
+        return $this->update($request, $team);
     }
 
     /**
@@ -94,7 +98,7 @@ class TeamController extends Controller
      */
     public function edit(Team $team)
     {
-        return view('pages.team.create',[
+        return view('pages.team.create', [
             'team' => $team
         ]);
     }
@@ -104,7 +108,7 @@ class TeamController extends Controller
      */
     public function update(StoreTeamRequest $request, Team $team)
     {
-        DB::transaction(function ()use($request,$team){
+        DB::transaction(function () use ($request, $team) {
             $data = $request->safe([
                 'name',
                 'acronym',
@@ -115,23 +119,23 @@ class TeamController extends Controller
             $team->update($data);
             $team->related()->detach($team->invited);
             $idsAdded = [];
-            if($members){
+            if ($members) {
                 $members = json_decode($members);
                 $cont = 0;
-                foreach($members as $member){
-                    $user = User::where('name',\Str::lower($member->value))->first();
+                foreach ($members as $member) {
+                    $user = User::where('name', Str::lower($member->value))->first();
 
-                    if($user){
+                    if ($user) {
                         $idsAdded[] = $user->id;
                         $team->related()->syncWithoutDetaching([$user->id]);
                         $cont += 1;
                     }
-                    if($cont >= 5){
+                    if ($cont >= 5) {
                         break;
                     }
                 }
             }
-            $removeMembers = $team->members()->where('owner',false)->whereNotIn('id',$idsAdded)->get();
+            $removeMembers = $team->members()->where('owner', false)->whereNotIn('id', $idsAdded)->get();
             $team->related()->detach($removeMembers);
         });
         return redirect()->route('team.index');
