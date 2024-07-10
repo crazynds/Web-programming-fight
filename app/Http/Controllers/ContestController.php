@@ -6,6 +6,7 @@ use App\Http\Requests\StoreCompetitorRequest;
 use App\Http\Requests\StoreContestRequest;
 use App\Models\Contest;
 use App\Models\Problem;
+use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -133,9 +134,24 @@ class ContestController extends Controller
             ]);
         } else {
             $team = $request->input('team', 0);
+            /** @var Team */
             $team = $user->myTeams()->where('team_id', $team)->first();
             if (!$team)
                 return Redirect::back()->withErrors(['team' => 'Please, select a team that you are the owner of.']);
+            if ($team->members()->count() > 3) {
+                return Redirect::back()->withErrors(['team' => 'Only up to 3 members are allowed in a team to participate in this contest.']);
+            }
+
+            $members = $team->members;
+
+            /** @var User $user */
+            foreach ($contest->competitors()->with('team.members')->lazy() as $team) {
+                foreach ($team->members as $user) {
+                    if ($members->contains('id', $user->id)) {
+                        return Redirect::back()->withErrors(['team' => 'The user ' . $user->name . ' is already participating in this contest']);
+                    }
+                }
+            }
 
             $contest->competitors()->create([
                 'team_id' => $team->id,
