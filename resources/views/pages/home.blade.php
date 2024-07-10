@@ -18,8 +18,16 @@
     @guest
 
         <h3>
-            Do the login to access all pages.
+            Login to access the platform!
         </h3>
+        <p>
+            Note that we use third-party github login to ensure user security, so no registration on the platform is necessary.
+            We
+            also do not store passwords or any sensitive user information in our database.
+        </p>
+        <p>
+            You can login by clicking on the github icon in the top right corner of the page.
+        </p>
     @endguest
 
     @auth
@@ -42,7 +50,7 @@
                         v1.0.1 - The Big Challenge! ⚔️💥🗡️🏆
                     </h3>
                     <p>
-                        Date: ----
+                        Date: 09-07-2024
                         By: Crazynds
                     </p>
                     <p>

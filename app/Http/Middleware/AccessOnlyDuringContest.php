@@ -20,6 +20,9 @@ class AccessOnlyDuringContest
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (session()->get('_old_input')) {
+            $request->replace(session()->get('_old_input'));
+        }
         if (!$this->contestService->inContest || !$this->contestService->started) {
             return redirect()->route('home');
         }

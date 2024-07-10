@@ -113,6 +113,7 @@ class ProblemController extends Controller
 
     public function podium(Problem $problem)
     {
+        Gate::authorize('view', $problem);
         $categories = $problem->ranks()->pluck("category")->unique();
         return view('pages.problem.podium', [
             'problem' => $problem,
@@ -126,9 +127,6 @@ class ProblemController extends Controller
      */
     public function show(Problem $problem)
     {
-        if ($this->contestService->inContest && !$this->contestService->contest->problems()->where('id', $problem->id)->exists()) {
-            return redirect()->route('home');
-        }
         return view('pages.problem.show', [
             'problem' => $problem,
             'testCases' => $problem->testCases()->orderBy('position')->where('public', true)->where('validated', true)->get()

@@ -47,6 +47,11 @@ class Contest extends Model
         return $this->start_time->addMinutes($this->duration);
     }
 
+    public function endTimeWithExtra(): Carbon
+    {
+        return $this->start_time->addMinutes($this->duration + 3);
+    }
+
     public function blindTime(): Carbon
     {
         return $this->start_time->addMinutes($this->duration - $this->blind_time);

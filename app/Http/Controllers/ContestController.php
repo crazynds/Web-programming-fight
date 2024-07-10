@@ -53,11 +53,17 @@ class ContestController extends Controller
         return redirect()->route('home');
     }
 
+    public function leave(Contest $contest)
+    {
+        session()->forget('contest');
+        return redirect()->route('contest.index');
+    }
+
     public function leaderboard(Contest $contest)
     {
         $key = 'contest.leaderboard.' . $contest->id;
         $problems = $contest->problems()->orderBy('id')->pluck('id');
-        $blind = $contest->blindTime()->lt(now()) && $contest->endTime()->addMinutes(10)->gt(now());
+        $blind = $contest->blindTime()->lt(now()) && $contest->endTimeWithExtra()->gt(now());
         // If is blind time, get the blind leaderboard. (The latest leaderboard loaded)
         if ($blind)
             $competitors = Cache::get($key . '.blind');
@@ -95,13 +101,15 @@ class ContestController extends Controller
             }
             Cache::put($key, $competitors, now()->addMinutes(5));
             // Freeze this leaderboard for blind
-            Cache::put($key . '.blind', $competitors, $contest->endTime()->addMinutes(10));
+            if ($contest->endTimeWithExtra()->gt(now()))
+                Cache::put($key . '.blind', $competitors, $contest->endTimeWithExtra());
         }
         return view('pages.contest.competitor.leaderboard', [
             'competitors' => $competitors,
             'contest' => $contest,
             'problems' => $problems,
-            'blind' => $blind
+            'blind' => $blind,
+            'channel' => 'contest.submissions.' . $contest->id,
         ]);
     }
 

@@ -62,7 +62,7 @@
                         <a href="{{ route('submitRun.index') }}">Runs</a> |
                     @else
                         <span style="font-size: 12pt;">
-                            Waiting for contest to start...
+                            Wait for the contest to start...
                         </span>
                     @endif
                     {{-- <a href="./Statistics.html">Ranking</a> | --}}
@@ -129,7 +129,7 @@
                 @auth
                     <td align="center" class="px-2" nowrap="">
                         @if ($contestService->inContest)
-                            <a href="" style="font-size:1.6em" title="Leave the contest!"><i
+                            <a href="{{ route('contest.leave') }}" style="font-size:1.6em" title="Leave the contest!"><i
                                     class="las la-door-open"></i></a>
                         @else
                             <a href="{{ route('auth.logout') }}">Logout</a>
@@ -187,7 +187,12 @@
 
                 // If the count down is finished, write some text
                 if (distance < 0) {
-                    document.getElementById("headerClock").innerHTML = "Starting Contest...";
+                    document.getElementById("headerClock").innerHTML =
+                        @if (!$contestService->started)
+                            "Starting Contest..."
+                        @else
+                            "Ending Contest..."
+                        @endif ;
                     location.reload()
                     clearInterval(x);
                 } else if (minutes == 10 && seconds == 0) {

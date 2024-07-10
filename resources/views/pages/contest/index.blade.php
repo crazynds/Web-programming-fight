@@ -98,13 +98,19 @@
                             @can('view', $contest)
                                 @if ($contest->start_time->addMinutes($contest->duration)->gt(now()))
                                     <a href="{{ route('contest.show', ['contest' => $contest->id]) }}"
-                                        title="View and enter context" class="d-flex action-btn">
+                                        title="View and enter contest" class="d-flex action-btn">
                                         <i class="las la-door-open"></i>
                                     </a>
                                 @else
-                                    <a href="{{ route('contest.show', ['contest' => $contest->id]) }}"
-                                        title="View context results" class="d-flex action-btn">
+                                    <a href="{{ route('contest.show', ['contest' => $contest->id]) }}" title="View contest"
+                                        class="d-flex action-btn">
                                         <i class="las la-search"></i>
+                                    </a>
+                                @endif
+                                @if ($contest->start_time->lt(now()))
+                                    <a href="{{ route('contest.leaderboard', ['contest' => $contest->id]) }}"
+                                        title="View contest leaderboard" class="d-flex action-btn">
+                                        <i class="las la-medal"></i>
                                     </a>
                                 @endif
                             @endcan

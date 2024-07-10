@@ -48,9 +48,9 @@ class ExecutorService
             case "C++":
                 return '--conf /var/nsjail/basic.conf';
             case "PyPy3.10":
-                return '--user 99999 --group 99999 -Mo -R /bin/ -R /lib -R /lib64/ -R /usr/ -R /sbin/ -T /dev -R /dev/urandom -R /var/nsjail/runPypy3.10.sh -R /var/nsjail/b.py --exec_file /var/nsjail/runPypy3.10.sh';
+                return '--conf /var/nsjail/python.conf -R /var/nsjail/runPypy3.10.sh --exec_file /var/nsjail/runPypy3.10.sh';
             case "Python3.11":
-                return '--user 99999 --group 99999 -Mo -R /bin/ -R /lib -R /lib64/ -R /usr/ -R /sbin/ -T /dev -R /dev/urandom -R /var/nsjail/runPython3.11.sh -R /var/nsjail/b.py --exec_file /var/nsjail/runPython3.11.sh';
+                return '--conf /var/nsjail/python.conf -R /var/nsjail/runPython3.11.sh --exec_file /var/nsjail/runPython3.11.sh';
             default:
                 // USE C++
                 return '--conf /var/nsjail/basic.conf';
@@ -95,8 +95,8 @@ class ExecutorService
     {
         $finput = '/var/work/problems/input';
 
-        // Limit to 134217728 chars, so the file can't be bigger than 128 MB. (1024 * 1024 * 128)
-        $limitOutput = 134217728;
+        // Limit to 536870912 bytes, so the file can't be bigger than 512 MB. (1024 * 1024 * 512)
+        $limitOutput = 536870912;
 
         // Configure time limit and memory limit with a small margin
         $time_limit = round((1500 + $timeLimit) / 1000);
@@ -191,7 +191,7 @@ class ExecutorService
 
         $output = Storage::disk('nsjail')->get('output');
 
-        // Restore old program
+        // Restore old program config
         $this->currentConfig = $oldConfig;
         exec("mv /var/nsjail/'$bkp' /var/nsjail/'$program'", $this->output, $this->retval);
 

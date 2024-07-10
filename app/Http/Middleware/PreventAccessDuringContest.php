@@ -24,12 +24,8 @@ class PreventAccessDuringContest
     {
         if ($this->contestService->inContest) {
             $newRoute = 'contest.' . Route::currentRouteName();
-            /* Fear to remove this code.
-            if (Route::has($newRoute))
+            if (Route::has($newRoute) && $request->method() == 'GET')
                 return redirect()->route($newRoute, $request->route()->parameters())->withInput($request->all());
-            else
-                return redirect()->route('home');
-            */
             // If some equivalent route is not found, redirect to home.
             if (!Route::has($newRoute))
                 return redirect()->route('home');

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Contest\CompetitorController;
+use App\Http\Controllers\ContestController;
 use App\Http\Controllers\ProblemController;
 use App\Http\Controllers\SubmitRunController;
 use App\Http\Middleware\AccessOnlyDuringContest;
@@ -24,3 +25,5 @@ Route::resource('competitor', CompetitorController::class)
     ->only(['index']);
 Route::get('competitor/leaderboard', [CompetitorController::class, 'leaderboard'])
     ->name('competitor.leaderboard');
+Route::get('/leave', [ContestController::class, 'leave'])
+    ->name('leave');
