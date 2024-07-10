@@ -56,18 +56,21 @@
                     <td class="px-2">
                         <div class="hstack gap-1">
                             @if ($team->pivot->accepted == false)
-                                <a href="{{ route('team.accept', ['team' => $team->id]) }}" class="d-flex action-btn">
-                                    <i class="las la-check-circle"></i>
-                                </a>
-                                <a href="{{ route('team.deny', ['team' => $team->id]) }}" class="d-flex action-btn">
-                                    <i class="lar la-times-circle"></i>
-                                </a>
+                                @can('modifyMembers', $team)
+                                    <a href="{{ route('team.accept', ['team' => $team->id]) }}" class="d-flex action-btn">
+                                        <i class="las la-check-circle"></i>
+                                    </a>
+                                    <a href="{{ route('team.deny', ['team' => $team->id]) }}" class="d-flex action-btn">
+                                        <i class="lar la-times-circle"></i>
+                                    </a>
+                                @endcan
                             @endif
                             @can('update', $team)
                                 <a href="{{ route('team.edit', ['team' => $team->id]) }}" class="d-flex action-btn">
                                     <i class="las la-edit"></i>
                                 </a>
-                            @else
+                            @endcan
+                            @can('leave', $team)
                                 <a href="{{ route('team.leave', ['team' => $team->id]) }}" class="d-flex action-btn">
                                     <i class="las la-door-open"></i>
                                 </a>
@@ -81,6 +84,9 @@
                                         <i class="las la-trash"></i>
                                     </button>
                                 </form>
+                            @endcan
+                            @cannot('modifyMembers', $team)
+                                |In contest|
                             @endcan
                         </div>
                     </td>
