@@ -77,7 +77,6 @@ class ContestComputeScore implements ShouldQueue
                 // Clear leaderboard cache
                 Cache::forget('contest.leaderboard.' . $this->contest->id);
                 break;
-
             case SubmitResult::fromValue(SubmitResult::TimeLimit)->description:
             case SubmitResult::fromValue(SubmitResult::MemoryLimit)->description:
             case SubmitResult::fromValue(SubmitResult::RuntimeError)->description:
@@ -88,11 +87,13 @@ class ContestComputeScore implements ShouldQueue
                     $this->competitor->penality += $this->contest->penality;
                     $this->competitor->save();
                 }
+                Cache::forget('contest.leaderboard.' . $this->contest->id);
                 break;
             case SubmitResult::fromValue(SubmitResult::CompilationError)->description:
                 // increase penality
                 $this->competitor->penality += $this->contest->penality;
                 $this->competitor->save();
+                Cache::forget('contest.leaderboard.' . $this->contest->id);
                 break;
             default:
                 // Do nothing

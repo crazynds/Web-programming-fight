@@ -4,10 +4,15 @@ namespace App\Policies;
 
 use App\Models\Problem;
 use App\Models\User;
+use App\Services\ContestService;
 use Illuminate\Auth\Access\Response;
 
 class ProblemPolicy
 {
+    public function __construct(protected ContestService $contestService)
+    {
+    }
+
     /**
      * Determine whether the user can view any models.
      */
@@ -21,7 +26,9 @@ class ProblemPolicy
      */
     public function view(User $user, Problem $problem): bool
     {
-        return true;
+        return ($this->contestService->inContest && $this->contestService->contest->problems()->where('id', $problem->id)->exists()) ||
+            $problem->user_id == $user->id ||
+            $problem->visible;
     }
 
     /**
@@ -37,7 +44,7 @@ class ProblemPolicy
      */
     public function update(User $user, Problem $problem): bool
     {
-        return $user->isAdmin() || $user->id==$problem->user_id;
+        return $user->isAdmin() || $user->id == $problem->user_id;
     }
 
     /**
@@ -45,7 +52,7 @@ class ProblemPolicy
      */
     public function delete(User $user, Problem $problem): bool
     {
-        return $user->isAdmin() || $user->id==$problem->user_id;
+        return $user->isAdmin() || $user->id == $problem->user_id;
     }
 
     /**
@@ -53,7 +60,7 @@ class ProblemPolicy
      */
     public function restore(User $user, Problem $problem): bool
     {
-        return $user->isAdmin() || $user->id==$problem->user_id;
+        return $user->isAdmin() || $user->id == $problem->user_id;
     }
 
     /**
