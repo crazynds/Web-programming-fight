@@ -194,11 +194,9 @@
                                     </div>
                                     <span style="padding-top: 14px;font-size: smaller">
                                         @if ($contest->time_based_points || $contest->parcial_solution)
-                                            {{ $score->score }}
-                                            ({{ $competitor->__get('sum_submissions_' . $problem) }})
+                                            {{ $score->score }}({{ $competitor->__get('sum_submissions_' . $problem) }})
                                         @else
-                                            {{ $competitor->__get('sum_submissions_' . $problem) }} /
-                                            {{ $score->penality }}
+                                            {{ $competitor->__get('sum_submissions_' . $problem) . '/' . $score->penality }}
                                         @endif
                                     </span>
                                 @elseif ($competitor->__get('sum_submissions_' . $problem) > 0)
