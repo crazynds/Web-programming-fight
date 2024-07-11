@@ -121,10 +121,6 @@
                                     <li>
                                         <a class="dropdown-item" href="{{ route('submitRun.global') }}">Global Runs</a>
                                     </li>
-                                    <li>
-                                        <a class="dropdown-item"
-                                            href="{{ route('contest.competitor.leaderboard') }}">Leaderboard</a>
-                                    </li>
                                 @else
                                     <li><a class="dropdown-item" href="{{ route('user.index') }}">Users</a></li>
                                     <li>

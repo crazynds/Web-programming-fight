@@ -197,7 +197,7 @@
                                 @endcan
                             @endif
                             @can('view', $submitRun)
-                                @if ($submitRun->file_id != null)
+                                @if ($submitRun->file_id != null && !$contestService->inContest)
                                     <a target="_blank"
                                         href="{{ route('submitRun.download', ['submitRun' => $submitRun->id], false) }}"
                                         class="d-flex action-btn">
