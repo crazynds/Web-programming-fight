@@ -2,12 +2,19 @@
 
 namespace App\Policies;
 
+use App\Enums\SubmitResult;
 use App\Models\SubmitRun;
 use App\Models\User;
+use App\Services\ContestService;
 use Illuminate\Auth\Access\Response;
 
 class SubmitRunPolicy
 {
+
+    public function __construct(protected ContestService $contestService)
+    {
+    }
+
     /**
      * Determine whether the user can view any models.
      */
@@ -21,7 +28,9 @@ class SubmitRunPolicy
      */
     public function view(User $user, SubmitRun $submitRun): bool
     {
-        return $user->id == $submitRun->user_id || $user->isAdmin();
+        $compErr = $submitRun->result == SubmitResult::fromValue(SubmitResult::CompilationError)->description;
+        $contest = ($this->contestService->inContest && $compErr) || !$this->contestService->inContest;
+        return ($user->id == $submitRun->user_id && $contest) || $user->isAdmin();
     }
 
     /**
