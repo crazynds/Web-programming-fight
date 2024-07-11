@@ -88,7 +88,7 @@ class ContestController extends Controller
                 ]);
             }
 
-            $competitors = $query->sortBy([
+            $competitors = $query->orderBy([
                 ['sum_scores_score', 'desc'],
                 ['sum_scores_penality', 'asc'],
             ])->get();
