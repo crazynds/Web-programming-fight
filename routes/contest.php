@@ -27,5 +27,8 @@ Route::resource('competitor', CompetitorController::class)
     ->only(['index']);
 Route::get('competitor/leaderboard', [CompetitorController::class, 'leaderboard'])
     ->name('competitor.leaderboard');
+
+
+
 Route::get('/leave', [ContestController::class, 'leave'])
     ->name('leave');
