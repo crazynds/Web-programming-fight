@@ -21,4 +21,5 @@ final class SubmitResult extends Enum
     const Error = 7;
     const FileTooLarge = 8;
     const InvalidUtf8File = 9;
+    const LanguageNotSupported = 9;
 }
