@@ -83,15 +83,22 @@
                             <span title="Owner of the contest" style="cursor:help">
                                 👑
                             </span>
-                        @elseif ($contest->is_private)
-                            <span title="Private Contest" style="cursor:help">
+                        @elseif ($contest->endTime()->gt(now()))
+                            @if ($contest->is_private)
+                                <span title="Private Contest" style="cursor:help">
+                                    🔒
+                                </span>
+                            @else
+                                <span title="Open to public" style="cursor:help">
+                                    ✨
+                                </span>
+                            @endif
+                        @else
+                            <span title="Contest ended" style="cursor:help">
                                 🚫
                             </span>
-                        @else
-                            <span title="Open to public" style="cursor:help">
-                                ✨
-                            </span>
                         @endif
+
                     </td>
                     <td class="px-2">
                         <div class="hstack gap-1">
