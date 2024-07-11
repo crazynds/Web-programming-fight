@@ -33,8 +33,8 @@ final class LanguagesType extends Enum
         return [
             'C++' => [1, 1],
             'C (-std=c17)' => [1, 1],
-            'PyPy3.10' => [1.2, 2], // 1.2 more time for pypy and 2 x more memory
-            'Python3.11' => [1.5, 2], // 1.5x more time for python and 2 x more memory
+            'PyPy3.10' => [1.5, 2], // 1.5x more time for pypy and 2x more memory
+            'Python3.11' => [1.75, 2], // 1.75x more time for python and 2x more memory
         ];
     }
 
