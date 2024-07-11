@@ -62,7 +62,7 @@ class Contest extends Model
         if ($this->individual) {
             return $this->competitors()->where('user_id', $user->id)->first();
         } else {
-            return $this->competitors()->whereHas('team.owner', function ($query) use ($user) {
+            return $this->competitors()->whereHas('team.members', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             })->first();
         }

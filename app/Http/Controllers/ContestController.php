@@ -145,10 +145,14 @@ class ContestController extends Controller
             $members = $team->members;
 
             /** @var User $user */
-            foreach ($contest->competitors()->with('team.members')->lazy() as $team) {
-                foreach ($team->members as $user) {
+
+            $competitor = $contest->competitors()->with('team.members')->whereHas('team.members', function ($query) use ($members) {
+                $query->whereIn('user_id', $members->pluck('id'));
+            })->first();
+            if ($competitor) {
+                foreach ($competitor->team->members as $user) {
                     if ($members->contains('id', $user->id)) {
-                        return Redirect::back()->withErrors(['team' => 'The user ' . $user->name . ' is already participating in this contest']);
+                        return Redirect::back()->withErrors(['team' => 'The user ' . $user->name . ' is already participating in this contest.']);
                     }
                 }
             }
