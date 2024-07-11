@@ -129,32 +129,44 @@
                         </span>
                     </td>
                     <td class="px-2 text-center">
-                        <small id="testCases">
+                        <small id="testCases"
+                            @switch($submitRun->result)
+                            @case('Accepted')
+                                style="color:#0a0"
+                                @break
+                            @case('Error')
+                            @case('File too large')
+                            @case('Invalid utf8 file')
+                                style="color:#f00"
+                                @break
+                            @case('Wrong answer')
+                                style="color:#a00"
+                                @break
+                            @case('Compilation error')
+                            @case('Runtime error')
+                                style="color:#aa0"
+                                @break
+                            @case('Time limit')
+                            @case('Memory limit')
+                                style="color:#00a"
+                                @break
+                            @default
+                                style="color:grey"
+                        @endswitch>
                             @switch($submitRun->result)
                                 @case('Accepted')
-                                    <span style="color:#0a0">
-                                        All
-                                    </span>
+                                    All
                                 @break
 
                                 @case('Wrong answer')
-                                    <span style="color:#a00">
-                                        {{ $submitRun->num_test_cases + 1 }}
-                                    </span>
+                                    {{ $submitRun->num_test_cases + 1 }}
                                 @break
 
                                 @case('Runtime error')
                                 @case('Time limit')
 
                                 @case('Memory limit')
-                                    <span style="color:#00a">
-                                        {{ $submitRun->num_test_cases + 1 }}
-                                    </span>
-                                @break
-
-                                @case('Error')
-                                @case('Compilation error')
-                                    ---
+                                    {{ $submitRun->num_test_cases + 1 }}
                                 @break
 
                                 @default
