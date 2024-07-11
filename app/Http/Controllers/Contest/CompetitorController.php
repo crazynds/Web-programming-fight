@@ -15,6 +15,12 @@ class CompetitorController extends Controller
 
     public function __construct(protected ContestService $contestService)
     {
+        $this->middleware(function ($request, $next) {
+            if (!$this->contestService->inContest) {
+                return redirect()->route('contest.index');
+            }
+            return $next($request);
+        });
     }
 
     /**
