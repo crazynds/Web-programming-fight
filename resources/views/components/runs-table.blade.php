@@ -188,7 +188,7 @@
                                     @endif
                                 @endcan
                                 @can('view', $submitRun)
-                                    @if (isset($submitRun->output) && !$contestService->inContest)
+                                    @if (isset($submitRun->output))
                                         <a href="{{ route('submitRun.show', ['submitRun' => $submitRun->id], false) }}"
                                             class="d-flex action-btn">
                                             <i class="las la-poll-h"></i>

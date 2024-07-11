@@ -46,7 +46,7 @@
         </div>
         <div class="col">
             <a style="float:right" href="{{ route('submitRun.create') }}">
-                <button>New +</button>
+                <button>New Submission +</button>
             </a>
         </div>
     </div>
