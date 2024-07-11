@@ -19,7 +19,7 @@ final class LanguagesType extends Enum
     {
         return [
             'C++' => LanguagesType::CPlusPlus,
-            'C' => LanguagesType::C,
+            'C (-std=c17)' => LanguagesType::C,
             'PyPy3.10' => LanguagesType::PyPy3_10,
             'Python3.11' => LanguagesType::Python3_11,
         ];
@@ -32,7 +32,7 @@ final class LanguagesType extends Enum
         // 1 => memory
         return [
             'C++' => [1, 1],
-            'C' => [1, 1],
+            'C (-std=c17)' => [1, 1],
             'PyPy3.10' => [1.2, 2], // 1.2 more time for pypy and 2 x more memory
             'Python3.11' => [1.5, 2], // 1.5x more time for python and 2 x more memory
         ];

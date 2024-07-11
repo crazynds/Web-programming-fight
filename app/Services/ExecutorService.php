@@ -76,7 +76,6 @@ class ExecutorService
         // c => layout bonitinho
         // i => not case sensitive
         exec("diff -abci --suppress-common-lines --ignore-trailing-space /var/work/user_output $foutput > /var/work/diff", $this->output, $this->retval);
-
         if ($this->retval != 0) {
             $oldRetVal = $this->retval;
             $prepareOutput = "csplit /var/work/diff '/--- [0-9]*,*[0-9]* ----/' > /dev/null && sed -i '1i\\\\n\\n' xx01 && pr -mt -w 115 xx00 xx01 | head -n 20";
@@ -233,11 +232,11 @@ class ExecutorService
                     return SubmitResult::CompilationError;
                 }
                 break;
-            case "C":
+            case "C (-std=c17)":
                 $outputName = 'a.bin';
                 $program = 'prog.c';
                 Storage::disk('nsjail')->writeStream($program, $code->readStream());
-                exec("gcc -std=c99 -mtune=native -march=native -w -O2 /var/work/'$program' -o /var/nsjail/'$outputName' 2>&1", $this->output, $this->retval);
+                exec("gcc -std=c17 -mtune=native -march=native -w -O2 /var/work/'$program' -o /var/nsjail/'$outputName' 2>&1", $this->output, $this->retval);
                 if ($this->retval != 0) {
                     return SubmitResult::CompilationError;
                 }
@@ -249,7 +248,7 @@ class ExecutorService
                 exec('mv /var/work/' . $outputName . ' /var/nsjail/' . $outputName, $this->output, $this->retval);
                 break;
             default:
-                return SubmitResult::Error;
+                return SubmitResult::LanguageNotSupported;
         }
         return SubmitResult::NoResult;
     }
