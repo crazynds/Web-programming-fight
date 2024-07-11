@@ -121,6 +121,8 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
             }
             if ($num > 0)
                 $this->submit->result = SubmitResult::Accepted;
+            else if ($testCases->count() == 0)
+                $this->submit->result = SubmitResult::NoTestCase;
             else
                 $this->submit->result = SubmitResult::WrongAnswer;
             $this->submit->output = null;

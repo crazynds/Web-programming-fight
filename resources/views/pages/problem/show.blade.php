@@ -18,7 +18,8 @@
 
 @section('content')
 
-    <div style="border: #bbb solid 1px;border-radius: 3px;padding: 10px;background-color: whitesmoke;" class="shadow-lg">
+    <div style="border: #bbb solid 1px;border-radius: 3px;padding: 10px;background-color: whitesmoke; margin: 0 15%"
+        class="shadow-lg">
         <div class="row">
             <h1 class="text-center mb-0">
                 <strong>{{ $problem->title }}</strong>
@@ -66,8 +67,8 @@
         </div>
         @if (sizeof($testCases) > 0)
             <hr>
-            <div class="row justify-content-center mt-2">
-                <div class="col-3 text-center" style="border: solid;border-width:1px 0;margin-right: 7%;">
+            <div class="row justify-content-center my-2">
+                <div class="col-3 text-center" style="border: solid;border-width:1px 0;margin-right: 10%;">
                     Input Example
                 </div>
                 <div class="col-3 text-center" style="border: solid;border-width:1px 0;">
@@ -76,18 +77,34 @@
             </div>
 
             @foreach ($testCases as $testCase)
-                <div class="row justify-content-center mt-2">
-                    <div class="col-4 px-1" style="background: #efefef;border: 1px gray solid;">
-                        <pre style="margin:0">{{ $testCase->inputFile->get() }}</pre>
+                <div class="row justify-content-center py-2">
+                    <div class="col-4 px-1 mx-2"
+                        style="background: #efefef;border: 1px gray solid; min-height: 60px; position: relative">
+                        <button style="position: absolute; top: 5px; right: 5px"
+                            onclick="copyCode('input{{ $testCase->id }}')">Copy</button>
+                        <pre style="margin:0" id="input{{ $testCase->id }}">{{ $testCase->inputFile->get() }}</pre>
                     </div>
-                    <div class="col-4 px-1" style="background: #efefef;border: 1px gray solid;border-left:0;">
-                        <pre style="margin:0">{{ $testCase->outputFile->get() }}</pre>
+                    <div class="col-4 px-1 mx-2"
+                        style="background: #efefef;border: 1px gray solid; min-height: 60px; position: relative">
+                        <button style="position: absolute; top: 5px; right: 5px"
+                            onclick="copyCode('output{{ $testCase->id }}')">Copy</button>
+                        <pre style="margin:0" id="output{{ $testCase->id }}">{{ $testCase->outputFile->get() }}</pre>
                     </div>
                 </div>
+                <hr style="max-width: 70%; margin: auto">
             @endforeach
         @endif
     </div>
 @endsection
 
 @section('script')
+    <script>
+        function copyCode(id) {
+            var range = document.createRange();
+            range.selectNode(document.getElementById(id));
+            window.getSelection().removeAllRanges(); // clear current selection
+            window.getSelection().addRange(range); // to select text
+            document.execCommand("copy");
+        }
+    </script>
 @endsection
