@@ -46,6 +46,7 @@ class ExecutorService
     {
         switch ($language) {
             case "C++":
+            case "C":
                 return '--conf /var/nsjail/basic.conf';
             case "PyPy3.10":
                 return '--conf /var/nsjail/python.conf -R /var/nsjail/runPypy3.10.sh --exec_file /var/nsjail/runPypy3.10.sh';
@@ -74,9 +75,15 @@ class ExecutorService
         // b => ignore multiples blank lines (\n\r == \r\n == \n)
         // c => layout bonitinho
         // i => not case sensitive
-        exec('diff -abci --suppress-common-lines --ignore-trailing-space /var/work/output ' . $foutput, $this->output, $this->retval);
+        exec("diff -abci --suppress-common-lines --ignore-trailing-space /var/work/user_output $foutput > /var/work/diff", $this->output, $this->retval);
 
-        //dump($this->output);
+        if ($this->retval != 0) {
+            $oldRetVal = $this->retval;
+            $prepareOutput = "csplit /var/work/diff '/--- [0-9]*,*[0-9]* ----/' > /dev/null && sed -i '1i\\\\n\\n' xx01 && pr -mt -w 115 xx00 xx01 | head -n 20";
+            exec($prepareOutput, $this->output, $this->retval);
+            $this->retval = $oldRetVal;
+            //dump($this->output);
+        }
     }
 
     public function loadFile($fileId, $path)
@@ -102,7 +109,7 @@ class ExecutorService
         $time_limit = round((1500 + $timeLimit) / 1000);
         $memory_limit = $memoryLimit + 256;
 
-        $command = 'command time -v --output=/var/work/time -p nsjail ' . $this->currentConfig . ' --max_cpus 1 --log /var/work/nsjail_out --time_limit=' . $time_limit . ' --rlimit_as=' . $memory_limit . ' < ' . $finput . ' 2> /dev/null | head -c ' . $limitOutput . ' > /var/work/output';
+        $command = 'command time -v --output=/var/work/time -p nsjail ' . $this->currentConfig . ' --max_cpus 1 --log /var/work/nsjail_out --time_limit=' . $time_limit . ' --rlimit_as=' . $memory_limit . ' < ' . $finput . ' 2> /dev/null | head -c ' . $limitOutput . ' > /var/work/user_output';
 
         dump($command);
         exec("rm /var/work/nsjail_out 2> /dev/null", $this->output, $this->retval);
@@ -222,6 +229,15 @@ class ExecutorService
                 $program = 'prog.cpp';
                 Storage::disk('nsjail')->writeStream($program, $code->readStream());
                 exec("g++ -std=c++20 -mtune=native -march=native -w -O2 /var/work/'$program' -o /var/nsjail/'$outputName' 2>&1", $this->output, $this->retval);
+                if ($this->retval != 0) {
+                    return SubmitResult::CompilationError;
+                }
+                break;
+            case "C":
+                $outputName = 'a.bin';
+                $program = 'prog.c';
+                Storage::disk('nsjail')->writeStream($program, $code->readStream());
+                exec("gcc -std=c99 -mtune=native -march=native -w -O2 /var/work/'$program' -o /var/nsjail/'$outputName' 2>&1", $this->output, $this->retval);
                 if ($this->retval != 0) {
                     return SubmitResult::CompilationError;
                 }

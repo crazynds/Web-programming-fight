@@ -107,6 +107,8 @@
                                 style="color:#0a0"
                                 @break
                             @case('Error')
+                            @case('File too large')
+                            @case('Invalid utf8 file')
                                 style="color:#f00"
                                 @break
                             @case('Wrong answer')

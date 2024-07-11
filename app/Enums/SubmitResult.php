@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Enums;
 
@@ -9,7 +11,7 @@ final class SubmitResult extends Enum
 {
     const NoResult = 0;
     const Accepted = 1;
-    
+
     const WrongAnswer = 2;
     const TimeLimit = 3;
     const CompilationError = 4;
@@ -18,4 +20,5 @@ final class SubmitResult extends Enum
 
     const Error = 7;
     const FileTooLarge = 8;
+    const InvalidUtf8File = 9;
 }
