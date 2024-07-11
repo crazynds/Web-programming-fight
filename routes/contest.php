@@ -19,6 +19,8 @@ Route::middleware(AccessOnlyDuringContest::class)->group(function () {
         ->only(['index', 'store', 'create', 'show']);
     Route::get('/submitRun/global/live', [SubmitRunController::class, 'global'])
         ->name('submitRun.global');
+    Route::get('/submitRun/{submitRun}/download', [SubmitRunController::class, 'download'])
+        ->name('submitRun.download');
 });
 
 Route::resource('competitor', CompetitorController::class)

@@ -88,13 +88,16 @@ class SubmitRunController extends Controller
             $originalFile = $request->file('code');
 
             // 4 MB
-            if ($originalFile->getSize() > 1024 * 1024 * 4) {
+            if ($originalFile->getSize() > 1024 * 1024 * 4 || !mb_check_encoding($originalFile->get(), 'UTF-8')) {
                 $run = new SubmitRun();
                 $run->language = $request->input('lang');
                 $run->problem()->associate($problem);
                 $run->user()->associate($user);
                 $run->status = SubmitStatus::Judged;
-                $run->result = SubmitResult::FileTooLarge;
+                if ($originalFile->getSize() > 1024 * 1024 * 4)
+                    $run->result = SubmitResult::FileTooLarge;
+                else
+                    $run->result = SubmitResult::InvalidUtf8File;
                 $run->save();
             } else {
                 $file = File::createFile($originalFile, 'users/' . $user->id . "/attempts" . '/' . $request->problem);
@@ -123,14 +126,21 @@ class SubmitRunController extends Controller
     public function download(SubmitRun $submitRun)
     {
         $this->authorize('view', $submitRun);
+        if ($this->contestService->inContest && !$this->contestService->contest->problems()->where('problems.id', $submitRun->problem_id)->exists()) {
+            abort(404);
+        }
         return $submitRun->file->download('#' . $submitRun->id . '_' . Str::slug($submitRun->problem->title) . '.' . $submitRun->file->type);
     }
 
     public function getCode(SubmitRun $submitRun)
     {
         $this->authorize('view', $submitRun);
+        $code =  $submitRun->file?->get() ?? 'Invalid Code!';
+        if (!mb_check_encoding($code, 'UTF-8'))
+            $code = "Malformed UTF-8 file!";
+
         return response()->json([
-            'code' => $submitRun->file->get()
+            'code' => $code,
         ]);
     }
 

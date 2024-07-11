@@ -40,11 +40,14 @@ class SubmitRun extends Model
     {
         return Attribute::make(
             set: function (?string $value) {
-                $limit = 1024 * 4;
-                $value = (isset($value) && strlen($value) > $limit) ? substr($value, 0, $limit) . '(...)' : $value;
+                $limit = 1024;
+                $value = (isset($value) && strlen($value) > $limit) ? substr($value, 0, $limit) . '\n\n(...)' : $value;
                 if (is_string($value)) {
                     $value = mb_convert_encoding($value, "UTF-8");
                 }
+                $value = trim($value);
+                if (strlen($value) == 0)
+                    return null;
                 return $value;
             },
             get: fn (?string $value) => $value,
