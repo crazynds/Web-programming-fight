@@ -36,7 +36,7 @@
             </div>
         </div>
         <div class="row mt-3">
-            <div class="col">
+            <div class="col" style="padding-top: 30px;">
                 <input id="tags" name="membersjson" placeholder="Members nickname"
                     value="{{ old('membersjson', $team->membersjson()) }}">
                 <small>
