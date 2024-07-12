@@ -126,8 +126,10 @@
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
+                                    @if($contestService->started)
                                     <li><a class="dropdown-item" href="{{ route('submitRun.global') }}">Global Runs</a>
                                     </li>
+                                    @endif
                                     {{-- <li>
                                     <hr class="dropdown-divider">
                                 </li>
