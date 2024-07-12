@@ -64,12 +64,12 @@ class ContestController extends Controller
 
     public function leaderboard(Contest $contest)
     {
-        $key = 'contest.leaderboard.' . $contest->id;
+        $key = 'contest:leaderboard:' . $contest->id;
         $problems = $contest->problems()->orderBy('id')->pluck('id');
         $blind = $contest->blindTime()->lt(now()) && $contest->endTimeWithExtra()->gt(now());
         // If is blind time, get the blind leaderboard. (The latest leaderboard loaded)
         if ($blind)
-            $competitors = Cache::get($key . '.blind');
+            $competitors = Cache::get($key . ':blind');
         else
             $competitors = Cache::get($key);
         // If any leaderboard could be loaded, retrive it from database.
@@ -104,7 +104,7 @@ class ContestController extends Controller
             Cache::put($key, $competitors, now()->addMinutes(5));
             // Freeze this leaderboard for blind
             if ($contest->endTimeWithExtra()->gt(now()))
-                Cache::put($key . '.blind', $competitors, $contest->endTimeWithExtra());
+                Cache::put($key . ':blind', $competitors, $contest->endTimeWithExtra());
         }
         return view('pages.contest.competitor.leaderboard', [
             'competitors' => $competitors,

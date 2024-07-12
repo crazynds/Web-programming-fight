@@ -90,7 +90,7 @@ class ExecutorService
         // Carrega o arquivo input para a pasta tmpfs
         $size = File::where('id', $fileId)->select('size')->first()->size;
         $time = $this->cacheTime($size);
-        $fileData = Cache::remember('file_' . $fileId, $time, function () use ($fileId) {
+        $fileData = Cache::remember('file:input_' . $fileId, $time, function () use ($fileId) {
             return File::find($fileId)->get();
         });
         Storage::disk('nsjail')->put($path, $fileData);

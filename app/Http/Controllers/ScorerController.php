@@ -46,10 +46,10 @@ class ScorerController extends Controller
     public function reavaliate(Problem $problem)
     {
         $user = Auth::user();
-        if (RateLimiter::tooManyAttempts('reavaliate-scores:' . $user->id, 3)) {
+        if (RateLimiter::tooManyAttempts('scores:reavaliate:' . $user->id, 3)) {
             return Redirect::back()->withErrors(['msg' => 'Too many attempts! Wait a moment and try again!']);
         }
-        RateLimiter::hit('reavaliate-scores:' . $user->id, $problem->submissions()->where('result', '=', SubmitResult::Accepted)->count() * 60);
+        RateLimiter::hit('scores:reavaliate:' . $user->id, $problem->submissions()->where('result', '=', SubmitResult::Accepted)->count() * 60);
         foreach ($problem->submissions()->where('result', '=', SubmitResult::Accepted)->lazy() as $submit) {
             ScoreSubmitJob::dispatch($submit)->onQueue('low');
         }
