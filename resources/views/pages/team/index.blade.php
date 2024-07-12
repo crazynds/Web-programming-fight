@@ -45,12 +45,12 @@
                     <td class="px-2 text-center">
                         <span class="">{{ $team->members_count }}</span>
                         @if ($team->invited_count > 0)
-                            (<u class="text-info">{{ $team->invited_count }}</u>)
+                            (<u class="text-info" title="Invited members awaiting to accept">{{ $team->invited_count }}</u>)
                         @endif
                     </td>
                     <td>
                         @if ($team->pivot->owner)
-                            <i class="las la-crown text-warning"></i>
+                            <i class="las la-crown text-warning" title="You are the owner of the team."></i>
                         @endif
                     </td>
                     <td class="px-2">
@@ -64,15 +64,16 @@
                                         <i class="lar la-times-circle"></i>
                                     </a>
                                 @endcan
+                            @else
+                                @can('leave', $team)
+                                    <a href="{{ route('team.leave', ['team' => $team->id]) }}" class="d-flex action-btn">
+                                        <i class="las la-door-open"></i>
+                                    </a>
+                                @endcan
                             @endif
                             @can('update', $team)
                                 <a href="{{ route('team.edit', ['team' => $team->id]) }}" class="d-flex action-btn">
                                     <i class="las la-edit"></i>
-                                </a>
-                            @endcan
-                            @can('leave', $team)
-                                <a href="{{ route('team.leave', ['team' => $team->id]) }}" class="d-flex action-btn">
-                                    <i class="las la-door-open"></i>
                                 </a>
                             @endcan
                             @can('delete', $team)
