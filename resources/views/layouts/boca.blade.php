@@ -104,26 +104,18 @@
                                 <a href="{{ route('contest.index') }}">Contests</a> |
                             @else
                                 <a href="{{ route('contest.competitor.leaderboard') }}">Leaderboard</a> |
+                                <a href="{{ route('contest.competitor.index') }}">Competitors</a> |
+                                @if ($contestService->started)
+                                    <a href="{{ route('submitRun.global') }}">Global Runs</a> |
+                                @endif
                             @endif
 
-                            <a class="dropdown-toggle" type="button" id="dropdown-headbar" data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                                Show More
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="dropdown-headbar">
-                                @if ($contestService->inContest)
-                                    <li><a class="dropdown-item"
-                                            href="{{ route('contest.competitor.index') }}">Competitors</a>
-                                    </li>
-                                    @if ($contestService->started)
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="{{ route('submitRun.global') }}">Global Runs</a>
-                                        </li>
-                                    @endif
-                                @else
+                            @if (!$contestService->inContest)
+                                <a class="dropdown-toggle" type="button" id="dropdown-headbar" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    Show More
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="dropdown-headbar">
                                     <li><a class="dropdown-item" href="{{ route('user.index') }}">Users</a></li>
                                     <li>
                                         <hr class="dropdown-divider">
@@ -135,8 +127,8 @@
                                 </li>
                                 <li><a class="dropdown-item" href="#">FAQ</a></li>
                                 <li><a class="dropdown-item" href="#">About</a></li> --}}
-                                @endif
-                            </ul>
+                                </ul>
+                            @endif
                         </div>
                     @else
                         <b style="width: calc(100% - 70px);text-align: end;display: inline-block;" class="blink">
