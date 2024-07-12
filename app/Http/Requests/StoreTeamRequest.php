@@ -35,6 +35,7 @@ class StoreTeamRequest extends FormRequest
             'name' => "required|string|min:2|max:40",
             'acronym' => "required|string|min:3|max:5|alpha_dash:ascii|unique:teams,acronym," . $teamId,
             'membersjson' => "nullable|json",
+            'institution_acronym' => 'nullable|string|max:10',
             recaptchaFieldName() => recaptchaRuleName()
         ];
     }
