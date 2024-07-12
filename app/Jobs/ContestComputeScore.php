@@ -70,9 +70,6 @@ class ContestComputeScore implements ShouldQueue
                         'penality' => $this->competitor->penality + $penality,
                         'submit_run_id' => $this->submitRun->id
                     ]);
-                } else {
-                    // Break early to don't forget the leaderboard.
-                    break;
                 }
                 // Clear leaderboard cache
                 Cache::forget('contest:leaderboard:' . $this->contest->id);
