@@ -26,7 +26,7 @@
         <div class="row">
             <div class="col">
                 <label for="name" class="form-label">Team name: </label><br />
-                <input type="text" name="name" class="form-control" maxlength="26"
+                <input type="text" name="name" class="form-control" maxlength="40"
                     value="{{ old('name', $team->name) }}" />
             </div>
             <div class="col-3">

@@ -32,7 +32,7 @@ class StoreTeamRequest extends FormRequest
             $teamId = -1;
         }
         return [
-            'name' => "required|string|min:2|max:26",
+            'name' => "required|string|min:2|max:40",
             'acronym' => "required|string|min:3|max:5|alpha_dash:ascii|unique:teams,acronym," . $teamId,
             'membersjson' => "nullable|json",
             recaptchaFieldName() => recaptchaRuleName()
