@@ -189,7 +189,7 @@
                                     @php($questions++)
                                     @php($score = $competitor->scores[$problem])
                                     <div style="position:relative; width: 20px; height: 32px">
-                                        <div class="balloon balloon-{{ $letter++ }}"></div>
+                                        <div class="balloon balloon-{{ $letter }}"></div>
                                         <div class="balloon-shadow"></div>
                                     </div>
                                     <span style="padding-top: 14px;font-size: smaller">
@@ -204,6 +204,7 @@
                                 @endif
                             </span>
                         </td>
+                        @php($letter++)
                     @endforeach
 
                     <td class="text-center" style="padding-left: 10px; padding-right: 4px">
