@@ -115,21 +115,21 @@
                                     <li><a class="dropdown-item"
                                             href="{{ route('contest.competitor.index') }}">Competitors</a>
                                     </li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('submitRun.global') }}">Global Runs</a>
-                                    </li>
+                                    @if ($contestService->started)
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('submitRun.global') }}">Global Runs</a>
+                                        </li>
+                                    @endif
                                 @else
                                     <li><a class="dropdown-item" href="{{ route('user.index') }}">Users</a></li>
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
-                                    @if($contestService->started)
                                     <li><a class="dropdown-item" href="{{ route('submitRun.global') }}">Global Runs</a>
                                     </li>
-                                    @endif
                                     {{-- <li>
                                     <hr class="dropdown-divider">
                                 </li>
