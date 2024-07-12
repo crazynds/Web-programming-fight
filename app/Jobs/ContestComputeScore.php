@@ -64,7 +64,7 @@ class ContestComputeScore implements ShouldQueue
                         'penality' => $this->competitor->penality + $penality,
                         'score' => $computedPontuation,
                     ]);
-                } else if ($score->score < $computedPontuation || ($score->score == $computedPontuation && $score->penality > $this->competitor->penality)) {
+                } else if ($score->score < $computedPontuation || ($score->score == $computedPontuation && $score->penality > ($this->competitor->penality + $penality))) {
                     $score->update([
                         'score' => $computedPontuation,
                         'penality' => $this->competitor->penality + $penality,
