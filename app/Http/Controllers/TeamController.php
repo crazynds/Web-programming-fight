@@ -74,6 +74,9 @@ class TeamController extends Controller
             'acronym',
             'institution_acronym',
         ]);
+        if (isset($data['institution_acronym'])) {
+            $data['institution_acronym'] = Str::upper($data['institution_acronym']);
+        }
         /** @var User */
         $user = Auth::user();
         $team = new Team($data);
@@ -115,6 +118,9 @@ class TeamController extends Controller
                 'acronym',
                 'institution_acronym',
             ]);
+            if (isset($data['institution_acronym'])) {
+                $data['institution_acronym'] = Str::upper($data['institution_acronym']);
+            }
             $members = $request->input('membersjson');
             /** @var User */
             $user = Auth::user();
