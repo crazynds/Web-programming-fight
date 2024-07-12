@@ -57,7 +57,7 @@ class Contest extends Model
         return $this->start_time->addMinutes($this->duration - $this->blind_time);
     }
 
-    public function checkCompetitor(User $user)
+    public function getCompetitor(User $user)
     {
         if ($this->individual) {
             return $this->competitors()->where('user_id', $user->id)->first();

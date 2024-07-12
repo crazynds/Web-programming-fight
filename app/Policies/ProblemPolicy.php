@@ -27,8 +27,7 @@ class ProblemPolicy
     public function view(User $user, Problem $problem): bool
     {
         return ($this->contestService->inContest && $this->contestService->contest->problems()->where('id', $problem->id)->exists()) ||
-            $problem->user_id == $user->id ||
-            $problem->visible;
+            $problem->visible || $this->update($user, $problem);
     }
 
     /**
@@ -52,7 +51,7 @@ class ProblemPolicy
      */
     public function delete(User $user, Problem $problem): bool
     {
-        return $user->isAdmin() || $user->id == $problem->user_id;
+        return $this->update($user, $problem);
     }
 
     /**
@@ -60,7 +59,7 @@ class ProblemPolicy
      */
     public function restore(User $user, Problem $problem): bool
     {
-        return $user->isAdmin() || $user->id == $problem->user_id;
+        return $this->update($user, $problem);
     }
 
     /**
