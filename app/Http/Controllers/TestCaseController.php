@@ -162,8 +162,8 @@ class TestCaseController extends Controller
 
                     $testCase->save();
                     $position--;
-                    Cache::forget('input_' . $testCase->id);
-                    Cache::forget('output_' . $testCase->id);
+                    Cache::forget('file:input_' . $testCase->id);
+                    Cache::forget('file:output_' . $testCase->id);
                 } else {
                     $testCase->position = $position;
                     $testCase->save();

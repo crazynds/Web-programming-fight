@@ -45,6 +45,9 @@ class AppServiceProvider extends ServiceProvider
                 ? Response::allow()
                 : Response::deny('You must be an administrator.');
         });
+        Gate::define('viewPulse', function (User $user) {
+            return $user->isAdmin();
+        });
         $this->app->singleton(ContestService::class, function () {
             return new ContestService();
         });
