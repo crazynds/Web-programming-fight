@@ -30,10 +30,10 @@ RUN apt-get update && \
 RUN mkdir /langs
 
 # Download and install pypy
-RUN wget https://downloads.python.org/pypy/pypy3.10-v7.3.16-linux64.tar.bz2 -P /langs
-RUN tar -xf /langs/pypy3.10-v7.3.16-linux64.tar.bz2 -C /langs && \
-    mv /langs/pypy3.10-v7.3.16-linux64 /langs/pypy3.10 && \
-    rm /langs/pypy3.10-v7.3.16-linux64.tar.bz2 && \
+RUN wget https://buildbot.pypy.org/nightly/py3.10/pypy-c-jit-184945-79a57c5ea141-linux64.tar.bz2 -P /langs
+RUN tar -xf /langs/pypy-c-jit-184945-79a57c5ea141-linux64.tar.bz2 -C /langs && \
+    mv /langs/pypy-c-jit-184945-79a57c5ea141-linux64 /langs/pypy3.10 && \
+    rm /langs/pypy-c-jit-184945-79a57c5ea141-linux64.tar.bz2 && \
     rm /langs/pypy3.10/bin/python* && \
     cp /langs/pypy3.10/bin/* /usr/bin -r && \
     cp /langs/pypy3.10/lib/* /usr/lib -r && \
