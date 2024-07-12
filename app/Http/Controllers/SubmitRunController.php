@@ -16,6 +16,7 @@ use App\Services\ContestService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
@@ -174,6 +175,7 @@ class SubmitRunController extends Controller
 
     public function show(SubmitRun $submitRun)
     {
+        $this->authorize('viewOutput', $submitRun);
         return view('pages.run.show', [
             'submitRun' => $submitRun,
             'output' => $submitRun->output

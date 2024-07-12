@@ -26,7 +26,8 @@
         <div class="row">
             <div class="col">
                 <label for="name" class="form-label">Team name: </label><br />
-                <input type="text" name="name" class="form-control" value="{{ old('name', $team->name) }}" />
+                <input type="text" name="name" class="form-control" maxlength="26"
+                    value="{{ old('name', $team->name) }}" />
             </div>
             <div class="col-3">
                 <label for="acronym" class="form-label">Team acronym: </label><br />
