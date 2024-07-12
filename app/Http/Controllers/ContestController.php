@@ -49,16 +49,17 @@ class ContestController extends Controller
             return Redirect::back()->withErrors(['contest' => 'You are\'nt participating this contest.']);
 
         $competitor = $contest->getCompetitor($user);
-        session()->put('contest', [
+        $data = [
             'contest' => $contest->id,
             'competitor' => $competitor->id,
-        ]);
+        ];
+        Cache::set('contest:user:' . $user->id, $data, $contest->endTime());
         return redirect()->route('home');
     }
 
     public function leave(Contest $contest)
     {
-        session()->forget('contest');
+        Cache::forget('contest:user:' . Auth::user()->id);
         return redirect()->route('contest.index');
     }
 
