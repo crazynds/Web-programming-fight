@@ -66,6 +66,11 @@
                         {{ $contest->duration }} mins
                     </td>
                     <td class="px-2">
+                        @if ($contest->endTime()->lt(now()))
+                            <span title="Contest ended" style="cursor:help">
+                                🚫
+                            </span>
+                        @endif
                         @if (\Gate::allows('enter', $contest))
                             <span title="You are a Competitor" style="cursor:help">
                                 @if ($contest->individual)
@@ -94,13 +99,6 @@
                                 </span>
                             @endif
                         @endif
-
-                        @if ($contest->endTime()->lt(now()))
-                            <span title="Contest ended" style="cursor:help">
-                                🚫
-                            </span>
-                        @endif
-
                     </td>
                     <td class="px-2">
                         <div class="hstack gap-1">

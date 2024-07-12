@@ -20,11 +20,11 @@
     <table border="1">
         <thead>
             <tr>
-                <th style><b>#</b></th>
-                <th class="text-center"><b>Name</b></th>
-                <th class="text-center"><b>Members</b></th>
-                <th class="text-center"><b>Role</b></th>
-                <th style="text-align: end;"><b>Actions</b></th>
+                <th><b>#</b></th>
+                <th class="text-center px-2"><b>Name</b></th>
+                <th class="text-center px-2"><b>Members</b></th>
+                <th class="text-center px-2"><b>Role</b></th>
+                <th class="text-center px-2"><b>Actions</b></th>
             </tr>
         </thead>
         <tbody>
@@ -68,7 +68,8 @@
                                 @endcan
                             @else
                                 @can('leave', $team)
-                                    <a href="{{ route('team.leave', ['team' => $team->id]) }}" class="d-flex action-btn">
+                                    <a href="{{ route('team.leave', ['team' => $team->id]) }}" class="d-flex action-btn"
+                                        title="Leave this team">
                                         <i class="las la-times-circle"></i>
                                     </a>
                                 @endcan
