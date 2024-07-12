@@ -95,11 +95,12 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
             }
         }
         if (($this->submit->result == 'Accepted' || $testCases->count() == 0) &&
-            $this->submit->problem->testCases()->where('validated', '=', false)->exists()
+            $this->submit->problem->testCases()->where('validated', '=', false)->exists() &&
+            $this->submit->contest_id == null
         ) {
             // Tenta validar os casos de testes não validados até então...
             try {
-                $lock = Cache::lock('validate-testcases-' . $this->submit->problem->id, 60);
+                $lock = Cache::lock('problem:validating:' . $this->submit->problem->id, 60);
                 $lock->block(5);
                 foreach ($this->submit->problem->testCases()->where('validated', '=', false)->with(['inputfile', 'outputfile'])->get() as $testCase) {
                     $result = $this->executeTestCase($executor, $testCase, $modifiers);

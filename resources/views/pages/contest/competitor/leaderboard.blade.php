@@ -189,16 +189,14 @@
                                     @php($questions++)
                                     @php($score = $competitor->scores[$problem])
                                     <div style="position:relative; width: 20px; height: 32px">
-                                        <div class="balloon balloon-{{ $letter++ }}"></div>
+                                        <div class="balloon balloon-{{ $letter }}"></div>
                                         <div class="balloon-shadow"></div>
                                     </div>
                                     <span style="padding-top: 14px;font-size: smaller">
                                         @if ($contest->time_based_points || $contest->parcial_solution)
-                                            {{ $score->score }}
-                                            ({{ $competitor->__get('sum_submissions_' . $problem) }})
+                                            {{ $score->score }}({{ $competitor->__get('sum_submissions_' . $problem) }})
                                         @else
-                                            {{ $competitor->__get('sum_submissions_' . $problem) }} /
-                                            {{ $score->penality }}
+                                            {{ $competitor->__get('sum_submissions_' . $problem) . '/' . $score->penality }}
                                         @endif
                                     </span>
                                 @elseif ($competitor->__get('sum_submissions_' . $problem) > 0)
@@ -206,6 +204,7 @@
                                 @endif
                             </span>
                         </td>
+                        @php($letter++)
                     @endforeach
 
                     <td class="text-center" style="padding-left: 10px; padding-right: 4px">
