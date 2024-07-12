@@ -4,7 +4,6 @@ cd /var/www/html
 
 # Startup default
 
-php artisan cache:clear
 php artisan clear-compiled
 php artisan config:cache
 php artisan route:cache
