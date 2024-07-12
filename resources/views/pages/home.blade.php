@@ -59,12 +59,16 @@
                         <li>Created fast problem import using ZIP files.</li>
                         <li>Created contest page!</li>
                         <li>Created contest mode and all contest related features! 🎉</li>
+                        <li>Added C to the available languages!</li>
                     </ul>
                     </p>
                     <p>
                         Changes ⚙️
                     <ul>
                         <li>FAQ and About options are no longer displayed while the pages do not exist.</li>
+                        <li>The multipliers in python and pypy are now less strict.</li>
+                        <li>Now we have a lot more result status to understand what happen with the submission.</li>
+                        <li>Refactored all permissions levels.</li>
                     </ul>
                     </p>
                     <p>
@@ -74,6 +78,10 @@
                         <li>Added 'Go Back' buttons in some forgotten areas.</li>
                         <li>Increased area size of Home button.</li>
                         <li>Create a custom style para contest mode!</li>
+                        <li>Problem layout improved.</li>
+                        <li>Leaderboard layout improved.</li>
+                        <li>Navbar layout improved.</li>
+                        <li>Language multiplier table added to the submission form.</li>
                     </ul>
                     </p>
 
@@ -81,6 +89,10 @@
                         Fixes 🐛
                     <ul>
                         <li>Fixed crashes when downloading a problem with big inputs.</li>
+                        <li>Fixed bugs when using teams with contest.</li>
+                        <li>Now the server won't save the file if it's not a valid text file.</li>
+                        <li>Fixed a bug when you couldn't download or see a old code.</li>
+                        <li>Fixed a bug when you couldn't see why compilation error happens.</li>
                     </ul>
                     </p>
                 </div>
