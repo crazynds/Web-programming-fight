@@ -161,7 +161,7 @@ class ContestController extends Controller
 
             $contest->competitors()->create([
                 'team_id' => $team->id,
-                'name' => ($team->institution_acronym ? $team->institution_acronym : '????') . ' - ' . $team->name,
+                'name' => '[' . ($team->institution_acronym ? $team->institution_acronym : '????') . '] ' . $team->name,
                 'acronym' => $team->acronym,
             ]);
         }
