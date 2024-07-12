@@ -8,7 +8,6 @@ printf "\nPULSE_SERVER_NAME=$FUNCTION\n" >> .env
 
 
 echo "== Configuring cache =="
-php artisan cache:clear
 php artisan clear-compiled
 php artisan config:cache
 php artisan event:cache
