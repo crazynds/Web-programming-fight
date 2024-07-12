@@ -91,7 +91,7 @@
                         @if (!$contestService->inContest || $contestService->started)
                             <a href="{{ route('problem.index') }}">Problems</a> |
                             {{-- <a href="{{ route('submitRun.create') }}">Submit</a> | --}}
-                            <a href="{{ route('submitRun.index') }}">Runs</a> |
+                            <a href="{{ route('submitRun.index') }}">Runs</a>
                         @else
                             <span style="font-size: 12pt;">
                                 Wait for the contest to start...
