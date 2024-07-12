@@ -45,7 +45,7 @@
                     <td class="px-2 text-center">
                         <span class="">{{ $team->members_count }}</span>
                         @if ($team->invited_count > 0)
-                            (<u class="text-info" title="Invited members awaiting to accept">{{ $team->invited_count }}</u>)
+                            (<u class="text-info" title="Invited members">{{ $team->invited_count }}</u>)
                         @endif
                     </td>
                     <td>

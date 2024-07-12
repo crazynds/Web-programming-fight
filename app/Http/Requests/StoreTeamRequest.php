@@ -13,7 +13,7 @@ class StoreTeamRequest extends FormRequest
     public function authorize(): bool
     {
         $data = $this->all();
-        if(isset($data['acronym'])){
+        if (isset($data['acronym'])) {
             $data['acronym'] = Str::upper($data['acronym']);
         }
         $this->replace($data);
@@ -28,12 +28,12 @@ class StoreTeamRequest extends FormRequest
     public function rules(): array
     {
         $teamId = $this->route('team')?->id;
-        if(!$teamId){
-            $teamId=-1;
+        if (!$teamId) {
+            $teamId = -1;
         }
         return [
-            'name' => "required|string|min:2|max:250",
-            'acronym' => "required|string|min:3|max:5|alpha_dash:ascii|unique:teams,acronym,".$teamId,
+            'name' => "required|string|min:2|max:26",
+            'acronym' => "required|string|min:3|max:5|alpha_dash:ascii|unique:teams,acronym," . $teamId,
             'membersjson' => "nullable|json",
             recaptchaFieldName() => recaptchaRuleName()
         ];
