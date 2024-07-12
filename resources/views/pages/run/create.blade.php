@@ -70,4 +70,38 @@
             ]) !!}
         </p>
     </form>
+
+    <br>
+    <table border="1" style="float:right">
+        <thead>
+            <tr>
+                <th class="px-1">
+                    Language
+                </th>
+                <th class="px-1">
+                    Time multi.
+                </th>
+                <th class="px-1">
+                    Memory multi.
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (App\Enums\LanguagesType::list() as $name => $code)
+                @if (!$contestService->inContest || in_array($code, $contestService->contest->languages))
+                    <tr>
+                        <td class="px-1">
+                            {{ $name }}
+                        </td>
+                        <td class="text-center">
+                            {{ App\Enums\LanguagesType::modifiers()[$name][0] }}x
+                        </td>
+                        <td class="text-center">
+                            {{ App\Enums\LanguagesType::modifiers()[$name][1] }}x
+                        </td>
+                    </tr>
+                @endif
+            @endforeach
+        </tbody>
+    </table>
 @endsection
