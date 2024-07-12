@@ -23,7 +23,7 @@
                 <th style><b>#</b></th>
                 <th class="text-center"><b>Name</b></th>
                 <th class="text-center"><b>Members</b></th>
-                <th class="text-center"><b></b></th>
+                <th class="text-center"><b>Role</b></th>
                 <th style="text-align: end;"><b>Actions</b></th>
             </tr>
         </thead>
@@ -50,7 +50,9 @@
                     </td>
                     <td>
                         @if ($team->pivot->owner)
-                            <i class="las la-crown text-warning" title="You are the owner of the team."></i>
+                            <span title="You are the owner of this team" style="cursor:help">
+                                👑
+                            </span>
                         @endif
                     </td>
                     <td class="px-2">
