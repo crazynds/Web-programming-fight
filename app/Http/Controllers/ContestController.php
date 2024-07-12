@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Redirect;
 
 class ContestController extends Controller
@@ -44,9 +45,10 @@ class ContestController extends Controller
         /** @var User $user */
         $user = Auth::user();
         /** @var Competitor $competitor */
-        $competitor = $contest->checkCompetitor($user);
-        if (!$competitor)
+        if (!Gate::allows('enter', $contest))
             return Redirect::back()->withErrors(['contest' => 'You are\'nt participating this contest.']);
+
+        $competitor = $contest->getCompetitor($user);
         session()->put('contest', [
             'contest' => $contest->id,
             'competitor' => $competitor->id,
@@ -62,12 +64,12 @@ class ContestController extends Controller
 
     public function leaderboard(Contest $contest)
     {
-        $key = 'contest.leaderboard.' . $contest->id;
+        $key = 'contest:leaderboard:' . $contest->id;
         $problems = $contest->problems()->orderBy('id')->pluck('id');
         $blind = $contest->blindTime()->lt(now()) && $contest->endTimeWithExtra()->gt(now());
         // If is blind time, get the blind leaderboard. (The latest leaderboard loaded)
         if ($blind)
-            $competitors = Cache::get($key . '.blind');
+            $competitors = Cache::get($key . ':blind');
         else
             $competitors = Cache::get($key);
         // If any leaderboard could be loaded, retrive it from database.
@@ -102,7 +104,7 @@ class ContestController extends Controller
             Cache::put($key, $competitors, now()->addMinutes(5));
             // Freeze this leaderboard for blind
             if ($contest->endTimeWithExtra()->gt(now()))
-                Cache::put($key . '.blind', $competitors, $contest->endTimeWithExtra());
+                Cache::put($key . ':blind', $competitors, $contest->endTimeWithExtra());
         }
         return view('pages.contest.competitor.leaderboard', [
             'competitors' => $competitors,
@@ -113,7 +115,7 @@ class ContestController extends Controller
         ]);
     }
 
-    public function join(StoreCompetitorRequest $request, Contest $contest)
+    public function register(StoreCompetitorRequest $request, Contest $contest)
     {
         /** @var User $user */
         $user = Auth::user();
@@ -122,7 +124,7 @@ class ContestController extends Controller
         }
 
         if ($contest->start_time->addMinutes($contest->duration)->lt(now())) {
-            return Redirect::back()->withErrors(['contest' => 'Contest is over! Try join on other contest.']);
+            return Redirect::back()->withErrors(['contest' => 'Contest is over! Try register on other contest.']);
         }
         // Verificar se o usuário já está inscrito (time ou individual)
         if ($contest->individual) {
@@ -210,7 +212,7 @@ class ContestController extends Controller
     {
         return view('pages.contest.show', [
             'contest' => $contest,
-            'competitor' => $contest->checkCompetitor(Auth::user()),
+            'competitor' => $contest->getCompetitor(Auth::user()),
         ]);
     }
 

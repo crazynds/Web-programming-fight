@@ -24,6 +24,11 @@ class ContestPolicy
         return true;
     }
 
+    public function enter(User $user, Contest $contest): bool
+    {
+        return $contest->getCompetitor($user) != null;
+    }
+
     /**
      * Determine whether the user can create models.
      */
@@ -45,7 +50,7 @@ class ContestPolicy
      */
     public function delete(User $user, Contest $contest): bool
     {
-        return ($user->id == $contest->user_id && $contest->start_time->gt(now()));
+        return $this->update($user, $contest);
     }
 
     /**

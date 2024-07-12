@@ -55,6 +55,22 @@ services:
     healthcheck:
       disable: true
 
+  pulse:
+    build:
+      context: .
+      dockerfile: ./docker/prod/Dockerfile
+    environment:
+      FUNCTION: "pulse"
+    restart: unless-stopped
+    networks:
+      - app_network
+    volumes_from:
+      - scheduler
+    depends_on:
+      - scheduler
+    healthcheck:
+      disable: true
+
   worker:
     build:
       context: .

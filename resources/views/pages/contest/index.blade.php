@@ -66,7 +66,7 @@
                         {{ $contest->duration }} mins
                     </td>
                     <td class="px-2">
-                        @if ($contest->checkCompetitor(Auth::user()))
+                        @if (\Gate::allows('enter', $contest))
                             <span title="You are a Competitor" style="cursor:help">
                                 @if ($contest->individual)
                                     👤

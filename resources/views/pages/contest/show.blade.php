@@ -107,7 +107,7 @@
                 <div class="col">
                     <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data"
                         style="justify-content: end;display:flex;"
-                        action="{{ route('contest.join', ['contest' => $contest->id]) }}">
+                        action="{{ route('contest.register', ['contest' => $contest->id]) }}">
                         @csrf
 
                         @if ($contest->is_private)
@@ -124,7 +124,7 @@
                                 @endforeach
                             </select>
                         @endif
-                        {!! htmlFormButton('Join', [
+                        {!! htmlFormButton('Register', [
                             'style' => 'padding: 0px 20px;margin-bottom: 8px;',
                         ]) !!}
                     </form>
