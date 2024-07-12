@@ -58,12 +58,12 @@ services:
   pulse:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile
+      dockerfile: ./docker/prod/Dockerfile
     environment:
       FUNCTION: "pulse"
     restart: unless-stopped
     networks:
-      - app-network
+      - app_network
     volumes_from:
       - scheduler
     depends_on:
