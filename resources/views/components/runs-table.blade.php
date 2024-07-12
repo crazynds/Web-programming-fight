@@ -199,7 +199,7 @@
                                         </a>
                                     @endif
                                 @endcan
-                                @can('view', $submitRun)
+                                @can('viewOutput', $submitRun)
                                     @if (isset($submitRun->output))
                                         <a href="{{ route('submitRun.show', ['submitRun' => $submitRun->id], false) }}"
                                             class="d-flex action-btn">
