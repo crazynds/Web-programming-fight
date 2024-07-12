@@ -72,6 +72,7 @@ class TeamController extends Controller
         $data = $request->safe([
             'name',
             'acronym',
+            'institution_acronym',
         ]);
         /** @var User */
         $user = Auth::user();
@@ -112,6 +113,7 @@ class TeamController extends Controller
             $data = $request->safe([
                 'name',
                 'acronym',
+                'institution_acronym',
             ]);
             $members = $request->input('membersjson');
             /** @var User */

@@ -43,6 +43,11 @@
                     Write the member's github nickname and press enter. It is not necessary to add your own
                     nickname.</small>
             </div>
+            <div class="col-3">
+                <label for="institution_acronym" class="form-label">Institution acronym: </label><br />
+                <input type="text" maxlength="6" name="institution_acronym" class="form-control"
+                    value="{{ old('institution_acronym', $team->institution_acronym) }}" />
+            </div>
         </div>
         @if ($errors->any())
             <div class="row p-3">
