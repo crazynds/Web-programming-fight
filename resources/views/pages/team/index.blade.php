@@ -69,7 +69,7 @@
                             @else
                                 @can('leave', $team)
                                     <a href="{{ route('team.leave', ['team' => $team->id]) }}" class="d-flex action-btn">
-                                        <i class="las la-door-open"></i>
+                                        <i class="las la-times-circle"></i>
                                     </a>
                                 @endcan
                             @endif

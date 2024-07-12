@@ -93,7 +93,9 @@
                                     ✨
                                 </span>
                             @endif
-                        @else
+                        @endif
+
+                        @if ($contest->endTime()->lt(now()))
                             <span title="Contest ended" style="cursor:help">
                                 🚫
                             </span>
