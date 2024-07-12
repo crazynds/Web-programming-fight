@@ -50,6 +50,8 @@ services:
       - app_network
     volumes_from:
       - scheduler
+    depends_on:
+      - scheduler
     healthcheck:
       disable: true
 
@@ -65,8 +67,7 @@ services:
     volumes_from:
       - scheduler
     depends_on:
-      scheduler:
-        condition: service_healthy
+      - scheduler
     healthcheck:
       disable: true
 
