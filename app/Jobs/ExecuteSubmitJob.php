@@ -49,8 +49,7 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
             $this->submit->execution_time = max($this->submit->execution_time ?? 0, $executor->execution_time);
             $this->submit->execution_memory = max($this->submit->execution_memory ?? 0, $executor->execution_memory);
         }
-        // 16 MB is the margin to work
-        if ($executor->execution_memory > $timeLimit + 16) {
+        if ($executor->execution_memory > $memoryLimit) {
             return SubmitResult::MemoryLimit;
         }
         if ($executor->execution_time > $timeLimit) {
