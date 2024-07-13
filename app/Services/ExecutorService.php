@@ -105,7 +105,7 @@ class ExecutorService
         $limitOutput = 536870912;
 
         // Configure time limit and memory limit with a small margin
-        $time_limit = round((1500 + $timeLimit) / 1000);
+        $time_limit = round((1500 + ($timeLimit * 1.15)) / 1000);
         $memory_limit = $memoryLimit + 256;
 
         $command = 'command time -v --output=/var/work/time -p nsjail ' . $this->currentConfig . ' --max_cpus 1 --log /var/work/nsjail_out --time_limit=' . $time_limit . ' --rlimit_as=' . $memory_limit . ' < ' . $finput . ' 2> /dev/null | head -c ' . $limitOutput . ' > /var/work/user_output';
