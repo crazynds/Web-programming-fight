@@ -128,6 +128,14 @@
                                     <i class="las la-edit"></i>
                                 </a>
                             @endcan
+
+                            @can('admin', $contest)
+                                <div class="vr"></div>
+                                <a href="{{ route('contest.admin', ['contest' => $contest->id]) }}"
+                                    title="Admin panel of this contest" class="d-flex action-btn">
+                                    <i class="las la-chalkboard-teacher"></i>
+                                </a>
+                            @endcan
                             @can('delete', $contest)
                                 <div class="vr"></div>
                                 <form action="{{ route('contest.destroy', ['contest' => $contest->id]) }}" method="POST">

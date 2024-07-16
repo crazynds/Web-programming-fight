@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Contest\ClarificationController;
 use App\Http\Controllers\Contest\CompetitorController;
 use App\Http\Controllers\ContestController;
 use App\Http\Controllers\ProblemController;
@@ -21,13 +22,16 @@ Route::middleware(AccessOnlyDuringContest::class)->group(function () {
         ->name('submitRun.global');
     Route::get('/submitRun/{submitRun}/download', [SubmitRunController::class, 'download'])
         ->name('submitRun.download');
+
+
+    Route::resource('clarification', ClarificationController::class)
+        ->only(['store']);
 });
 
 Route::resource('competitor', CompetitorController::class)
     ->only(['index']);
 Route::get('competitor/leaderboard', [CompetitorController::class, 'leaderboard'])
     ->name('competitor.leaderboard');
-
 
 
 Route::get('/leave', [ContestController::class, 'leave'])

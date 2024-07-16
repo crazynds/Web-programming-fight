@@ -37,12 +37,17 @@ class ContestPolicy
         return $user->isAdmin();
     }
 
+    public function admin(User $user, Contest $contest): bool
+    {
+        return $user->id == $contest->user_id;
+    }
+
     /**
      * Determine whether the user can update the model.
      */
     public function update(User $user, Contest $contest): bool
     {
-        return ($user->id == $contest->user_id && $contest->start_time->gt(now()));
+        return ($this->admin($user, $contest) && $contest->start_time->gt(now()));
     }
 
     /**
