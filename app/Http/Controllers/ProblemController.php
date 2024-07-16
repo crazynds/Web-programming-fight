@@ -138,7 +138,7 @@ class ProblemController extends Controller
         return view('pages.problem.show', [
             'problem' => $problem,
             'testCases' => $problem->testCases()->orderBy('position')->where('public', true)->where('validated', true)->get(),
-            'clarifications' => $clarifications,
+            'clarifications' => $clarifications ?? null,
         ]);
     }
 
