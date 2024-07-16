@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Contest\ClarificationController;
 use App\Http\Controllers\ContestController;
 use App\Http\Controllers\IOProblemController;
 use App\Http\Controllers\ProblemController;
@@ -118,6 +119,10 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
         ->name('contest.enter');
     Route::get('/constest/{contest}/leaderboard', [ContestController::class, 'leaderboard'])
         ->name('contest.leaderboard');
+    Route::get('/contest/{contest}/admin', [ContestController::class, 'admin'])
+        ->name('contest.admin');
+    Route::resource('contest.clarification', ClarificationController::class)
+        ->only(['update']);
 });
 
 Route::get('/', function () {

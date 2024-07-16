@@ -127,9 +127,18 @@ class ProblemController extends Controller
      */
     public function show(Problem $problem)
     {
+        if ($this->contestService->inContest)
+            $clarifications = $this->contestService->contest->clarifications()->where('problem_id', $problem->id)
+                ->where(function ($query) {
+                    $query->where('competitor_id', $this->contestService->competitor->id)
+                        ->orWhere('public', true);
+                })
+                ->orderBy('id')->get();
+
         return view('pages.problem.show', [
             'problem' => $problem,
-            'testCases' => $problem->testCases()->orderBy('position')->where('public', true)->where('validated', true)->get()
+            'testCases' => $problem->testCases()->orderBy('position')->where('public', true)->where('validated', true)->get(),
+            'clarifications' => $clarifications,
         ]);
     }
 

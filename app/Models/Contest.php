@@ -33,6 +33,10 @@ class Contest extends Model
     {
         return $this->belongsToMany(Problem::class, 'contest_problem');
     }
+    public function clarifications()
+    {
+        return $this->hasMany(ContestClatification::class);
+    }
     public function competitors()
     {
         return $this->hasMany(Competitor::class);

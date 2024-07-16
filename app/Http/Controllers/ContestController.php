@@ -23,6 +23,14 @@ class ContestController extends Controller
         $this->authorizeResource(Contest::class, 'contest');
     }
 
+    public function admin(Contest $contest)
+    {
+        $this->authorize('admin', $contest);
+        return view('pages.contest.admin', [
+            'contest' => $contest
+        ]);
+    }
+
     /**
      * Display a listing of the resource.
      */
