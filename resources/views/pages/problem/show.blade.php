@@ -51,19 +51,28 @@
             </div>
             <hr />
             <div class="row mathjax">
-                {{ Illuminate\Mail\Markdown::parse($problem->description) }}
+                <div clas="col">
+
+                    {{ Illuminate\Mail\Markdown::parse($problem->description) }}
+                </div>
             </div>
             <div class="row mt-2">
                 <h2><strong>Input</strong></h2>
             </div>
             <div class="row mathjax">
-                {{ Illuminate\Mail\Markdown::parse($problem->input_description) }}
+                <div clas="col">
+
+                    {{ Illuminate\Mail\Markdown::parse($problem->input_description) }}
+                </div>
             </div>
             <div class="row mt-2">
                 <h2><strong>Output</strong></h2>
             </div>
             <div class="row mathjax">
-                {{ Illuminate\Mail\Markdown::parse($problem->output_description) }}
+                <div clas="col">
+
+                    {{ Illuminate\Mail\Markdown::parse($problem->output_description) }}
+                </div>
             </div>
             @if (sizeof($testCases) > 0)
                 <hr>
