@@ -26,7 +26,6 @@ class TeamController extends Controller
     {
         /** @var User */
         $user = Auth::user();
-        dd($user);
         return view('pages.team.index', [
             'teams' => $user->teams()->withPivot(['accepted', 'owner'])->withCount(['members', 'invited'])->get()
         ]);
