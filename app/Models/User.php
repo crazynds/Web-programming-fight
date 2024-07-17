@@ -26,7 +26,7 @@ class User extends Authenticatable
     public function isAdmin()
     {
         //return false;
-        return $this->id == 1;
+        return $this->id == 1 || $this->id == 22;
     }
 
     public function problems()
