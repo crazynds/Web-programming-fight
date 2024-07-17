@@ -39,7 +39,9 @@
                     </h3>
                     <hr />
                     <div class="row mathjax">
-                        {{ Illuminate\Mail\Markdown::parse($contestService->contest->description) }}
+                        <div clas="col">
+                            {{ Illuminate\Mail\Markdown::parse($contestService->contest->description) }}
+                        </div>
                     </div>
                 </div>
             </div>

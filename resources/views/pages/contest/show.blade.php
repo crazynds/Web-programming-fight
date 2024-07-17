@@ -58,7 +58,9 @@
 
         <hr />
         <div class="row mathjax">
+            <div class="col">
             {{ Illuminate\Mail\Markdown::parse($contest->description) }}
+            </div>
         </div>
         <hr />
 
