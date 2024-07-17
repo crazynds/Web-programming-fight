@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -28,7 +29,7 @@ class AuthController extends Controller
             'provider_id' => $user->id
         ], [
             'name' => $user->name ?? $user->nickname,
-            'email' => $user->email,
+            'email' => Str::lower($user->email),
             'avatar' => $user->avatar,
             'url' => $user->user['html_url'] ?? null,
             //'github_token' => $user->token,

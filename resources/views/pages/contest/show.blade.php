@@ -68,9 +68,9 @@
                     @if ($contest->parcial_solution)
                         <li style="cursor: help;text-decoration: underline;"
                             title="You only start earning points if you get at least 30% of the test cases right, with a maximum score of 60% if there is complete acceptance for all cases except one.">
-                            Parcial solution recieve score points too.</li>
+                            Parcial solution score parcial points.</li>
                     @else
-                        <li>Only solutions that pass in all test cases recive score points.</li>
+                        <li>Only solutions that pass all test cases score.</li>
                     @endif
                     @if ($contest->show_wrong_answer)
                         <li style="cursor: help;text-decoration: underline;"
@@ -130,6 +130,20 @@
                     </form>
                 </div>
             </div>
+        @elseif($competitor && $contest->start_time->addMinutes($contest->duration)->gt(now()))
+            <hr />
+            <div class="row">
+                <div class="col">
+                    <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data"
+                        style="justify-content: end;display:flex;"
+                        action="{{ route('contest.unregister', ['contest' => $contest->id]) }}">
+                        @csrf
+                        {!! htmlFormButton('Cancel Registration', [
+                            'style' => 'padding: 0px 20px;margin-bottom: 8px;',
+                        ]) !!}
+                    </form>
+                </div>
+            </div>
         @endif
     </div>
     @if ($competitor)
@@ -156,10 +170,12 @@
 @endsection
 
 @section('script')
-    @if ($contest->start_time->gt(now()))
+    @if ($contest->endTime()->gt(now()))
         <script>
             // Set the date we're counting down to
-            var countDownDate = new Date("{{ $contest->start_time }}").getTime();
+            var countDownDate = new Date(
+                "{{ $contest->start_time->lt(now()) ? $contest->endTime() : $contest->start_time }}"
+            ).getTime();
 
             const clock = function() {
 
@@ -191,12 +207,22 @@
                     displayTime += minutes.toString().padStart(2, '0') + ":";
                     displayTime += seconds.toString().padStart(2, '0');
                 }
-                document.getElementById("clock").innerHTML = displayTime;
+                document.getElementById("clock").innerHTML =
+                    @if (!$contest->start_time->lt(now()))
+                        "Starting in "
+                    @else
+                        "Ending in "
+                    @endif + displayTime;
 
 
                 // If the count down is finished, write some text
                 if (distance < 0) {
-                    document.getElementById("clock").innerHTML = "Starting Contest...";
+                    document.getElementById("clock").innerHTML =
+                        @if (!$contest->start_time->lt(now()))
+                            "Starting Contest..."
+                        @else
+                            "Ending Contest..."
+                        @endif ;
                     location.reload()
                     clearInterval(x);
                 } else if (minutes == 10 && seconds == 0) {

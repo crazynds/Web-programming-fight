@@ -124,6 +124,18 @@ class ContestController extends Controller
         ]);
     }
 
+    public function unregister(Contest $contest)
+    {
+        $competitor = $contest->getCompetitor(Auth::user());
+        if (!$competitor) {
+            return back()->withErrors([
+                'unregister' => 'You are not participating in this contest.'
+            ]);
+        }
+        $competitor->delete();
+        return back();
+    }
+
     public function register(StoreCompetitorRequest $request, Contest $contest)
     {
         /** @var User $user */
