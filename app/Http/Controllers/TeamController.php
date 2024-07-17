@@ -26,6 +26,7 @@ class TeamController extends Controller
     {
         /** @var User */
         $user = Auth::user();
+        dd($user);
         return view('pages.team.index', [
             'teams' => $user->teams()->withPivot(['accepted', 'owner'])->withCount(['members', 'invited'])->get()
         ]);
@@ -131,7 +132,10 @@ class TeamController extends Controller
                 $members = json_decode($members);
                 $cont = 0;
                 foreach ($members as $member) {
-                    $user = User::where('name', Str::lower($member->value))->first();
+                    // No mysql o == é case insensitive, então fds...
+                    $user = User::where('name', Str::lower($member->value))
+                        ->orWhere('email', Str::lower($member->value))
+                        ->first();
 
                     if ($user) {
                         $idsAdded[] = $user->id;
