@@ -59,7 +59,7 @@
         <hr />
         <div class="row mathjax">
             <div class="col">
-            {{ Illuminate\Mail\Markdown::parse($contest->description) }}
+                {{ Illuminate\Mail\Markdown::parse($contest->description) }}
             </div>
         </div>
         <hr />
@@ -211,9 +211,9 @@
                 }
                 document.getElementById("clock").innerHTML =
                     @if (!$contest->start_time->lt(now()))
-                        "Starting in "
+                        "Starting in<br>"
                     @else
-                        "Ending in "
+                        "Ending in<br>"
                     @endif + displayTime;
 
 
