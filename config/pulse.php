@@ -257,5 +257,9 @@ return [
                 '#^/pulse$#', // Pulse dashboard...
             ],
         ],
+
+        \Geow\DiskMetrics\Recorders\DiskRecorder::class => [
+            'enabled' => env('GEOW_DISK_METRICS', true),
+        ]
     ],
 ];
