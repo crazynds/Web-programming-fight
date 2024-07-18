@@ -19,6 +19,7 @@
         "league/flysystem-aws-s3-v3": "^3.0",
         "league/flysystem-ziparchive": "^3.16",
         "livewire/livewire": "^3.4",
+        "opcodesio/log-viewer": "^3.10",
         "paulo-hortelan/requests-graph-pulse": "^1.1",
         "predis/predis": "^2.2",
         "schmeits/pulse-database-table-info": "^1.7",

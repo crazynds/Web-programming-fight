@@ -315,16 +315,28 @@
         window.addEventListener("load", function() {
             window.Echo.private(channel)
                 .listen('NewSubmissionEvent', (data) => {
-                    data = data.data
+                    /*data = data.data
                     var row = $('#row' + data.contest.competitor_id);
                     if (row.length != 0) {
                         updateRow(row, data);
-                    }
+                    } */
                 })
 
             window.Echo.private(channel)
                 .listen('UpdateSubmissionEvent', (data) => {
                     data = data.data
+                    switch (data.result) {
+                        case 'Compilation error':
+                        case 'Runtime error':
+                        case 'Error':
+                        case 'Wrong answer':
+                        case 'Time limit':
+                        case 'Memory limit':
+                        case 'Accepted':
+                            location.reload();
+                            break;
+                    }
+                    /*
                     var row = $('#row' + data.contest.competitor_id);
                     if (row.length == 0) {
                         if (userId != null && userId != data.user_id) return
@@ -371,7 +383,7 @@
                             }
                         }
                         geraResultado();
-                    }
+                    }*/
                 });
         })
 
