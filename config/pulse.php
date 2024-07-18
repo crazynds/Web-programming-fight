@@ -138,7 +138,8 @@ return [
             'sample_rate' => env('PULSE_CACHE_INTERACTIONS_SAMPLE_RATE', 0.2),
             'ignore' => [
                 ...Pulse::defaultVendorCacheKeys(),
-                '/^contest:user:.*/' => 'contest:user:*',
+                '/^contest:user:.*/',
+                '/^lv:.*/',
             ],
             'groups' => [
                 '/^job-exceptions:.*/' => 'job-exceptions:*',
