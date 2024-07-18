@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9c60d6876f60faf18c83e8dc07265be5",
+    "content-hash": "6450846f465a6d93766cfa18b86a86d1",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -8868,71 +8868,6 @@
                 "source": "https://github.com/tijsverkoyen/CssToInlineStyles/tree/v2.2.7"
             },
             "time": "2023-12-08T13:03:43+00:00"
-        },
-        {
-            "name": "vcian/pulse-active-sessions",
-            "version": "v1.6.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/vcian/pulse-active-sessions.git",
-                "reference": "ff82761303c41c16708401a9ec5f05ac038daee5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/vcian/pulse-active-sessions/zipball/ff82761303c41c16708401a9ec5f05ac038daee5",
-                "reference": "ff82761303c41c16708401a9ec5f05ac038daee5",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/support": "*",
-                "laravel/pulse": "^1.0.0@beta",
-                "php": "^8.1",
-                "predis/predis": "^2.2"
-            },
-            "require-dev": {
-                "pestphp/pest": "^2.20",
-                "pestphp/pest-plugin-arch": "^2.0",
-                "pestphp/pest-plugin-laravel": "^2.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Vcian\\Pulse\\PulseActiveSessions\\PulseActiveSessionsServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "files": [
-                    "src/helpers.php"
-                ],
-                "psr-4": {
-                    "Vcian\\Pulse\\PulseActiveSessions\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Vcian - ViitorCloud",
-                    "homepage": "https://github.com/vcian"
-                }
-            ],
-            "description": "A Laravel Pulse card to show active user sessions",
-            "homepage": "https://github.com/vcian/pulse-active-sessions",
-            "keywords": [
-                "laravel",
-                "laravel-pulse",
-                "pulse",
-                "pulse-active-sessions"
-            ],
-            "support": {
-                "issues": "https://github.com/vcian/pulse-active-sessions/issues",
-                "source": "https://github.com/vcian/pulse-active-sessions/tree/v1.6.0"
-            },
-            "time": "2024-04-23T07:49:44+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
