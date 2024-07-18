@@ -135,9 +135,10 @@ return [
     'recorders' => [
         Recorders\CacheInteractions::class => [
             'enabled' => env('PULSE_CACHE_INTERACTIONS_ENABLED', true),
-            'sample_rate' => env('PULSE_CACHE_INTERACTIONS_SAMPLE_RATE', 0.1),
+            'sample_rate' => env('PULSE_CACHE_INTERACTIONS_SAMPLE_RATE', 0.2),
             'ignore' => [
                 ...Pulse::defaultVendorCacheKeys(),
+                '/^contest:user:.*/' => 'contest:user:*',
             ],
             'groups' => [
                 '/^job-exceptions:.*/' => 'job-exceptions:*',
@@ -174,9 +175,10 @@ return [
         Recorders\SlowJobs::class => [
             'enabled' => env('PULSE_SLOW_JOBS_ENABLED', true),
             'sample_rate' => env('PULSE_SLOW_JOBS_SAMPLE_RATE', 1),
-            'threshold' => env('PULSE_SLOW_JOBS_THRESHOLD', 30000), // More than 30 secs
+            'threshold' => env('PULSE_SLOW_JOBS_THRESHOLD', 5000), // More than 30 secs
             'ignore' => [
                 // '/^Package\\\\Jobs\\\\/',
+                '/^App\\\\Jobs\\\\ExecuteSubmitJob$/',
             ],
         ],
 
@@ -241,10 +243,6 @@ return [
                 //'#^telescope#', // Ignore telescope entries...
                 //'#^health_check_result#', // ignore health_check_results
             ],
-        ],
-
-        \Vcian\Pulse\PulseActiveSessions\Recorders\PulseActiveSessionRecorder::class => [
-            'enabled' => env('PULSE_ACTIVE_SESSIONS_ENABLED', true),
         ],
 
         \PauloHortelan\RequestsGraphPulse\Recorders\RequestsGraphRecorder::class => [

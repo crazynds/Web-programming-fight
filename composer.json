@@ -24,8 +24,7 @@
         "predis/predis": "^2.2",
         "schmeits/pulse-database-table-info": "^1.7",
         "stechstudio/laravel-zipstream": "^4.14",
-        "sysatom/php-bloom-filter": "^1.0",
-        "vcian/pulse-active-sessions": "^1.6"
+        "sysatom/php-bloom-filter": "^1.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
