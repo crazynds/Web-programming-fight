@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         DB::listen(function ($query) {
-            if (config('app.env') === 'production' && $query->time < 20) {
+            if (config('app.env') === 'production' && $query->time < 50) {
                 return;
             }
             if (!str_contains($query->sql, 'select * from `jobs`'))
