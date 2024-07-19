@@ -19,7 +19,7 @@ return new class extends Migration
          * because this table is linked with files table, and to delete files this must delete from
          * disk before.
          */
-        Schema::create('scores', function (Blueprint $table) {
+        Schema::create('scorers', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Problem::class)->constrained();
             $table->foreignIdFor(File::class)->constrained();

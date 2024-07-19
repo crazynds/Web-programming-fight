@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Scorer extends Model
 {
+    protected $table = 'scores';
     public $timestamps = false;
     public $guarded = [];
 
