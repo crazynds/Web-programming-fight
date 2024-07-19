@@ -17,3 +17,9 @@
   
 
  - default: Queue to broadcast all message over all the users. Run in separeted queue.
+
+## Admin Managers
+
+ - /pulse: Pulse painel
+ - /logs: Log viewr
+ - /files: File manager

@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "alexusmai/laravel-file-manager": "^3.2",
         "bensampo/laravel-enum": "^6.6",
         "biscolab/laravel-recaptcha": "^6.0",
         "geowrgetudor/disk-metrics": "^1.3",
