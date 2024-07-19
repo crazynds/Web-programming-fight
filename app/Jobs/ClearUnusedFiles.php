@@ -54,14 +54,15 @@ class ClearUnusedFiles implements ShouldQueue, ShouldBeUnique
         }
 
         // TODO: quando essa parte estiver 100%, remover esse trecho de código.
-        foreach ($toDelete as $file) {
-            $file = File::where('path', $file)->first();
+        foreach ($toDelete as $path) {
+            dump($path);
+            $file = File::where('path', $path)->first();
             if ($file) {
                 Log::channel('leakedfiles')->info(
                     sprintf('Falso positivo: %s', $file)
                 );
             } else {
-                $storage->delete($file);
+                $storage->delete($path);
             }
         }
     }
