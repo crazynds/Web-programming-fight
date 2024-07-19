@@ -19,7 +19,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Problem::class)->constrained()->onDelete('cascade');
             $table->foreignIdFor(User::class)->constrained()->onDelete('cascade');
-            $table->foreignIdFor(Scorer::class)->constrained()->onDelete('cascade');
+            $table->foreignIdFor(Scorer::class)->constrained('scorers')->onDelete('cascade');
             $table->foreignIdFor(SubmitRun::class)->nullable()->constrained()->onDelete('set null');
 
             $table->unsignedSmallInteger('language');
