@@ -129,7 +129,7 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
 
 Route::get('/files', function () {
     return view('vendor.filemanager.index');
-})->can('viewFileManager');
+})->can('viewPulse');
 
 Route::get('/', function () {
     return redirect()->route('home');
