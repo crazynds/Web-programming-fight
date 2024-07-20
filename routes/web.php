@@ -35,6 +35,10 @@ Route::get('/home', function () {
 Route::get('/auth/{provider}/redirect', [AuthController::class, 'redirect'])->name('auth.login');
 Route::get('/auth/{provider}/callback', [AuthController::class, 'callback'])->name('auth.callback');
 Route::get('/auth/logout', [AuthController::class, 'logout'])->middleware('auth')->name('auth.logout');
+Route::get('/auth/changeUser', [AuthController::class, 'login_as_user'])
+    ->middleware('auth')
+    ->can('viewPulse')
+    ->name('auth.changeUser');
 
 Route::name('contest.')->prefix('contest/')->middleware('auth')->group(base_path('routes/contest.php'));
 
