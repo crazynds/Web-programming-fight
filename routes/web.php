@@ -12,7 +12,6 @@ use App\Http\Controllers\TestCaseController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\AccessOnlyDuringContest;
 use App\Http\Middleware\PreventAccessDuringContest;
-use App\Models\SubmitRun;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -122,7 +121,7 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
         ->name('contest.enter');
     Route::get('/constest/{contest}/leaderboard', [ContestController::class, 'leaderboard'])
         ->name('contest.leaderboard');
-    Route::get('/constest/{contest}/submissions', [SubmitRun::class, 'global'])
+    Route::get('/constest/{contest}/submissions', [SubmitRunController::class, 'global'])
         ->name('contest.submissions');
     Route::get('/contest/{contest}/admin', [ContestController::class, 'admin'])
         ->name('contest.admin');
