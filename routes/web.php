@@ -34,15 +34,21 @@ Route::get('/home', function () {
 // auth routes
 Route::get('/auth/{provider}/redirect', [AuthController::class, 'redirect'])->name('auth.login');
 Route::get('/auth/{provider}/callback', [AuthController::class, 'callback'])->name('auth.callback');
-Route::get('/auth/logout', [AuthController::class, 'logout'])->middleware('auth')->name('auth.logout');
-Route::get('/auth/changeUser', [AuthController::class, 'login_as_user'])
-    ->middleware('auth')
-    ->can('viewPulse')
-    ->name('auth.changeUser');
 
-Route::name('contest.')->prefix('contest/')->middleware('auth')->group(base_path('routes/contest.php'));
+Route::middleware(['auth'])->group(function () {
+    Route::get('/auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
+    Route::get('/auth/changeUser', [AuthController::class, 'changeUser'])
+        ->name('auth.changeUser');
 
-// Rotas do sistema como um todo
+    Route::get('/files', function () {
+        return view('vendor.filemanager.index');
+    })->middleware('auth')->can('viewPulse');
+
+    // Rotas de dentro do contest
+    Route::name('contest.')->prefix('contest/')->group(base_path('routes/contest.php'));
+});
+
+// Rotas do sistema normal
 Route::middleware(['auth', PreventAccessDuringContest::class])->group(function () {
     Route::resource('problem', ProblemController::class);
     Route::resource('problem.testCase', TestCaseController::class)
@@ -133,9 +139,6 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
         ->only(['update']);
 });
 
-Route::get('/files', function () {
-    return view('vendor.filemanager.index');
-})->can('viewPulse');
 
 Route::get('/', function () {
     return redirect()->route('home');
