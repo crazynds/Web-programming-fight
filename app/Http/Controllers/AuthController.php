@@ -43,7 +43,9 @@ class AuthController extends Controller
 
     public function login_as_user()
     {
-        foreach (User::all()->random() as $user) {
+        $users = User::all();
+        $users->shuffle();
+        foreach ($users as $user) {
             if (!$user->isAdmin()) {
                 Auth::logout();
                 Auth::login($user, true);
