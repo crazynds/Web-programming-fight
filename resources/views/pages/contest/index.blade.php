@@ -124,7 +124,7 @@
                                     @can('viewSubmissions', $contest)
                                         <a href="{{ route('contest.submissions', ['contest' => $contest->id]) }}"
                                             title="View contest submissions" class="d-flex action-btn">
-                                            <i class="las la-medal"></i>
+                                            <i class="las la-th-list"></i>
                                         </a>
                                     @endcan
                                 @endif
