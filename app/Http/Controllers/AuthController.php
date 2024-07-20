@@ -45,8 +45,11 @@ class AuthController extends Controller
     {
         foreach (User::all()->random() as $user) {
             if (!$user->isAdmin()) {
+                Auth::logout();
                 Auth::login($user, true);
-                return redirect()->route('home');
+                return redirect()->route('user.profile', [
+                    'user' => $user->id
+                ]);
             }
         }
         return redirect()->route('home');
