@@ -39,7 +39,15 @@ class ContestPolicy
 
     public function admin(User $user, Contest $contest): bool
     {
-        return $user->id == $contest->user_id;
+        return $user->id == $contest->user_id || $user->isAdmin();
+    }
+
+    /**
+     * Determine whether the user can view the model.
+     */
+    public function viewSubmissions(User $user, Contest $contest): bool
+    {
+        return $contest->public || $contest->getCompetitor($user) != null || $this->admin($user, $contest);
     }
 
     /**

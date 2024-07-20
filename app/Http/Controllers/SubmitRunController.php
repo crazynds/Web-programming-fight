@@ -8,6 +8,7 @@ use App\Http\Requests\StoreSubmitRunRequest;
 use App\Http\Resources\SubmitRunResultResource;
 use App\Jobs\ExecuteSubmitJob;
 use App\Models\Competitor;
+use App\Models\Contest;
 use App\Models\SubmitRun;
 use App\Models\File;
 use App\Models\Problem;
@@ -29,10 +30,11 @@ class SubmitRunController extends Controller
         $this->authorizeResource(SubmitRun::class, 'submitRun');
     }
 
-    public function global()
+    public function global(Contest $contest = null)
     {
         return view('pages.run.index', [
             'global' => true,
+            'contest' => $contest
         ]);
     }
 

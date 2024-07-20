@@ -115,10 +115,18 @@
                                     </a>
                                 @endif
                                 @if ($contest->start_time->lt(now()))
+                                    <div class="vr"></div>
                                     <a href="{{ route('contest.leaderboard', ['contest' => $contest->id]) }}"
                                         title="View contest leaderboard" class="d-flex action-btn">
                                         <i class="las la-medal"></i>
                                     </a>
+                                    <div class="vr"></div>
+                                    @can('viewSubmissions', $contest)
+                                        <a href="{{ route('contest.submissions', ['contest' => $contest->id]) }}"
+                                            title="View contest submissions" class="d-flex action-btn">
+                                            <i class="las la-medal"></i>
+                                        </a>
+                                    @endcan
                                 @endif
                             @endcan
                             @can('update', $contest)

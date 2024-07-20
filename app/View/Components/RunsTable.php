@@ -2,6 +2,7 @@
 
 namespace App\View\Components;
 
+use App\Models\Contest;
 use App\Models\SubmitRun;
 use App\Services\ContestService;
 use Closure;
@@ -16,6 +17,7 @@ class RunsTable extends Component
      */
     public function __construct(
         public bool $global,
+        public Contest|null $contest,
         protected ContestService $contestService,
     ) {
     }
@@ -23,8 +25,8 @@ class RunsTable extends Component
     private function getQuery()
     {
         if ($this->global) {
-            if ($this->contestService->inContest) {
-                $contest = $this->contestService->contest;
+            if ($this->contest) {
+                $contest = $this->contest;
                 $query = $contest
                     ->submissions()
                     ->with('competitor');
@@ -59,9 +61,9 @@ class RunsTable extends Component
     {
         if ($this->contestService->inContest) {
             if ($this->global)
-                return 'contest.submissions.' . $this->contestService->contest->id;
+                return 'contest.submissions.' . $this->contest->id;
             else
-                return 'contest.submissions.' . $this->contestService->contest->id . '.' . $this->contestService->competitor->id;
+                return 'contest.submissions.' . $this->contest->id . '.' . $this->contestService->competitor->id;
         }
         return 'submissions';
     }
