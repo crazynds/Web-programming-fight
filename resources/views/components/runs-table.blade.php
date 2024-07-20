@@ -81,7 +81,7 @@
                         </small>
                     </td>
                     <td class="px-2">
-                        @if ($contestService->inContest)
+                        @if ($contestService->inContest || $contest)
                             {{ $submitRun->competitor?->acronym }}
                         @else
                             {{ $submitRun->user->name }}
@@ -192,7 +192,7 @@
                         <div class="hstack gap-1">
                             @if ($submitRun->status == 'Judged' || $submitRun->status == 'Error')
                                 @can('update', $submitRun)
-                                    @if ($limit && $submitRun->status != 'Compilation error' && !$contestService->inContest)
+                                    @if ($limit && $submitRun->status != 'Compilation error')
                                         <a href="{{ route('submitRun.rejudge', ['submitRun' => $submitRun->id], false) }}"
                                             class="d-flex action-btn">
                                             <i class="las la-redo-alt"></i>
@@ -405,7 +405,7 @@
             idtag.text('#' + data.id);
         }
         datetimetag.text(data.datetime);
-        usertag.text({{ $contestService->inContest ? 'data.contest.competitor' : 'data.user' }});
+        usertag.text({{ $contestService->inContest || $contest ? 'data.contest.competitor' : 'data.user' }});
         titletag.text(data.problem.title);
         langtag.text(data.language);
         statustag.text(data.status);

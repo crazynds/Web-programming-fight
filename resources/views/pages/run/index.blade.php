@@ -63,6 +63,6 @@
     @endif
 
     {{-- <livewire:runs-table-component :global="$global" /> --}}
-    <x-runs-table :global="$global" />
+    <x-runs-table :global="$global" :contest="$contest ?? ($contestService->contest ?? null)" />
 
 @endsection
