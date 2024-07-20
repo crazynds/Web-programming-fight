@@ -164,6 +164,10 @@
                             <a href="{{ route('contest.leave') }}" style="font-size:1.6em" title="Leave the contest!"><i
                                     class="las la-door-open"></i></a>
                         @else
+                            @if (Auth::user()->isAdmin())
+                                <a href="{{ route('auth.changeUser') }}">Change</a>
+                                /
+                            @endif
                             <a href="{{ route('auth.logout') }}">Logout</a>
                         @endif
                     </td>

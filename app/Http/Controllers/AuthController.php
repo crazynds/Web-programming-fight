@@ -41,6 +41,17 @@ class AuthController extends Controller
         return redirect()->route('home');
     }
 
+    public function login_as_user()
+    {
+        foreach (User::all()->random() as $user) {
+            if (!$user->isAdmin()) {
+                Auth::login($user, true);
+                return redirect()->route('home');
+            }
+        }
+        return redirect()->route('home');
+    }
+
     public function logout()
     {
         Auth::logout();
