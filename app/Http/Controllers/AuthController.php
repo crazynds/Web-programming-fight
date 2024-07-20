@@ -12,7 +12,7 @@ class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('guest')->except('logout');
+        $this->middleware('guest')->except(['logout', 'changeUser']);
     }
 
     public function redirect($provider)
@@ -41,13 +41,12 @@ class AuthController extends Controller
         return redirect()->route('home');
     }
 
-    public function login_as_user()
+    public function changeUser()
     {
         $users = User::all();
         $users->shuffle();
         foreach ($users as $user) {
             if (!$user->isAdmin()) {
-                Auth::logout();
                 Auth::login($user, true);
                 return redirect()->route('user.profile', [
                     'user' => $user->id
