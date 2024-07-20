@@ -14,9 +14,11 @@
             </h1>
         </div>
         <div class="col">
-            <a style="float:right" href="{{ route('problem.testCase.create', ['problem' => $problem->id]) }}">
-                <button>New +</button>
-            </a>
+            @can('update', $problem)
+                <a style="float:right" href="{{ route('problem.testCase.create', ['problem' => $problem->id]) }}">
+                    <button>New +</button>
+                </a>
+            @endcan
         </div>
     </div>
 

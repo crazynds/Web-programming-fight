@@ -38,7 +38,8 @@ class ContestController extends Controller
     {
         $contests = Contest::orderBy('start_time', 'desc')
             ->where('user_id', Auth::user()->id)
-            ->orWhereDate('start_time', '>=', now()->subDays(3))->get();
+            //->orWhereDate('start_time', '>=', now()->subDays(3))
+            ->get();
         return view('pages.contest.index', [
             "contests" => $contests
         ]);
