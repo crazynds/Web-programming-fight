@@ -120,8 +120,8 @@
                                         title="View contest leaderboard" class="d-flex action-btn">
                                         <i class="las la-medal"></i>
                                     </a>
-                                    <div class="vr"></div>
                                     @can('viewSubmissions', $contest)
+                                        <div class="vr"></div>
                                         <a href="{{ route('contest.submissions', ['contest' => $contest->id]) }}"
                                             title="View contest submissions" class="d-flex action-btn">
                                             <i class="las la-th-list"></i>

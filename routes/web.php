@@ -132,7 +132,8 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
     Route::get('/constest/{contest}/leaderboard', [ContestController::class, 'leaderboard'])
         ->name('contest.leaderboard');
     Route::get('/constest/{contest}/submissions', [SubmitRunController::class, 'global'])
-        ->name('contest.submissions');
+        ->name('contest.submissions')
+        ->can('viewSubmissions', 'contest');
     Route::get('/contest/{contest}/admin', [ContestController::class, 'admin'])
         ->name('contest.admin');
     Route::resource('contest.clarification', ClarificationController::class)
