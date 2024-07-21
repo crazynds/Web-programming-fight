@@ -4,6 +4,7 @@ namespace App\View\Components;
 
 use App\Models\Contest;
 use App\Models\SubmitRun;
+use App\Models\User;
 use App\Services\ContestService;
 use Closure;
 use Illuminate\Contracts\View\View;
@@ -48,13 +49,24 @@ class RunsTable extends Component
                 $query = $user->submissions()->where('contest_id', null);
             }
         }
-        return $query->with('user', function ($query) {
-            $query->select('id', 'name');
-        })
+        if (!$this->contest)
+            $query->with('user', function ($query) {
+                $query->select('id', 'name');
+            });
+        else
+            $query->with('competidor', function ($query) {
+                $query->select('id', 'acronym');
+            });
+        /** @var User */
+        $user = Auth::user();
+        if (!$user->isAdmin())
+            $query->limit(300);
+
+        return $query
             ->with('problem', function ($query) {
                 $query->select('id', 'title');
             })
-            ->orderByDesc('id')->limit(100);
+            ->orderByDesc('id');
     }
 
     private function getChannel()

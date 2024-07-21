@@ -170,7 +170,7 @@ class TestCaseController extends Controller
                 }
             }
         });
-        CheckSubmissionsOnProblem::dispatch($problem)->delay(now()->addMinutes(60))->afterResponse();
+        CheckSubmissionsOnProblem::dispatch($problem)->delay(now()->addSeconds(300))->afterResponse();
         foreach (File::whereIn('id', $filesToDelete)->lazy() as $file) {
             $file->delete();
         }
@@ -197,7 +197,7 @@ class TestCaseController extends Controller
         });
 
         // Dispatch Job to check submissions
-        CheckSubmissionsOnProblem::dispatch($problem)->delay(now()->addMinutes(60))->afterResponse();
+        CheckSubmissionsOnProblem::dispatch($problem)->delay(now()->addSeconds(300))->afterResponse();
         return redirect()->route('problem.testCase.index', ['problem' => $problem->id]);
     }
 }

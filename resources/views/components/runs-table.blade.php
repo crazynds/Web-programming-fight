@@ -81,7 +81,7 @@
                         </small>
                     </td>
                     <td class="px-2">
-                        @if ($contestService->inContest || $contest)
+                        @if ($submitRun->competitor)
                             {{ $submitRun->competitor?->acronym }}
                         @else
                             {{ $submitRun->user->name }}

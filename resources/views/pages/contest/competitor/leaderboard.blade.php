@@ -193,11 +193,7 @@
                                         <div class="balloon-shadow"></div>
                                     </div>
                                     <span style="padding-top: 14px;font-size: smaller">
-                                        @if ($contest->time_based_points || $contest->parcial_solution)
-                                            {{ $score->score }}({{ $competitor->__get('sum_submissions_' . $problem) }})
-                                        @else
-                                            {{ $competitor->__get('sum_submissions_' . $problem) . '/' . $score->penality }}
-                                        @endif
+                                        {{ $competitor->__get('sum_submissions_' . $problem) . '/' . abs($score->submission->created_at->diffInMinutes($contest->start_time)) }}
                                     </span>
                                 @elseif ($competitor->__get('sum_submissions_' . $problem) > 0)
                                     -- ({{ $competitor->__get('sum_submissions_' . $problem) }})

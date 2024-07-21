@@ -84,6 +84,7 @@ class ContestController extends Controller
         if (!$competitors) {
             $query = $contest->competitors()
                 ->with('scores')
+                ->with('scores.submission')
                 ->withSum('scores', 'score')
                 ->withSum('scores', 'penality');
 
