@@ -38,4 +38,14 @@ class ClarificationController extends Controller
         $clarification->update($data);
         return back()->with('success', 'Clarification answered.');
     }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Contest $contest, ContestClatification $clarification)
+    {
+        $clarification->delete();
+
+        return back()->with('success', 'Clarification deleted.');
+    }
 }
