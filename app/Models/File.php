@@ -20,8 +20,8 @@ class File extends Model
     {
         $file = new File();
         $preventCompact |= $forceDisk;
-        $storeInDb = $upfile->getSize() > self::MAX_DB_CONTENT && !$forceDisk;
-        if (!$storeInDb && $upfile->getSize() < self::MAX_DB_CONTENT * 2 && !$preventCompact) {
+        $storeInDb = false;
+        if ($upfile->getSize() < self::MAX_DB_CONTENT * 2 && !$preventCompact) {
             $file->path = $path . '/' . $upfile->hashName() . '_db';
             $file->content = $upfile->get();
             $file->compact();
