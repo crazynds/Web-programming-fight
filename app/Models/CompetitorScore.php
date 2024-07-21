@@ -29,7 +29,7 @@ class CompetitorScore extends Model
 
     public function submission()
     {
-        return $this->belongsTo(SubmitRun::class);
+        return $this->belongsTo(SubmitRun::class, 'submit_run_id');
     }
     /**
      * Set the keys for a save update query.

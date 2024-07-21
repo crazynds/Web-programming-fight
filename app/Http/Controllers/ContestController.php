@@ -83,7 +83,6 @@ class ContestController extends Controller
         // If any leaderboard could be loaded, retrive it from database.
         if (!$competitors) {
             $query = $contest->competitors()
-                ->with('scores')
                 ->with('scores.submission')
                 ->withSum('scores', 'score')
                 ->withSum('scores', 'penality');
@@ -112,6 +111,7 @@ class ContestController extends Controller
             }
             Cache::put($key, $competitors, now()->addMinutes(5));
             // Freeze this leaderboard for blind
+            dd($competitors);
             if ($contest->endTimeWithExtra()->gt(now()))
                 Cache::put($key . ':blind', $competitors, $contest->endTimeWithExtra());
         }
