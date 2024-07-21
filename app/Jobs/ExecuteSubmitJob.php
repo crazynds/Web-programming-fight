@@ -61,6 +61,7 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
             // TODO: Um RuntimeError pode ser causado por memory limit, mas não tem como saber nesses casos
             // Buscar solução alternativa
             // Por enquanto funciona em python ok.
+            $this->submit->output = $executor->output;
             return SubmitResult::RuntimeError;
         } else {
 
