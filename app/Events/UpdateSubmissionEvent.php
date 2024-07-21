@@ -26,7 +26,7 @@ class UpdateSubmissionEvent implements ShouldBroadcast
                 'contest_id' => $submitRun->contest_id,
                 'competitor_id' => $submitRun->contest_id ? $submitRun->competitor?->id : null,
                 'competitor' => $submitRun->contest_id ? $submitRun->competitor?->acronym : null,
-                'blind' => $submitRun->contest->blindTime()->lt(now()),
+                'blind' => $submitRun->contest->blindTime()->lt(now()) && $submitRun->contest->endTimeWithExtra()->gt(now()),
             ];
         $this->data = [
             'id' => $submitRun->id,
