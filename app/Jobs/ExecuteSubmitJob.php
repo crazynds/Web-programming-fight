@@ -67,7 +67,7 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
             $executor->testOutputFile($testCase);
 
             if ($executor->retval != 0) {
-                $this->submit->output = implode(PHP_EOL, $executor->output);
+                $this->submit->output = 'Test case: ' . $testCase->name . "\n" . implode(PHP_EOL, $executor->output);
                 return SubmitResult::WrongAnswer;
             }
         }
