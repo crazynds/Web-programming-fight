@@ -111,7 +111,6 @@ class ContestController extends Controller
             }
             Cache::put($key, $competitors, now()->addMinutes(5));
             // Freeze this leaderboard for blind
-            dd($competitors);
             if ($contest->endTimeWithExtra()->gt(now()))
                 Cache::put($key . ':blind', $competitors, $contest->endTimeWithExtra());
         }
