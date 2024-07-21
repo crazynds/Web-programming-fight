@@ -193,7 +193,7 @@
                                         <div class="balloon-shadow"></div>
                                     </div>
                                     <span style="padding-top: 14px;font-size: smaller">
-                                        {{ $competitor->__get('sum_submissions_' . $problem) . '/' . abs($score->submission->created_at->diffInMinutes($contest->start_time)) }}
+                                        {{ $competitor->__get('sum_submissions_' . $problem) . '/' . floor(abs($score->submission->created_at->diffInMinutes($contest->start_time))) }}
                                     </span>
                                 @elseif ($competitor->__get('sum_submissions_' . $problem) > 0)
                                     -- ({{ $competitor->__get('sum_submissions_' . $problem) }})

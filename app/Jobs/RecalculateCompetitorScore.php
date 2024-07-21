@@ -104,7 +104,7 @@ class RecalculateCompetitorScore implements ShouldQueue
             /** @var Carbon */
             $created = $submitRun->created_at;
             $penality = $created->diffInMinutes($this->contest->start_time);
-            $penality = abs($penality);
+            $penality = floor(abs($penality));
         }
         $penalityTried = $problemsBefore * $this->contest->penality;
         return $penality + $penalityTried;
