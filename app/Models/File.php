@@ -19,24 +19,19 @@ class File extends Model
     public static function createFile(UploadedFile $upfile, string $path, bool $forceDisk = false, bool $preventCompact = false)
     {
         $file = new File();
-
-        $forceDb = $upfile->getSize() > self::MAX_DB_CONTENT;
-        if (!$forceDb && $upfile->getSize() < self::MAX_DB_CONTENT * 2 && !$preventCompact) {
+        $preventCompact |= $forceDisk;
+        $storeInDb = $upfile->getSize() > self::MAX_DB_CONTENT && !$forceDisk;
+        if (!$storeInDb && $upfile->getSize() < self::MAX_DB_CONTENT * 2 && !$preventCompact) {
+            $file->path = $path . '/' . $upfile->hashName() . '_db';
             $file->content = $upfile->get();
             $file->compact();
             if (strlen($file->content) > self::MAX_DB_CONTENT) {
                 $file->compacted = false;
                 $file->content = null;
-            } else $forceDb = true;
+                $storeInDb = false;
+            } else $storeInDb = true;
         }
-
-        // less than MAX_DB_CONTENT
-        if ($forceDb) {
-            $file->path = $path . '/' . $upfile->hashName() . '_db';
-            $file->content = $upfile->get();
-            if (!$preventCompact)
-                $file->compact();
-        } else {
+        if (!$storeInDb) {
             $file->path = $upfile->store($path);
             $file->content = null;
         }
