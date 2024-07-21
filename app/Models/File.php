@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Cache\Store;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use \Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -14,18 +12,30 @@ class File extends Model
     public $timestamps = false;
     public $guarded = [];
 
-    // Save at max 2KB in database of content
-    const MAX_DB_CONTENT = 2 * 1024;
+    // Save at max 4KB in database of content
+    const MAX_DB_CONTENT = 4 * 1024;
 
 
-    public static function createFile(UploadedFile $upfile, string $path, bool $forceDisk = false)
+    public static function createFile(UploadedFile $upfile, string $path, bool $forceDisk = false, bool $preventCompact = false)
     {
         $file = new File();
 
-        // less than 2KB
-        if ($upfile->getSize() < self::MAX_DB_CONTENT && !$forceDisk) {
+        $forceDb = $upfile->getSize() > self::MAX_DB_CONTENT;
+        if (!$forceDb && $upfile->getSize() < self::MAX_DB_CONTENT * 2 && !$preventCompact) {
+            $file->content = $upfile->get();
+            $file->compact();
+            if (strlen($file->content) > self::MAX_DB_CONTENT) {
+                $file->compacted = false;
+                $file->content = null;
+            } else $forceDb = true;
+        }
+
+        // less than MAX_DB_CONTENT
+        if ($forceDb) {
             $file->path = $path . '/' . $upfile->hashName() . '_db';
             $file->content = $upfile->get();
+            if (!$preventCompact)
+                $file->compact();
         } else {
             $file->path = $upfile->store($path);
             $file->content = null;
@@ -45,10 +55,11 @@ class File extends Model
         $file = new File();
 
         $hashName = sha1($hash . '-' . $size . '-' . random_bytes(4));
-        // less than 2KB
+
         if ($size < self::MAX_DB_CONTENT && !$forceDisk) {
             $file->path = $path . '/' . $hashName . '_streamed_db';
             $file->content = fread($stream, $size);
+            $file->compact();
             fclose($stream);
         } else {
             Storage::put($path . '/' . $hashName, $stream);
@@ -70,7 +81,7 @@ class File extends Model
             return Storage::download($this->path, $title);
         } else {
             return response()->streamDownload(function () {
-                echo $this->content;
+                echo $this->get();
             }, $title);
         }
     }
@@ -80,7 +91,10 @@ class File extends Model
         if (is_null($this->content)) {
             return Storage::get($this->path);
         } else {
-            return $this->content;
+            if ($this->compacted) {
+                return gzuncompress($this->content);
+            } else
+                return $this->content;
         }
     }
 
@@ -90,7 +104,7 @@ class File extends Model
             return Storage::readStream($this->path);
         } else {
             $stream = fopen('php://memory', 'r+');
-            fwrite($stream, $this->content);
+            fwrite($stream, $this->get());
             rewind($stream);
             return $stream;
         }
@@ -101,7 +115,7 @@ class File extends Model
         if (is_null($pathName)) $pathName = $this->path;
 
         if (!is_null($this->content)) {
-            $zip->addRaw($this->content, $pathName);
+            $zip->addRaw($this->get(), $pathName);
         } else {
             $zip->add($this->url(), $pathName);
         }
@@ -119,5 +133,26 @@ class File extends Model
                 $url = Storage::url($this->path);
         }
         return $url;
+    }
+
+    public function compact()
+    {
+        if (is_null($this->content))
+            return;
+        if ($this->compacted)
+            return;
+        $this->compacted = true;
+        $this->content = gzcompress($this->content, 9);
+    }
+
+    public function extract()
+    {
+        if (is_null($this->content))
+            return;
+        if (!$this->compacted)
+            return;
+
+        $this->compacted = true;
+        $this->content = gzuncompress($this->content);
     }
 }

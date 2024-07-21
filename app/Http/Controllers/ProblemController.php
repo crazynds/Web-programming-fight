@@ -23,7 +23,7 @@ class ProblemController extends Controller
     public function publicChange(Problem $problem)
     {
         $this->authorize('update', $problem);
-        $mininun = 5;
+        $mininun = 3;
         if ($problem->testCases()->where('validated', true)->count() < $mininun) {
             $problem->visible = false;
             $problem->save();
