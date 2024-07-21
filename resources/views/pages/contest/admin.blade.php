@@ -46,7 +46,8 @@
                     @method('PUT')
                     <div style="border: #bbb solid 1px;border-radius: 3px;padding: 10px;background-color: whitesmoke; margin-left: 15%;font-size: 0.8em;"
                         class="shadow-md mb-1">
-                        <b>Question: </b> <small>{{ $clarification->problem->title }}</small><br>
+                        <b>{{ $clarification->competitor->acronym }}: </b>
+                        <small>{{ $clarification->problem->title }}</small><br>
                         {{ $clarification->question }}
                     </div>
                     <textarea name="answer" id="answer" cols="50" rows="4">{{ $clarification->answer ?? '' }}</textarea>
@@ -64,7 +65,7 @@
                     method="post">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" style="float:right"> Delete </button>
+                    <button type="submit" style="float:right;margin-right: 80px;margin-top: -34px;"> Delete </button>
                 </form>
                 <hr />
             @endforeach
