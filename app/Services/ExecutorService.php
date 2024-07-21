@@ -143,8 +143,9 @@ class ExecutorService
             }
         }
         if ($this->retval != 0) {
+            $command = str_replace('command time -v --output=/var/work/time -p ', '', $command);
             $command  = str_replace('2> /dev/null', '2>&1', $command);
-            exec($command, $this->output, $this->retval);
+            exec($command);
             $this->output = Storage::disk('nsjail')->get('user_output');
         }
         $this->execution_time = $exectime;
