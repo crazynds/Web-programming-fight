@@ -142,6 +142,11 @@ class ExecutorService
                 default:
             }
         }
+        if ($this->retval != 0) {
+            $command  = str_replace('2> /dev/null', '2>&1', $command);
+            exec($command, $this->output, $this->retval);
+            $this->output = Storage::disk('nsjail')->get('user_output');
+        }
         $this->execution_time = $exectime;
         $this->execution_memory = intval($memoryPeak);
         //dump($exectime, $memoryPeak, $retval);
