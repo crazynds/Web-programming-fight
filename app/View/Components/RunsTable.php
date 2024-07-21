@@ -54,7 +54,7 @@ class RunsTable extends Component
                 $query->select('id', 'name');
             });
         else
-            $query->with('competidor', function ($query) {
+            $query->with('competitor', function ($query) {
                 $query->select('id', 'acronym');
             });
         /** @var User */
