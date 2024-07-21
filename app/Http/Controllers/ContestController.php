@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCompetitorRequest;
 use App\Http\Requests\StoreContestRequest;
+use App\Jobs\RecalculateCompetitorScore;
 use App\Models\Contest;
 use App\Models\Problem;
 use App\Models\Team;
@@ -29,6 +30,16 @@ class ContestController extends Controller
         return view('pages.contest.admin', [
             'contest' => $contest
         ]);
+    }
+
+    public function recomputateScores(Contest $contest)
+    {
+        $this->authorize('admin', $contest);
+        /** @var Competitor $competitor */
+        foreach ($contest->competitors()->lazy() as $competitor) {
+            RecalculateCompetitorScore::dispatch($contest, $competitor);
+        }
+        return redirect()->route('contest.leaderboard', ['contest' => $contest->id]);
     }
 
     /**

@@ -19,6 +19,11 @@
     <div class="row">
         <div class="col-6">
             painel de leaderboard
+
+            <form action="{{ route('contest.recomputateScores', ['contest' => $contest->id]) }}" method="post">
+                @csrf
+                <button type="submit" style="float:right"> Re-computate Scores </button>
+            </form>
         </div>
         <div class="col-6">
             <h4>Clarifications</h4>
@@ -53,6 +58,13 @@
                         @if ($clarification->public) checked @endif />
 
                     <button type="submit" style="float:right"> Submit </button>
+                </form>
+                <form
+                    action="{{ route('contest.clarification.destroy', ['contest' => $contest->id, 'clarification' => $clarification->id]) }}"
+                    method="post">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" style="float:right"> Delete </button>
                 </form>
                 <hr />
             @endforeach

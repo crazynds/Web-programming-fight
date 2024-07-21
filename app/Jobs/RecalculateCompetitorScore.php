@@ -33,6 +33,7 @@ class RecalculateCompetitorScore implements ShouldQueue
         protected Contest $contest,
         protected Competitor $competitor
     ) {
+        $this->onQueue('contest');
     }
 
     /**
