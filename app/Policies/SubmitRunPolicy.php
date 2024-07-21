@@ -33,10 +33,13 @@ class SubmitRunPolicy
 
     public function viewOutput(User $user, SubmitRun $submitRun): bool
     {
-        $compErr = $submitRun->result == SubmitResult::fromValue(SubmitResult::CompilationError)->description;
-        $contest = ($this->contestService->inContest && $compErr) || !$this->contestService->inContest;
+        if ($user->isAdmin()) return true;
+        if (!$this->view($user, $submitRun)) return false;
 
-        return $this->view($user, $submitRun) && $contest || $user->isAdmin();
+        $compErr = $submitRun->result == SubmitResult::fromValue(SubmitResult::CompilationError)->description;
+        $runErr = $submitRun->result == SubmitResult::fromValue(SubmitResult::RuntimeError)->description;
+
+        return $submitRun->contest_id == null || $compErr || $runErr || $submitRun->contest->show_wrong_answer;
     }
 
     /**

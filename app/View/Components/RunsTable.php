@@ -21,6 +21,8 @@ class RunsTable extends Component
         public Contest|null $contest,
         protected ContestService $contestService,
     ) {
+        if ($contestService->inContest)
+            $this->contest = $contestService->contest;
     }
 
     private function getQuery()
@@ -30,7 +32,7 @@ class RunsTable extends Component
                 $contest = $this->contest;
                 $query = $contest
                     ->submissions()
-                    ->with('competitor');
+                    ->with(['competitor', 'contest']);
 
                 if ($contest->endTime()->addMinutes(5)->gt(now()))
                     $query->where('submit_runs.created_at', '<', $contest->blindTime());
@@ -42,7 +44,8 @@ class RunsTable extends Component
             }
         } else {
             if ($this->contestService->inContest) {
-                $query = $this->contestService->competitor->submissions();
+                $query = $this->contestService->competitor->submissions()
+                    ->with('contest');
             } else {
                 /** @var User */
                 $user = Auth::user();
