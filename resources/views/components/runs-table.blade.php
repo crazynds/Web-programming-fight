@@ -92,7 +92,7 @@
                             {{ $submitRun->problem->title }}
                         </a>
                     </td>
-                    <td class="px-2">
+                    <td class="px-2" id="lang">
                         {{ $submitRun->language }}
                     </td>
                     <td class="px-2">

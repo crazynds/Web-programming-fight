@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
 use App\Models\SubmitRun;
 use Illuminate\Bus\Queueable;
@@ -27,7 +28,15 @@ class FindBrokenSubmissionsAndFixJob implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
-        foreach (SubmitRun::where('status', SubmitStatus::WaitingInLine)->lazy() as $submitRun) {
+        $query = SubmitRun::where(function ($query) {
+            $query->whereIn('status', [
+                SubmitStatus::WaitingInLine,
+            ])->orWhereIn('result', [
+                SubmitResult::NoResult,
+                SubmitResult::NoTestCase,
+            ]);
+        })->where('created_at', '<', now()->subMinutes(10));
+        foreach ($query->lazy() as $submitRun) {
             ExecuteSubmitJob::dispatch($submitRun);
         }
     }

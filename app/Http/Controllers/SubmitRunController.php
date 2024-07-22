@@ -175,8 +175,8 @@ class SubmitRunController extends Controller
             $submitRun->save();
 
             if ($submitRun->language == LanguagesType::name(LanguagesType::Auto_detect)) {
-                AutoDetectLangSubmitRun::dispatch('low')->afterCommit();
-            } else ExecuteSubmitJob::dispatch('low')->afterCommit();
+                AutoDetectLangSubmitRun::dispatch($submitRun)->onQueue('low')->afterCommit();
+            } else ExecuteSubmitJob::dispatch($submitRun)->onQueue('low')->afterCommit();
         }
         return redirect()->back();
     }

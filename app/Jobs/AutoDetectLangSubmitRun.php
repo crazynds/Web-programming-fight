@@ -12,6 +12,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class AutoDetectLangSubmitRun implements ShouldQueue
 {
@@ -23,6 +24,7 @@ class AutoDetectLangSubmitRun implements ShouldQueue
     public function __construct(
         protected SubmitRun $submitRun
     ) {
+        $this->onQueue('submit');
     }
 
     /**
@@ -32,8 +34,8 @@ class AutoDetectLangSubmitRun implements ShouldQueue
     {
         $this->submitRun->status = SubmitStatus::DetectingLang;
         $this->submitRun->save();
-        Storage::disk('nsjail')->writeStream('0.file', $this->submitRun->file->readStream());
-        $comand = "python3 /var/scripts/autolang.py < /var/nsjail/0.file";
+        Storage::disk('nsjail')->writeStream('0.code', $this->submitRun->file->readStream());
+        $comand = "python3 /var/scripts/autolang.py < /var/work/0.code";
         exec($comand, $output, $retval);
         switch ($output[0]) {
             case 'Python':
@@ -44,7 +46,7 @@ class AutoDetectLangSubmitRun implements ShouldQueue
                 $this->submitRun->language = LanguagesType::CPlusPlus;
                 break;
             default:
-                $this->submitRun->language = LanguagesType::Not_found;
+                $this->submitRun->language = LanguagesType::Auto_detect;
                 $this->submitRun->status = SubmitStatus::Error;
                 $this->submitRun->result = SubmitResult::LanguageNotSupported;
                 $this->submitRun->save();
@@ -53,5 +55,13 @@ class AutoDetectLangSubmitRun implements ShouldQueue
         $this->submitRun->status = SubmitStatus::WaitingInLine;
         $this->submitRun->save();
         ExecuteSubmitJob::dispatch($this->submitRun)->onQueue($this->queue);
+    }
+
+    public function failed(Throwable $exception): void
+    {
+        $this->submitRun->status = SubmitStatus::Error;
+        $this->submitRun->result = SubmitResult::Error;
+        $this->submitRun->output = $exception->getTraceAsString();
+        $this->submitRun->save();
     }
 }

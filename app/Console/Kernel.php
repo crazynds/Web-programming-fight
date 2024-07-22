@@ -3,7 +3,7 @@
 namespace App\Console;
 
 use App\Jobs\ClearUnusedFiles;
-use App\Jobs\DeleteCompilationErrorFiles;
+use App\Jobs\DeleteOldSubmissionsErrorFiles;
 use App\Jobs\FindBrokenSubmissionsAndFixJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -17,8 +17,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->job(new ClearUnusedFiles(), 'low')->weekly()->days([1])->dailyAt('05:00');
 
-        $schedule->job(new DeleteCompilationErrorFiles(), 'low')->weekly()->days([6])->dailyAt('05:00');
-        $schedule->job(new FindBrokenSubmissionsAndFixJob(), 'low')->hourly();
+        $schedule->job(new DeleteOldSubmissionsErrorFiles(), 'low')->weekly()->days([6])->dailyAt('05:00');
+        $schedule->job(new FindBrokenSubmissionsAndFixJob(), 'low')->everyTenMinutes();
     }
 
     /**

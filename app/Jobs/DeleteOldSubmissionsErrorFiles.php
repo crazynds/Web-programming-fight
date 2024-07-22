@@ -11,7 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class DeleteCompilationErrorFiles implements ShouldQueue
+class DeleteOldSubmissionsErrorFiles implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -28,7 +28,12 @@ class DeleteCompilationErrorFiles implements ShouldQueue
      */
     public function handle(): void
     {
-        foreach (SubmitRun::where('result', SubmitResult::CompilationError)->whereNotNull('file_id')->with('file')->lazy() as $run) {
+        foreach (SubmitRun::whereIn('result', [
+            SubmitResult::CompilationError,
+            SubmitResult::Error,
+            SubmitResult::LanguageNotSupported,
+            SubmitResult::NoTestCase,
+        ])->where('created_at', '<', now()->subMonth())->whereNotNull('file_id')->with('file')->lazy() as $run) {
             $file = $run->file;
             $run->file_id = null;
             $run->save();
