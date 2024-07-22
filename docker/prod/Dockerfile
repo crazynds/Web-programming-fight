@@ -31,7 +31,7 @@ RUN mkdir /langs
 
 # Prepare AI environment
 RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --break-system-packages
-RUN pip install transformers optimum[onnxruntime] optimum
+RUN pip install transformers optimum[onnxruntime] optimum --break-system-packages
 RUN mkdir /var/scripts
 RUN chmod 0777 /var/scripts
 COPY ./docker/scripts /var/scripts
