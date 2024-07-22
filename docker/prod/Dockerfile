@@ -25,9 +25,18 @@ RUN apt-get update && \
     make \
     pkg-config \
     protobuf-compiler \
-    python3.11
+    python3.11 python3-pip
 
 RUN mkdir /langs
+
+# Prepare AI environment
+RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+RUN pip install transformers optimum[onnxruntime] optimum
+RUN mkdir /var/scripts
+RUN chmod 0777 /var/scripts
+COPY ./docker/scripts /var/scripts
+## Run one time to load the model
+RUN python3 /var/scripts/autolang.py < /var/scripts/autolang.py
 
 # Download and install pypy
 RUN wget https://buildbot.pypy.org/nightly/py3.10/pypy-c-jit-184945-79a57c5ea141-linux64.tar.bz2 -P /langs
