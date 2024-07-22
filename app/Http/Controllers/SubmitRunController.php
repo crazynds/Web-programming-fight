@@ -114,7 +114,7 @@ class SubmitRunController extends Controller
                 $run->user()->associate($user);
                 $run->status = SubmitStatus::WaitingInLine;
                 $run->save();
-                if ($run->language == LanguagesType::Auto_detect) {
+                if ($run->language == LanguagesType::name(LanguagesType::Auto_detect)) {
                     $job = AutoDetectLangSubmitRun::dispatch($run)->afterCommit();
                 } else $job = ExecuteSubmitJob::dispatch($run)->afterCommit();
             }
@@ -173,8 +173,10 @@ class SubmitRunController extends Controller
             $submitRun->status = SubmitStatus::WaitingInLine;
             $submitRun->result = SubmitResult::NoResult;
             $submitRun->save();
-            // Put this run in the low priority queue
-            ExecuteSubmitJob::dispatch($submitRun)->onQueue('low')->afterCommit();
+
+            if ($submitRun->language == LanguagesType::name(LanguagesType::Auto_detect)) {
+                AutoDetectLangSubmitRun::dispatch('low')->afterCommit();
+            } else ExecuteSubmitJob::dispatch('low')->afterCommit();
         }
         return redirect()->back();
     }
