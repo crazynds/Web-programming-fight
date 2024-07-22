@@ -10,7 +10,6 @@ use Illuminate\Validation\Rules\File;
 final class LanguagesType extends Enum
 {
     const Auto_detect = 5;
-    const Not_found = 100;
 
     const CPlusPlus = 0;
     const PyPy3_10 = 1;
@@ -21,7 +20,7 @@ final class LanguagesType extends Enum
     public static function list()
     {
         return [
-            'Auto detect' => LanguagesType::Auto_detect,
+            'Auto detect 95%' => LanguagesType::Auto_detect,
             'C++' => LanguagesType::CPlusPlus,
             'C (-std=c17)' => LanguagesType::C,
             'PyPy3.10' => LanguagesType::PyPy3_10,
