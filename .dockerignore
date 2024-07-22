@@ -10,6 +10,7 @@
 !/docker/prod/start-container
 !/docker/prod/reverb-supervisord.conf
 !/docker/prod/start.sh
+!/docker/scripts/autolang.py
 /storage/framework/cache/*
 /storage/framework/sessions/*
 /storage/framework/views/*

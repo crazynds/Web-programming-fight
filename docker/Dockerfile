@@ -78,20 +78,31 @@ RUN apt-get install -y \
     make \
     pkg-config \
     protobuf-compiler \
-    python3.11 \
+    python3.11 python3-pip \
     && apt-get -y autoremove \
     && apt-get clean 
 
 RUN mkdir /langs
+
+# Prepare AI environment
+RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+RUN pip install transformers optimum[onnxruntime] optimum
+RUN mkdir /var/scripts
+RUN chmod 0777 /var/scripts
+COPY ./docker/scripts /var/scripts
+## Run one time to load the model
+RUN python3 /var/scripts/autolang.py < /var/scripts/autolang.py
+
 
 # Download and install pypy
 RUN wget https://buildbot.pypy.org/nightly/py3.10/pypy-c-jit-184945-79a57c5ea141-linux64.tar.bz2 -P /langs
 RUN tar -xf /langs/pypy-c-jit-184945-79a57c5ea141-linux64.tar.bz2 -C /langs
 RUN mv /langs/pypy-c-jit-184945-79a57c5ea141-linux64 /langs/pypy3.10
 RUN rm /langs/pypy-c-jit-184945-79a57c5ea141-linux64.tar.bz2
-RUN cp /langs/pypy3.10/bin/* /usr/bin -r
-RUN cp /langs/pypy3.10/lib/* /usr/lib -r
-RUN cp /langs/pypy3.10/include/* /usr/include -r
+RUN rm /langs/pypy3.10/bin/python* && \
+    cp /langs/pypy3.10/bin/* /usr/bin -r && \
+    cp /langs/pypy3.10/lib/* /usr/lib -r && \
+    cp /langs/pypy3.10/include/* /usr/include -r
 
 
 # Download and install NSJail

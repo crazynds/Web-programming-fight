@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Enums;
 
@@ -15,6 +17,9 @@ final class SubmitStatus extends Enum
     const Judging = 2;
     // The result is ready
     const Judged = 3;
+
+    // Is detecting the language
+    const DetectingLang = 4;
 
     // Error on some of the steps
     const Error = 100;

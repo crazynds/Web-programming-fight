@@ -9,6 +9,9 @@ use Illuminate\Validation\Rules\File;
 
 final class LanguagesType extends Enum
 {
+    const Auto_detect = 5;
+    const Not_found = 100;
+
     const CPlusPlus = 0;
     const PyPy3_10 = 1;
     const Python3_11 = 2;
@@ -18,6 +21,7 @@ final class LanguagesType extends Enum
     public static function list()
     {
         return [
+            'Auto detect' => LanguagesType::Auto_detect,
             'C++' => LanguagesType::CPlusPlus,
             'C (-std=c17)' => LanguagesType::C,
             'PyPy3.10' => LanguagesType::PyPy3_10,
@@ -53,6 +57,7 @@ final class LanguagesType extends Enum
             case self::PyPy3_10:
             case self::Python3_11:
             case self::C:
+            case self::Auto_detect:
                 return [
                     File::defaults()
                         ->max('1mb'), // 1 MB

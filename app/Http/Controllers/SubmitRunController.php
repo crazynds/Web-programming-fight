@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\LanguagesType;
 use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
 use App\Http\Requests\StoreSubmitRunRequest;
 use App\Http\Resources\SubmitRunResultResource;
+use App\Jobs\AutoDetectLangSubmitRun;
 use App\Jobs\ExecuteSubmitJob;
 use App\Models\Competitor;
 use App\Models\Contest;
@@ -112,7 +114,9 @@ class SubmitRunController extends Controller
                 $run->user()->associate($user);
                 $run->status = SubmitStatus::WaitingInLine;
                 $run->save();
-                $job = ExecuteSubmitJob::dispatch($run)->afterCommit();
+                if ($run->language == LanguagesType::Auto_detect) {
+                    $job = AutoDetectLangSubmitRun::dispatch($run)->afterCommit();
+                } else $job = ExecuteSubmitJob::dispatch($run)->afterCommit();
             }
             if ($this->contestService->started && $this->contestService->inContest) {
                 $run->contest()->associate($this->contestService->contest);
