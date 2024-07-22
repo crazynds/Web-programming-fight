@@ -12,8 +12,8 @@ class File extends Model
     public $timestamps = false;
     public $guarded = [];
 
-    // Save at max 4KB in database of content
-    const MAX_DB_CONTENT = 4 * 1024;
+    // Save at max 16KB in database of content
+    const MAX_DB_CONTENT = 16 * 1024;
 
 
     public static function createFile(UploadedFile $upfile, string $path, bool $forceDisk = false, bool $preventCompact = false)
@@ -39,6 +39,37 @@ class File extends Model
         $file->size = $upfile->getSize();
         $file->type = $upfile->getClientOriginalExtension();
         $file->hash = hash_file("sha256", $upfile->getPathname());
+        $file->save();
+        return $file;
+    }
+
+    public static function createFileByData($data, string $path, bool $forceDisk = false, bool $preventCompact = false)
+    {
+        $file = new File();
+        $preventCompact |= $forceDisk;
+        $storeInDb = false;
+
+        $hashName = sha1(hash('sha256', $data) . '-' . strlen($data) . '-' . random_bytes(4));
+
+        if (strlen($data) < self::MAX_DB_CONTENT * 2 && !$preventCompact) {
+            $file->path = $path . '/' . $hashName . '_db';
+            $file->content = $data;
+            $file->compact();
+            if (strlen($file->content) > self::MAX_DB_CONTENT) {
+                $file->compacted = false;
+                $file->content = null;
+                $storeInDb = false;
+            } else $storeInDb = true;
+        }
+        if (!$storeInDb) {
+            $file->path = $path . '/' . $hashName;
+            Storage::put($path . '/' . $hashName, $data);
+            $file->content = null;
+        }
+
+        $file->size = strlen($data);
+        $file->type = 'blob';
+        $file->hash = hash('sha256', $data);
         $file->save();
         return $file;
     }

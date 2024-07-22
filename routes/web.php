@@ -52,7 +52,12 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', PreventAccessDuringContest::class])->group(function () {
     Route::resource('problem', ProblemController::class);
     Route::resource('problem.testCase', TestCaseController::class)
-        ->except(['edit', 'update']);
+        ->except(['update']);
+    Route::get('/problem/{problem}/testcase/create/manual', [TestCaseController::class, 'createManual'])
+        ->name('problem.testCase.create.manual');
+    Route::post('/problem/{problem}/testcase/create/manual', [TestCaseController::class, 'storeManual'])
+        ->name('problem.testCase.store.manual');
+
     Route::resource('problem.scorer', ScorerController::class)
         ->except(['edit', 'update']);
 
