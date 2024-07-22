@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
 use App\Enums\TestCaseType;
+use App\Http\Requests\StoreManualTestCaseRequest;
 use App\Http\Requests\StoreTestCaseRequest;
 use App\Jobs\CheckSubmissionsOnProblem;
 use App\Jobs\ExecuteSubmitJob;
@@ -57,6 +58,24 @@ class TestCaseController extends Controller
         return view('pages.testCase.create', [
             'problem' => $problem,
             'testCase' => new TestCase(),
+        ]);
+    }
+
+    public function createManual(Problem $problem)
+    {
+        $this->authorize('update', $problem);
+        return view('pages.testCase.create-manual', [
+            'problem' => $problem,
+            'testCase' => new TestCase(),
+        ]);
+    }
+
+    public function edit(Problem $problem, TestCase $testCase)
+    {
+        $this->authorize('update', $problem);
+        return view('pages.testCase.create-manual', [
+            'problem' => $problem,
+            'testCase' => $testCase,
         ]);
     }
     /**
@@ -135,38 +154,37 @@ class TestCaseController extends Controller
         }
         $files = array_intersect(array_keys($inputs), array_keys($outputs));
         $filesToDelete = [];
-        DB::transaction(function () use ($problem, $inputs, $outputs, $files) {
+        DB::transaction(function () use ($problem, $inputs, $outputs, $files, $filesToDelete) {
             $position = $problem->testCases()->count();
             foreach ($files as $file) {
                 $position++;
 
                 $inputFile = File::createFile($inputs[$file], "problems/{$problem->id}/input");
-
                 $outputFile = File::createFile($outputs[$file], "problems/{$problem->id}/output");
+
+                $t = $problem->testCases()->where('name', $file)->first();
                 $testCase = $problem->testCases()->updateOrCreate([
                     'name' => $file,
                 ], [
                     'type' => TestCaseType::FileDiff,
                     'input_file' => $inputFile->id,
                     'output_file' => $outputFile->id,
+                    'validated' => false,
+                    'position' => $problem->testCases()->count() + 1,
                 ]);
-                if (!$testCase->wasRecentlyCreated) {
-                    $testCase->position = $testCase->getOriginal('position');
-                    $input = $testCase->getOriginal('input_file');
-                    $output = $testCase->getOriginal('output_file');
-                    $filesToDelete[] = $input;
-                    $filesToDelete[] = $output;
+
+                if ($t) {
+                    $testCase->position = $t->position;
+                    $filesToDelete[] = $t->input_file;
+                    $filesToDelete[] = $t->output_file;
+
                     // Clear test who ran in this testcase 
                     $testCase->validated = false;
                     $testCase->submitRuns()->sync([]);
-
                     $testCase->save();
-                    $position--;
+
                     Cache::forget('file:input_' . $testCase->id);
                     Cache::forget('file:output_' . $testCase->id);
-                } else {
-                    $testCase->position = $position;
-                    $testCase->save();
                 }
             }
         });
@@ -174,6 +192,51 @@ class TestCaseController extends Controller
         foreach (File::whereIn('id', $filesToDelete)->lazy() as $file) {
             $file->delete();
         }
+        return redirect()->route('problem.testCase.index', ['problem' => $problem->id]);
+    }
+
+    public function storeManual(StoreManualTestCaseRequest $request, Problem $problem)
+    {
+        $this->authorize('update', $problem);
+
+        DB::beginTransaction();
+        $data = $request->safe()->all();
+
+        $filesToDelete = [];
+
+        $inputFile = File::createFileByData($data['input'], "problems/{$problem->id}/input");
+        $outputFile = File::createFileByData($data['output'], "problems/{$problem->id}/output");
+
+
+        $t = $problem->testCases()->where('name', $data['name'])->first();
+        $testCase = $problem->testCases()->updateOrCreate([
+            'name' => $data['name'],
+        ], [
+            'type' => TestCaseType::FileDiff,
+            'input_file' => $inputFile->id,
+            'output_file' => $outputFile->id,
+            'validated' => false,
+            'position' => $problem->testCases()->count() + 1,
+        ]);
+
+        if ($t) {
+            $testCase->position = $t->position;
+            $filesToDelete[] = $t->input_file;
+            $filesToDelete[] = $t->output_file;
+
+            // Clear test who ran in this testcase 
+            $testCase->validated = false;
+            $testCase->submitRuns()->sync([]);
+            $testCase->save();
+
+            Cache::forget('file:input_' . $testCase->id);
+            Cache::forget('file:output_' . $testCase->id);
+        }
+        foreach (File::whereIn('id', $filesToDelete)->lazy() as $file) {
+            $file->delete();
+        }
+        DB::commit();
+        CheckSubmissionsOnProblem::dispatch($problem)->delay(now()->addSeconds(300))->afterResponse();
         return redirect()->route('problem.testCase.index', ['problem' => $problem->id]);
     }
 

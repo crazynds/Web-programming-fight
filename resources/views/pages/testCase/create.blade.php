@@ -56,7 +56,7 @@
                 *Each input file need an output file with the same name to create a test case.
             </strong>
             <strong>
-                *Test cases with the same name as the files sended will be replaced.
+                *Test cases with the same name as an existent text case will be replace the old one.
             </strong>
         </div>
 

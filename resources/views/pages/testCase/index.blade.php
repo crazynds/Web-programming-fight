@@ -15,8 +15,12 @@
         </div>
         <div class="col">
             @can('update', $problem)
-                <a style="float:right" href="{{ route('problem.testCase.create', ['problem' => $problem->id]) }}">
+                <a style="float:right" href="{{ route('problem.testCase.create.manual', ['problem' => $problem->id]) }}">
                     <button>New +</button>
+                </a>
+                <a style="float:right; margin-right: 5px;"
+                    href="{{ route('problem.testCase.create', ['problem' => $problem->id]) }}">
+                    <button>Upload Test Case +</button>
                 </a>
             @endcan
         </div>
@@ -141,6 +145,11 @@
                                     <i class="las la-eye"></i>
                                 </a>
                                 <div class="vr"></div>
+                                <a href="{{ route('problem.testCase.edit', ['problem' => $problem->id, 'testCase' => $testCase->id]) }}"
+                                    title="Edit this test case" class="d-flex action-btn">
+                                    <i class="las la-edit"></i>
+                                </a>
+                                <div class="vr"></div>
                                 <a href="{{ route('problem.testCase.input', ['problem' => $problem->id, 'testCase' => $testCase->id]) }}"
                                     target="_blank" class="d-flex action-btn">
                                     <i class="las la-sign-in-alt"></i>
@@ -168,9 +177,16 @@
         </tbody>
     </table>
 
-    <div class="row">
+    <div class="row mt-3">
         <strong>
-            *To validate a test case, you need to submit a solution that pass the test case
+            *To validate a test case, you need to submit a solution that pass in all the previous validated test cases and
+            the one you want to validate!
+        </strong>
+        <strong>
+            *You can rejudge a submission to validade a new test case.
+        </strong>
+        <strong>
+            *Only validated test cases are considered to accept a solution.
         </strong>
     </div>
 @endsection

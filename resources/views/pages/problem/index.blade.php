@@ -108,11 +108,13 @@
                                     </a>
                                 @endcan
                                 @can('update', $problem)
-                                    <div class="vr"></div>
-                                    <a href="{{ route('problem.scorer.index', ['problem' => $problem->id]) }}"
-                                        title="Edit scores" class="d-flex action-btn">
-                                        <i class="las la-star"></i>
-                                    </a>
+                                    @if (Auth::user()->isAdmin())
+                                        <div class="vr"></div>
+                                        <a href="{{ route('problem.scorer.index', ['problem' => $problem->id]) }}"
+                                            title="Edit scores" class="d-flex action-btn">
+                                            <i class="las la-star"></i>
+                                        </a>
+                                    @endif
 
                                     <div class="vr"></div>
                                     <a href="{{ route('problem.download', ['problem' => $problem->id]) }}"
