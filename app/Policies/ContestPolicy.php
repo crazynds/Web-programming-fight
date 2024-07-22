@@ -34,7 +34,7 @@ class ContestPolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->problems()->count() > 1;
     }
 
     public function admin(User $user, Contest $contest): bool
