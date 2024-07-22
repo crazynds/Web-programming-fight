@@ -106,6 +106,9 @@
         </div>
         @if ($contestService->inContest)
             <div class="col-3" style="margin-right: -80px;">
+                <h5>
+                    Clarifications
+                </h5>
                 @foreach ($clarifications as $clarification)
                     <div style="border: #bbb solid 1px;border-radius: 3px;padding: 10px;background-color: whitesmoke;margin-right: 15%;font-size: 0.8em;"
                         class="shadow-md mb-1 mr-2">
