@@ -132,6 +132,8 @@ class ProblemController extends Controller
      */
     public function show(Problem $problem)
     {
+        if ($this->contestService->inContest && $this->contestService->contest->problems()->where('id', $problem->id)->count() == 0)
+            return back();
         if ($this->contestService->inContest)
             $clarifications = $this->contestService->contest->clarifications()->where('problem_id', $problem->id)
                 ->where(function ($query) {
