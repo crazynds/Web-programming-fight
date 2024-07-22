@@ -89,17 +89,19 @@
         <tbody>
             @foreach (App\Enums\LanguagesType::list() as $name => $code)
                 @if (!$contestService->inContest || in_array($code, $contestService->contest->languages))
-                    <tr>
-                        <td class="px-1">
-                            {{ $name }}
-                        </td>
-                        <td class="text-center">
-                            {{ App\Enums\LanguagesType::modifiers()[$name][0] }}x
-                        </td>
-                        <td class="text-center">
-                            {{ App\Enums\LanguagesType::modifiers()[$name][1] }}x
-                        </td>
-                    </tr>
+                    @if (array_key_exists($name, App\Enums\LanguagesType::modifiers()))
+                        <tr>
+                            <td class="px-1">
+                                {{ $name }}
+                            </td>
+                            <td class="text-center">
+                                {{ App\Enums\LanguagesType::modifiers()[$name][0] }}x
+                            </td>
+                            <td class="text-center">
+                                {{ App\Enums\LanguagesType::modifiers()[$name][1] }}x
+                            </td>
+                        </tr>
+                    @endif
                 @endif
             @endforeach
         </tbody>
