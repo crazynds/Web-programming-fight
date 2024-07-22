@@ -224,6 +224,8 @@ class ContestController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
+        $data['description'] = strip_tags($data['description']);
+
         DB::beginTransaction();
         /** @var Contest */
         $contest = $user->contest()->create($data);
@@ -273,6 +275,9 @@ class ContestController extends Controller
         $data = $request->safe()->except(['problems', 'g-recaptcha-response']);
         /** @var User $user */
         $user = Auth::user();
+
+        if (isset($data['description']))
+            $data['description'] = strip_tags($data['description']);
 
         DB::beginTransaction();
         /** @var Contest */

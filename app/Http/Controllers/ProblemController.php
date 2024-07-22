@@ -105,6 +105,11 @@ class ProblemController extends Controller
         $data = $request->safe([
             'title', 'author', 'time_limit', 'memory_limit', 'description', 'input_description', 'output_description'
         ]);
+        if (!$user->isAdmin()) {
+            $data['description'] = strip_tags($data['description']);
+            $data['input_description'] = strip_tags($data['input_description']);
+            $data['output_description'] = strip_tags($data['output_description']);
+        }
         $problem = $user->problems()->create($data);
 
         return redirect()->route('problem.show', ['problem' => $problem->id]);
@@ -155,9 +160,20 @@ class ProblemController extends Controller
      */
     public function update(StoreProblemRequest $request, Problem $problem)
     {
-        $problem->update($request->safe([
+        /** @var User $user */
+        $user = Auth::user();
+        $data = $request->safe([
             'title', 'author', 'time_limit', 'memory_limit', 'description', 'input_description', 'output_description'
-        ]));
+        ]);
+        if (!$user->isAdmin()) {
+            if (isset($data['description']))
+                $data['description'] = strip_tags($data['description']);
+            if (isset($data['input_description']))
+                $data['input_description'] = strip_tags($data['input_description']);
+            if (isset($data['output_description']))
+                $data['output_description'] = strip_tags($data['output_description']);
+        }
+        $problem->update($data);
 
         return redirect()->route('problem.show', ['problem' => $problem->id]);
     }

@@ -35,6 +35,8 @@ class ClarificationController extends Controller
     public function update(AwnserClarificationRequest $request, Contest $contest, ContestClatification $clarification)
     {
         $data = $request->safe()->all();
+        if (isset($data['answer']))
+            $data['answer'] = strip_tags($data['answer']);
         $clarification->update($data);
         return back()->with('success', 'Clarification answered.');
     }
