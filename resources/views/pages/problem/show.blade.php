@@ -145,7 +145,7 @@
                         Question:
                     </label>
                     <textarea class="form-control" id="question" name="question" rows="3"></textarea>
-                    <button type="submit" style="float:right">Send</button>
+                    <button type="submit" style="float:right">Ask</button>
                 </form>
                 @if ($errors->any())
                     <div class="row p-3">
