@@ -29,7 +29,7 @@ class ExecutorService
         if ($fileSize < 4 * 1024) {
             // less than 4kb
             // 60 minutes
-            $time = 60 * 15;
+            $time = 60 * 60;
         } else if ($fileSize < 1024 * 1024) {
             // less than 1 MB
             // 15 minutes
