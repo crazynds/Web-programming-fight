@@ -134,7 +134,7 @@ class ExecutorService
                         $nsjailOut = Storage::disk('nsjail')->get('nsjail_out');
                         if (str_contains($nsjailOut, 'Killing it')) {
                             if (str_contains($nsjailOut, 'run time >= time limit')) {
-                                $exectime = $timeLimit + 1500;
+                                $exectime = $time_limit;
                             }
                         }
                     }
