@@ -55,7 +55,7 @@ class SubmitRunController extends Controller
      */
     public function create(Request $request)
     {
-        /** @var $user */
+        /** @var User $user */
         $user = Auth::user();
 
         if ($this->contestService->inContest) {
@@ -116,7 +116,7 @@ class SubmitRunController extends Controller
                 $run->save();
                 if ($run->language == LanguagesType::name(LanguagesType::Auto_detect)) {
                     $job = AutoDetectLangSubmitRun::dispatch($run)->afterCommit();
-                } else $job = ExecuteSubmitJob::dispatch($run)->afterCommit();
+                } else $job = ExecuteSubmitJob::dispatch($run)->delay(now()->addSeconds(5))->afterCommit();
             }
             if ($this->contestService->started && $this->contestService->inContest) {
                 $run->contest()->associate($this->contestService->contest);
