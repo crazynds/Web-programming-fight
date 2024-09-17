@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Enums\SubmitResult;
 use App\Http\Requests\StoreProblemRequest;
+use App\Models\Contest;
 use App\Models\File;
 use App\Models\Problem;
 use App\Services\ContestService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use ZipArchive;
@@ -40,7 +42,7 @@ class ProblemController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         if ($this->contestService->inContest) {
             $problems = $this->contestService->contest->problems()
@@ -80,7 +82,16 @@ class ProblemController extends Controller
                         $query->where('user_id', $user->id)
                             ->orWhere('visible', true);
                 })
-                ->orderBy('id')->get();
+                ->orderBy('id');
+            if ($request->input('contest')) {
+                /** @var Contest */
+                $contest = Contest::find($request->input('contest'));
+                if ($contest->endTime()->lt(now())) {
+                    $problems->join('contest_problem', 'problems.id', 'contest_problem.problem_id')
+                        ->where('contest_id', $request->input('contest'));
+                }
+            }
+            $problems = $problems->get();
         }
         return view('pages.problem.index', [
             'problems' => $problems,
@@ -103,7 +114,13 @@ class ProblemController extends Controller
         /** @var User $user */
         $user = Auth::user();
         $data = $request->safe([
-            'title', 'author', 'time_limit', 'memory_limit', 'description', 'input_description', 'output_description'
+            'title',
+            'author',
+            'time_limit',
+            'memory_limit',
+            'description',
+            'input_description',
+            'output_description'
         ]);
         if (!$user->isAdmin()) {
             $data['description'] = strip_tags($data['description']);
@@ -165,7 +182,13 @@ class ProblemController extends Controller
         /** @var User $user */
         $user = Auth::user();
         $data = $request->safe([
-            'title', 'author', 'time_limit', 'memory_limit', 'description', 'input_description', 'output_description'
+            'title',
+            'author',
+            'time_limit',
+            'memory_limit',
+            'description',
+            'input_description',
+            'output_description'
         ]);
         if (!$user->isAdmin()) {
             if (isset($data['description']))
@@ -183,9 +206,9 @@ class ProblemController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Problem $problem)
+    public function destroy(Request $request, Problem $problem)
     {
         $problem->delete();
-        return $this->index();
+        return $this->index($request);
     }
 }
