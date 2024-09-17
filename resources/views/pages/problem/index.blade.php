@@ -17,6 +17,9 @@
                     <a style="float:right; margin-right: 5px;" href="{{ route('problem.import') }}">
                         <button>Import +</button>
                     </a>
+                    <a style="float:right; margin-right: 5px;" href="{{ route('problem.import') }}">
+                        <button>Import SBC +</button>
+                    </a>
                 @endif
             @endif
         </div>
@@ -32,7 +35,7 @@
                 <th class="text-center px-2"><b>Accepts</b></th>
                 <th class="text-center px-2"><b>Attempts</b></th>
                 @if (!$contestService->inContest)
-                    <th class="text-center px-2"><b>Writer</b></th>
+                    <th class="text-center px-2"><b>Maintainer</b></th>
                 @endif
                 <th style="text-align: end;" class="px-2"><b>Actions</b></th>
             </tr>
