@@ -1,5 +1,9 @@
 @extends('layouts.boca')
 
+@section('head')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+@endsection
+
 @section('content')
     <div class="row mb-4">
         <div class="col">
@@ -17,7 +21,7 @@
                     <a style="float:right; margin-right: 5px;" href="{{ route('problem.import') }}">
                         <button>Import +</button>
                     </a>
-                    <a style="float:right; margin-right: 5px;" href="{{ route('problem.import') }}">
+                    <a style="float:right; margin-right: 5px;" href="{{ route('problem.import.sbc') }}">
                         <button>Import SBC +</button>
                     </a>
                 @endif
@@ -30,6 +34,7 @@
             <tr>
                 <th class="px-1"><b>#</b></th>
                 <th class="text-center px-2"><b>Title</b></th>
+                <th class="text-center px-2"><b>Rating</b></th>
                 <th class="text-center px-2"><b>Mem</b></th>
                 <th class="text-center px-2"><b>Time</b></th>
                 <th class="text-center px-2"><b>Accepts</b></th>
@@ -56,6 +61,13 @@
                         <a href="{{ route('problem.show', ['problem' => $problem->id]) }}">
                             {{ Str::limit($problem->title, 30) }}
                         </a>
+                    </td>
+                    <td>
+                        <input type="hidden" class="star-rating rating" data-show-clear="false"
+                            data-problem-id="{{ $problem->id }}" data-show-caption="false" data-size="xs"
+                            @if ($problem->my_accepted_submissions == 0) value="{{ $problem->rating / 2.0 }}" data-readonly="true" 
+                            @else
+                            value="{{ (\App\Models\Rating::where('problem_id', $problem->id)->where('user_id', Auth::id())->first()?->value ??$problem->rating) /2.0 }}" @endif>
                     </td>
                     <td class="px-2 text-center">
                         {{ $problem->memory_limit }}MB
@@ -159,4 +171,42 @@
             @endforeach
         </tbody>
     </table>
+@endsection
+
+@section('script')
+    <script>
+        $(document).ready(function() {
+
+            MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+
+            var trackChange = function(element) {
+                console.log(element)
+                var observer = new MutationObserver(function(mutations, observer) {
+                    if (mutations[0].attributeName == "value") {
+                        $(element).trigger("change");
+                    }
+                });
+                observer.observe(element, {
+                    attributes: true
+                });
+            }
+
+            // Hidden input does not trigger change events, so this is needed to trigger it.
+            $(".star-rating").each((idx, el) => trackChange(el));
+
+            $('.star-rating').change(function() {
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('problem.rating.store', ['problem' => -1]) }}".replace('-1',
+                        $(this).data('problem-id')),
+                    data: {
+                        value: parseInt(this.value * 2)
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+            })
+        })
+    </script>
 @endsection

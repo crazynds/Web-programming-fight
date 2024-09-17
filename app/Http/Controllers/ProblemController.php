@@ -7,6 +7,9 @@ use App\Http\Requests\StoreProblemRequest;
 use App\Models\Contest;
 use App\Models\File;
 use App\Models\Problem;
+use App\Models\Rating;
+use App\Models\SubmitRun;
+use App\Models\User;
 use App\Services\ContestService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -158,11 +161,18 @@ class ProblemController extends Controller
                         ->orWhere('public', true);
                 })
                 ->orderBy('id')->get();
-
+        /** @var User */
+        $user = Auth::user();
+        $rating = Rating::find([
+            'user_id' => $user->id,
+            'problem_id' => $problem->id,
+        ]);
         return view('pages.problem.show', [
             'problem' => $problem,
             'testCases' => $problem->testCases()->orderBy('position')->where('public', true)->where('validated', true)->get(),
             'clarifications' => $clarifications ?? null,
+            'rating' => $rating ?? null,
+            'accepted' => $user->submissions()->where('problem_id', $problem->id)->where('result', SubmitResult::Accepted)->exists(),
         ]);
     }
 

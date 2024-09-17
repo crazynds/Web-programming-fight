@@ -20,6 +20,7 @@
         "@types/jquery": "^3.5.27",
         "@vitejs/plugin-vue": "^5.0.4",
         "@yaireo/tagify": "^4.17.9",
+        "bootstrap-star-rating": "^4.1.2",
         "canvas-confetti": "^1.9.2",
         "easymde": "^2.18.0",
         "fine-uploader": "^5.16.2",

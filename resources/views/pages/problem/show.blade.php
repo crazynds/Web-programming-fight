@@ -12,6 +12,8 @@
             }
         }
     </script>
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <script id="MathJax-script" async src="{{ asset('js/mathjax/tex-chtml.js') }}"></script>
 @endsection
 
@@ -28,6 +30,12 @@
                     <div>
                         #{{ $problem->id }}
                     </div>
+                    <div class="vr"></div>
+                    <input type="hidden" class="star-rating rating" data-show-clear="false"
+                        data-problem-id="{{ $problem->id }}" data-show-caption="false" data-size="sm"
+                        @if (!$accepted) value="{{ $problem->rating / 2.0 }}" data-readonly="true" 
+                        @else
+                        value="{{ (\App\Models\Rating::where('problem_id', $problem->id)->where('user_id', Auth::id())->first()?->value ??$problem->rating) /2.0 }}" @endif>
                     <div class="vr"></div>
                     <small>
                         Made by: <strong>{{ $problem->author }}</strong>
@@ -172,5 +180,37 @@
             window.getSelection().addRange(range); // to select text
             document.execCommand("copy");
         }
+        $(document).ready(function() {
+
+            MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+
+            var trackChange = function(element) {
+                var observer = new MutationObserver(function(mutations, observer) {
+                    if (mutations[0].attributeName == "value") {
+                        $(element).trigger("change");
+                    }
+                });
+                observer.observe(element, {
+                    attributes: true
+                });
+            }
+
+            // Hidden input does not trigger change events, so this is needed to trigger it.
+            $(".star-rating").each((idx, el) => trackChange(el));
+
+            $('.star-rating').change(function() {
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('problem.rating.store', ['problem' => -1]) }}".replace('-1',
+                        $(this).data('problem-id')),
+                    data: {
+                        value: parseInt(this.value * 2)
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+            })
+        })
     </script>
 @endsection

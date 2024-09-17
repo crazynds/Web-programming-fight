@@ -25,6 +25,10 @@ class Problem extends Model
     {
         return $this->hasMany(Scorer::class);
     }
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class);
+    }
     public function ranks($category = null)
     {
         if ($category != null) return $this->hasMany(Rank::class)->where('category', $category);

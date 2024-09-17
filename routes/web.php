@@ -5,6 +5,7 @@ use App\Http\Controllers\Contest\ClarificationController;
 use App\Http\Controllers\ContestController;
 use App\Http\Controllers\IOProblemController;
 use App\Http\Controllers\ProblemController;
+use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ScorerController;
 use App\Http\Controllers\SubmitRunController;
 use App\Http\Controllers\TeamController;
@@ -58,13 +59,21 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
     Route::post('/problem/{problem}/testcase/create/manual', [TestCaseController::class, 'storeManual'])
         ->name('problem.testCase.store.manual');
 
+    Route::resource('problem.rating', RatingController::class)
+        ->only('store');
+
+
     Route::resource('problem.scorer', ScorerController::class)
         ->except(['edit', 'update']);
 
     Route::get('/problem_import', [IOProblemController::class, 'import'])
         ->name('problem.import');
+    Route::get('/problem_import/sbc', [IOProblemController::class, 'importSbc'])
+        ->name('problem.import.sbc');
     Route::post('/problem_upload', [IOProblemController::class, 'upload'])
         ->name('problem.upload');
+    Route::post('/problem_upload/sbc', [IOProblemController::class, 'uploadSbc'])
+        ->name('problem.upload.sbc');
 
     Route::controller(TestCaseController::class)
         ->name('problem.')->prefix('problem/{problem}')
