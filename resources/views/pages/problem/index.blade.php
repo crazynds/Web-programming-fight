@@ -34,7 +34,7 @@
             <tr>
                 <th class="px-1"><b>#</b></th>
                 <th class="text-center px-2"><b>Title</b></th>
-                <th class="text-center px-2"><b>Rating</b></th>
+                <th class="text-center px-2"><b>Difficulty</b></th>
                 <th class="text-center px-2"><b>Mem</b></th>
                 <th class="text-center px-2"><b>Time</b></th>
                 <th class="text-center px-2"><b>Accepts</b></th>
