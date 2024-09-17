@@ -4,6 +4,7 @@ use App\Http\Controllers\Contest\ClarificationController;
 use App\Http\Controllers\Contest\CompetitorController;
 use App\Http\Controllers\ContestController;
 use App\Http\Controllers\ProblemController;
+use App\Http\Controllers\RatingController;
 use App\Http\Controllers\SubmitRunController;
 use App\Http\Middleware\AccessOnlyDuringContest;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(AccessOnlyDuringContest::class)->group(function () {
     Route::resource('problem', ProblemController::class)
         ->only(['index', 'show']);
+
+    Route::resource('problem.rating', RatingController::class)
+        ->only('store');
 
     Route::resource('submitRun', SubmitRunController::class)
         ->only(['index', 'store', 'create', 'show']);

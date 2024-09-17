@@ -21,6 +21,14 @@ class IOProblemController extends Controller
         return view('pages.problem.import');
     }
 
+    public function importSbc()
+    {
+        Gate::authorize('import-zip');
+        return view('pages.problem.importSbc');
+    }
+
+    public function uploadSbc(UploadProblemRequest $request) {}
+
     public function upload(UploadProblemRequest $request)
     {
 
