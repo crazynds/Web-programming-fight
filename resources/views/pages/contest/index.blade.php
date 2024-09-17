@@ -103,7 +103,7 @@
                     <td class="px-2">
                         <div class="hstack gap-1">
                             @can('view', $contest)
-                                @if ($contest->start_time->addMinutes($contest->duration)->gt(now()))
+                                @if ($contest->endTime()->gt(now()))
                                     <a href="{{ route('contest.show', ['contest' => $contest->id]) }}"
                                         title="View and enter contest" class="d-flex action-btn">
                                         <i class="las la-door-open"></i>
@@ -112,6 +112,10 @@
                                     <a href="{{ route('contest.show', ['contest' => $contest->id]) }}" title="View contest"
                                         class="d-flex action-btn">
                                         <i class="las la-search"></i>
+                                    </a>
+                                    <a href="{{ route('problem.index') . '?contest=' . $contest->id }}"
+                                        title="View contest problems" class="d-flex action-btn">
+                                        <i class="las la-list-ul"></i>
                                     </a>
                                 @endif
                                 @if ($contest->start_time->lt(now()))
