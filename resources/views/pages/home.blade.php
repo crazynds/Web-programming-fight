@@ -77,6 +77,7 @@
                         Styles 🎨
                     <ul>
                         <li>Now we have stars in each problem ✨</li>
+                        <li>Images in problems description are now horizontally centered</li>
                         <li></li>
                     </ul>
                     </p>
