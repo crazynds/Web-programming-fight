@@ -202,36 +202,44 @@ class TestCaseController extends Controller
         DB::beginTransaction();
         $data = $request->safe()->all();
 
+        $comparator = fn($s1, $s2) => str_replace("\r\n", "\n", trim($s1)) == str_replace("\r\n", "\n", trim($s2));
+
         $filesToDelete = [];
-
-        $inputFile = File::createFileByData($data['input'], "problems/{$problem->id}/input");
-        $outputFile = File::createFileByData($data['output'], "problems/{$problem->id}/output");
-
-
         $t = $problem->testCases()->where('name', $data['name'])->first();
+        $changed = !$t;
+
+        if (!$t || !$comparator($t->inputfile->get(), $data['input'])) {
+            $inputFile = File::createFileByData($data['input'], "problems/{$problem->id}/input");
+            $filesToDelete[] = $t->input_file;
+            $changed = true;
+        } else {
+            $inputFile = $t->inputfile;
+        }
+        if (!$t || !$comparator($t->outputfile->get(), $data['output'])) {
+            $outputFile = File::createFileByData($data['output'], "problems/{$problem->id}/output");
+            $filesToDelete[] = $t->output_file;
+            $changed = true;
+        } else {
+            $outputFile = $t->outputfile;
+        }
+
         $testCase = $problem->testCases()->updateOrCreate([
             'name' => $data['name'],
         ], [
             'type' => TestCaseType::FileDiff,
             'input_file' => $inputFile->id,
             'output_file' => $outputFile->id,
-            'validated' => false,
-            'position' => $problem->testCases()->count() + 1,
+            'explanation' => $data['explanation'] ?? $t->explanation ?? null,
+            'validated' => $changed ? false : $t->validated,
+            'position' => $t ? $t->position : $problem->testCases()->count() + 1,
         ]);
 
         if ($t) {
-            $testCase->position = $t->position;
-            $filesToDelete[] = $t->input_file;
-            $filesToDelete[] = $t->output_file;
-
-            // Clear test who ran in this testcase 
-            $testCase->validated = false;
             $testCase->submitRuns()->sync([]);
-            $testCase->save();
-
             Cache::forget('file:input_' . $testCase->id);
             Cache::forget('file:output_' . $testCase->id);
         }
+
         foreach (File::whereIn('id', $filesToDelete)->lazy() as $file) {
             $file->delete();
         }

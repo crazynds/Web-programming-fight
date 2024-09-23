@@ -23,10 +23,19 @@
         @csrf
 
         <div class="row">
-            <div class="col">
-                <label for="name" class="form-label">Title: </label><br />
-                <input type="text" class="form-control" id="name" name="name"
-                    value="{{ old('name', $testCase->name) }}" />
+            <div class="col-6">
+                @if (!$testCase->name)
+                    <label for="name" class="form-label">Title: </label><br />
+                    <input type="text" class="form-control" id="name" name="name"
+                        value="{{ old('name', $testCase->name) }}" />
+                @else
+                    <input type="hidden" class="form-control" id="name" name="name"
+                        value="{{ old('name', $testCase->name) }}" />
+                @endif
+            </div>
+            <div class="col-6">
+                <label for="explanation" class="form-label">Explanation: </label><br />
+                <textarea name="explanation" id="explanation" rows="8" style="width: 100%">{{ old('explanation', $testCase->explanation) }}</textarea>
             </div>
         </div>
 

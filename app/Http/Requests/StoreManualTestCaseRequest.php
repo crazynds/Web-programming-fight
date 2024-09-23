@@ -25,6 +25,7 @@ class StoreManualTestCaseRequest extends FormRequest
             'name' => 'required|string|max:30',
             'input' => 'required|string|max:64000',
             'output' => 'required|string|max:64000',
+            'explanation' => 'sometimes|string|max:1024',
         ];
     }
 }

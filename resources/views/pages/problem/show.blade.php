@@ -30,12 +30,14 @@
                     <div>
                         #{{ $problem->id }}
                     </div>
-                    <div class="vr"></div>
-                    <input type="hidden" class="star-rating rating" data-show-clear="false"
-                        data-problem-id="{{ $problem->id }}" data-show-caption="false" data-size="sm"
-                        @if (!$accepted) value="{{ $problem->rating / 2.0 }}" data-readonly="true" 
+                    @if (!$contestService->inContest)
+                        <div class="vr"></div>
+                        <input type="hidden" class="star-rating rating" data-show-clear="false"
+                            data-problem-id="{{ $problem->id }}" data-show-caption="false" data-size="sm"
+                            @if (!$accepted) value="{{ $problem->rating / 2.0 }}" data-readonly="true" 
                         @else
                         value="{{ (\App\Models\Rating::where('problem_id', $problem->id)->where('user_id', Auth::id())->first()?->value ??$problem->rating) /2.0 }}" @endif>
+                    @endif
                     <div class="vr"></div>
                     <small>
                         Made by: <strong>{{ $problem->author }}</strong>
@@ -94,7 +96,7 @@
                 </div>
 
                 @foreach ($testCases as $testCase)
-                    <div class="row justify-content-center py-2">
+                    <div class="row justify-content-center pt-3">
                         <div class="col-4 px-1 mx-2"
                             style="background: #efefef;border: 1px gray solid; min-height: 60px; position: relative">
                             <button style="position: absolute; top: 5px; right: 5px"
@@ -108,6 +110,19 @@
                             <pre style="margin:0" id="output{{ $testCase->id }}">{{ $testCase->outputFile->get() }}</pre>
                         </div>
                     </div>
+                    @if ($testCase->explanation)
+                        <div class="row justify-content-center py-2">
+                            <p class="col-9" style="font-size: 0.75em">
+                                <b>
+                                    Explanation {{ $loop->index + 1 }}:
+                                </b>
+                                <br>
+                                <i class="mathjax">
+                                    {{ $testCase->explanation }}
+                                </i>
+                            </p>
+                        </div>
+                    @endif
                     <hr style="max-width: 70%; margin: auto">
                 @endforeach
             @endif
