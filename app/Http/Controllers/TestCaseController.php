@@ -229,7 +229,7 @@ class TestCaseController extends Controller
             'type' => TestCaseType::FileDiff,
             'input_file' => $inputFile->id,
             'output_file' => $outputFile->id,
-            'explanation' => $data['explanation'] ?? $t->explanation ?? null,
+            'explanation' => $data['explanation'] ?? null,
             'validated' => $changed ? false : $t->validated,
             'position' => $t ? $t->position : $problem->testCases()->count() + 1,
         ]);
