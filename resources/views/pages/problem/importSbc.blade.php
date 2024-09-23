@@ -17,7 +17,7 @@
         </div>
     </div>
 
-    <form id="{{ getFormId() }}" enctype="multipart/form-data" method="post" action="{{ route('problem.upload') }}">
+    <form id="{{ getFormId() }}" enctype="multipart/form-data" method="post" action="{{ route('problem.upload.sbc') }}">
         @csrf
 
         <div class="row">

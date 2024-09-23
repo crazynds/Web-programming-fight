@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UploadProblemRequest;
+use App\Http\Requests\UploadSBCProblemsRequest;
+use App\Jobs\PrepareSBCProblemsJob;
 use App\Models\File;
 use App\Models\Problem;
 use Illuminate\Http\UploadedFile;
@@ -27,7 +29,16 @@ class IOProblemController extends Controller
         return view('pages.problem.importSbc');
     }
 
-    public function uploadSbc(UploadProblemRequest $request) {}
+    public function uploadSbc(UploadSBCProblemsRequest $request)
+    {
+        /** @var UploadedFile $file */
+        $file = $request->file('file');
+
+        $inputFile = File::createFile($file, 'problems/sbc', true);
+        PrepareSBCProblemsJob::dispatch($inputFile, Auth::user(), $request->input('event', 'Maratona SBC'));
+
+        return redirect()->back();
+    }
 
     public function upload(UploadProblemRequest $request)
     {

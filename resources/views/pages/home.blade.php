@@ -49,6 +49,50 @@
             <div class="row">
                 <div class="col-8">
                     <h3>
+                        v1.0.2 - Default Update!
+                    </h3>
+                    <p>
+                        Date: XX-XX-2024
+                        By: Crazynds
+                    </p>
+                    <p>
+                        Features ✨
+                    <ul>
+                        <li>Added difficulty in all problems.</li>
+                        <li>If you get AC on a problem, you can rate how difficult it is.</li>
+                        <li>Added option to import SBC maraton problems.</li>
+                        <li>Added diff program to test differents outcomes.</li>
+                        <li>Added tags to problems, even if you don't see them.</li>
+                        <li></li>
+                    </ul>
+                    </p>
+                    <p>
+                        Changes ⚙️
+                    <ul>
+                        <li></li>
+                        <li></li>
+                    </ul>
+                    </p>
+                    <p>
+                        Styles 🎨
+                    <ul>
+                        <li>Now we have stars in each problem ✨</li>
+                        <li></li>
+                    </ul>
+                    </p>
+
+                    <p>
+                        Fixes 🐛
+                    <ul>
+                        <li>Fix a bug when you try to add a new test case you get a error 500 page.</li>
+                    </ul>
+                    </p>
+                </div>
+            </div>
+            <hr style="margin-top: 120px" />
+            <div class="row">
+                <div class="col-8">
+                    <h3>
                         v1.0.1 - The Big Challenge! ⚔️💥🗡️🏆
                     </h3>
                     <p>

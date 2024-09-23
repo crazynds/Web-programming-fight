@@ -7,6 +7,10 @@
             <b>
                 Test Cases:
             </b>
+
+            <a style="margin-right: 5px;" href="{{ route('problem.testCase.index', ['problem' => $problem->id]) }}">
+                <button>New Tester +</button>
+            </a>
         </div>
         <div class="col" style="text-align:center;">
             <h1>
@@ -15,7 +19,8 @@
         </div>
         <div class="col">
             @can('update', $problem)
-                <a style="float:right" href="{{ route('problem.testCase.create.manual', ['problem' => $problem->id]) }}">
+                <a style="float:right; margin-right: 5px;"
+                    href="{{ route('problem.testCase.create.manual', ['problem' => $problem->id]) }}">
                     <button>New +</button>
                 </a>
                 <a style="float:right; margin-right: 5px;"

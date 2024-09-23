@@ -12,7 +12,10 @@ class Problem extends Model
     use SoftDeletes;
     public $guarded = [];
 
-
+    public function tags()
+    {
+        return $this->belongsToMany(Problem::class, 'problem_tag', 'problem_id', 'tag_id');
+    }
     public function testCases()
     {
         return $this->hasMany(TestCase::class);

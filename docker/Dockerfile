@@ -79,6 +79,7 @@ RUN apt-get install -y \
     pkg-config \
     protobuf-compiler \
     python3.11 python3-pip \
+    poppler-utils \
     && apt-get -y autoremove \
     && apt-get clean 
 

@@ -81,6 +81,8 @@ services:
       FUNCTION: "worker"
     networks:
       - app_network
+    tmpfs:
+      - "/var/work"
     volumes_from:
       - scheduler
     depends_on:
