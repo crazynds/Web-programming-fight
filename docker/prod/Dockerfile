@@ -64,7 +64,7 @@ RUN chmod +x /var/nsjail/runPython3.11.sh
 
 
 # Add php additional extensions 
-RUN install-php-extensions redis pdo_mysql pdo_pgsql mbstring exif pcntl curl zip intl sockets xml
+RUN install-php-extensions redis pdo_mysql pdo_pgsql mbstring exif pcntl curl zip intl sockets xml gd
 
 # Install Composer
 RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer 
