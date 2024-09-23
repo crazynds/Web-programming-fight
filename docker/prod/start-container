@@ -6,13 +6,10 @@ echo "== Starting application =="
 # Startup default
 printf "\nPULSE_SERVER_NAME=$FUNCTION\n" >> .env
 
+php artisan storage:link
 
 echo "== Configuring cache =="
 php artisan clear-compiled
-php artisan config:cache
-php artisan event:cache
-php artisan route:cache
-php artisan view:cache
 php artisan optimize 
 
 echo "== Starting my job as $FUNCTION =="

@@ -21,6 +21,9 @@ echo '!Migrating!'
 
 php artisan migrate
 
+echo '!Storage Link!'
+
+php artisan storage:link
 
 echo '!Starting container!'
 
