@@ -12,6 +12,13 @@
             }
         }
     </script>
+    <style>
+        .content img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script id="MathJax-script" async src="{{ asset('js/mathjax/tex-chtml.js') }}"></script>
@@ -60,7 +67,7 @@
                 </div>
             </div>
             <hr />
-            <div class="row mathjax">
+            <div class="row mathjax content">
                 <div clas="col">
 
                     {{ Illuminate\Mail\Markdown::parse($problem->description) }}
@@ -69,7 +76,7 @@
             <div class="row mt-2">
                 <h2><strong>Input</strong></h2>
             </div>
-            <div class="row mathjax">
+            <div class="row mathjax content">
                 <div clas="col">
 
                     {{ Illuminate\Mail\Markdown::parse($problem->input_description) }}
@@ -78,7 +85,7 @@
             <div class="row mt-2">
                 <h2><strong>Output</strong></h2>
             </div>
-            <div class="row mathjax">
+            <div class="row mathjax content">
                 <div clas="col">
 
                     {{ Illuminate\Mail\Markdown::parse($problem->output_description) }}
