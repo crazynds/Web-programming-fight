@@ -69,7 +69,7 @@
                     <p>
                         Changes ⚙️
                     <ul>
-                        <li></li>
+                        <li>Now when you edit a test case you cannot change its name unless you know our tricks... 👀</li>
                         <li></li>
                     </ul>
                     </p>
@@ -85,6 +85,7 @@
                         Fixes 🐛
                     <ul>
                         <li>Fix a bug when you try to add a new test case you get a error 500 page.</li>
+                        <li>Fix a bug to show preview of image in file manager.</li>
                     </ul>
                     </p>
                 </div>
