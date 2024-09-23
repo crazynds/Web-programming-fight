@@ -34,7 +34,9 @@
             <tr>
                 <th class="px-1"><b>#</b></th>
                 <th class="text-center px-2"><b>Title</b></th>
-                <th class="text-center px-2"><b>Difficulty</b></th>
+                @if (!$contestService->inContest)
+                    <th class="text-center px-2"><b>Difficulty</b></th>
+                @endif
                 <th class="text-center px-2"><b>Mem</b></th>
                 <th class="text-center px-2"><b>Time</b></th>
                 <th class="text-center px-2"><b>Accepts</b></th>
@@ -62,13 +64,15 @@
                             {{ Str::limit($problem->title, 30) }}
                         </a>
                     </td>
-                    <td>
-                        <input type="hidden" class="star-rating rating" data-show-clear="false"
-                            data-problem-id="{{ $problem->id }}" data-show-caption="false" data-size="xs"
-                            @if ($problem->my_accepted_submissions == 0) value="{{ $problem->rating / 2.0 }}" data-readonly="true" 
+                    @if (!$contestService->inContest)
+                        <td>
+                            <input type="hidden" class="star-rating rating" data-show-clear="false"
+                                data-problem-id="{{ $problem->id }}" data-show-caption="false" data-size="xs"
+                                @if ($problem->my_accepted_submissions == 0) value="{{ $problem->rating / 2.0 }}" data-readonly="true" 
                             @else
                             value="{{ (\App\Models\Rating::where('problem_id', $problem->id)->where('user_id', Auth::id())->first()?->value ??$problem->rating) /2.0 }}" @endif>
-                    </td>
+                        </td>
+                    @endif
                     <td class="px-2 text-center">
                         {{ $problem->memory_limit }}MB
                     </td>
