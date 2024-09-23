@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\LanguagesType;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +12,14 @@ class Problem extends Model
 {
     use SoftDeletes;
     public $guarded = [];
+
+
+    protected function diffProgramLanguage(): Attribute
+    {
+        return Attribute::make(
+            get: fn(string|null $value) => is_null($value) ? null : LanguagesType::name(intval($value)),
+        );
+    }
 
     public function tags()
     {
@@ -40,5 +49,9 @@ class Problem extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    public function diffProgram()
+    {
+        return $this->belongsTo(File::class, 'diff_program_id');
     }
 }

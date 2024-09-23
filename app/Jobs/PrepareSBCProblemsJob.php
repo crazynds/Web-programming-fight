@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Enums\LanguagesType;
 use App\Enums\TagTypeEnum;
 use App\Enums\TestCaseType;
 use App\Models\File;
@@ -46,7 +47,7 @@ class PrepareSBCProblemsJob implements ShouldQueue
         $letter = $problemInfo['basename'];
         $data = $zp->getFromName('description/' . $problemInfo['descfile']);
         if (str_ends_with($problemInfo['descfile'], '.pdf')) {
-            Storage::disk('nsjail')->put('sbc.pdf', $data);
+            Storage::disk('work')->put('sbc.pdf', $data);
             $text = Pdf::getText('/var/work/sbc.pdf', options: [
                 'x 0',
                 'y 50',
@@ -81,6 +82,24 @@ class PrepareSBCProblemsJob implements ShouldQueue
             'memory_limit' => $memorylimit
         ]);
 
+        // Pegar os testes cases
+        $num = 0;
+        while ($inputTestCase = $zp->getFromName('input/' . $letter . '_' . ++$num)) {
+            $file = $letter . '_' . $num;
+            $outputTestCase = $zp->getFromName('output/' . $file);
+            $inputFile = File::createFileByData($inputTestCase, "problems/{$problem->id}/input");
+            $outputFile = File::createFileByData($outputTestCase, "problems/{$problem->id}/output");
+            $problem->testCases()->create([
+                'name' => $file,
+                'type' => TestCaseType::FileDiff,
+                'input_file' => $inputFile->id,
+                'output_file' => $outputFile->id,
+                'validated' => true,
+                'public' => $num <= 2, // Show only the first 2 test cases
+                'position' => $problem->testCases()->count() + 1,
+            ]);
+        }
+        // Vincular as tags
         $problem->tags()->attach(Tag::firstOrCreate(
             ['name' => 'Imported'],
             ['type' => TagTypeEnum::Others]
@@ -98,25 +117,13 @@ class PrepareSBCProblemsJob implements ShouldQueue
             ['type' => TagTypeEnum::Event]
         ));
 
-        // Pegar os testes cases
-        $num = 1;
-        while ($inputTestCase = $zp->getFromName('input/' . $letter . '_' . $num)) {
-            $file = $letter . '_' . $num++;
-            $outputTestCase = $zp->getFromName('output/' . $file);
-            $inputFile = File::createFileByData($inputTestCase, "problems/{$problem->id}/input");
-            $outputFile = File::createFileByData($outputTestCase, "problems/{$problem->id}/output");
-            $problem->testCases()->create([
-                'name' => $file,
-                'type' => TestCaseType::FileDiff,
-                'input_file' => $inputFile->id,
-                'output_file' => $outputFile->id,
-                'validated' => true,
-                'position' => $problem->testCases()->count() + 1,
-            ]);
-        }
-        // Vincular as tags
-
         // Pegar programa comparador
+        if ($data = $zp->getFromName('compare/cpp')) {
+            $file = File::createFileByData($data, "problems/{$problem->id}/diff", preventCompact: true);
+            $problem->diffProgram()->associate($file);
+            $problem->diff_program_language = LanguagesType::BINARY;
+            $problem->save();
+        }
     }
 
     /**
@@ -124,17 +131,18 @@ class PrepareSBCProblemsJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Storage::disk('nsjail')->put('sbc.tar', $this->zip->readStream());
+        Storage::disk('work')->put('sbc.tar', $this->zip->readStream());
         $phar = new PharData('/var/work/sbc.tar');
         exec('rm -rf /var/work/sbc'); // Force to delete old dir
         $phar->extractTo('/var/work/sbc'); // extract all files
-        foreach (Storage::disk('nsjail')->allFiles('sbc/packages_contest') as $file) {
+        foreach (Storage::disk('work')->allFiles('sbc/packages_contest') as $file) {
             if (str_ends_with($file, '.zip')) {
                 try {
                     DB::transaction(function () use ($file) {
                         $this->adicionaProblema($file);
                     });
                 } catch (Exception $e) {
+                    throw $e;
                 }
             }
         }

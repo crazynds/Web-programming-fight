@@ -16,6 +16,8 @@ final class LanguagesType extends Enum
     const Python3_11 = 2;
     const C = 4;
 
+    const BINARY = 99;
+
 
     public static function list()
     {
@@ -43,6 +45,7 @@ final class LanguagesType extends Enum
 
     public static function name(int $langCode)
     {
+        if ($langCode == 99) return 'BINARY';
         foreach (self::list() as $key => $code) {
             if ($code == $langCode)
                 return $key;
@@ -60,6 +63,11 @@ final class LanguagesType extends Enum
                 return [
                     File::defaults()
                         ->max('1mb'), // 1 MB
+                ];
+            case self::BINARY:
+                return [
+                    File::defaults()
+                        ->max('0mb'), // 0 MB   - Prevent upload of binary file
                 ];
         }
         return [];

@@ -34,7 +34,7 @@ class AutoDetectLangSubmitRun implements ShouldQueue
     {
         $this->submitRun->status = SubmitStatus::DetectingLang;
         $this->submitRun->save();
-        Storage::disk('nsjail')->writeStream('0.code', $this->submitRun->file->readStream());
+        Storage::disk('work')->writeStream('0.code', $this->submitRun->file->readStream());
         $comand = "python3 /var/scripts/autolang.py < /var/work/0.code";
         exec($comand, $output, $retval);
         switch ($output[0]) {

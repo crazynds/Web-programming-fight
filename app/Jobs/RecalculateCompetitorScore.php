@@ -23,7 +23,8 @@ class RecalculateCompetitorScore implements ShouldQueue
         SubmitResult::Error,
         SubmitResult::FileTooLarge,
         SubmitResult::InvalidUtf8File,
-        SubmitResult::LanguageNotSupported
+        SubmitResult::LanguageNotSupported,
+        SubmitResult::InternalCompilationError
     ];
 
     /**
