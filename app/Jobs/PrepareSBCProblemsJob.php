@@ -135,7 +135,7 @@ class PrepareSBCProblemsJob implements ShouldQueue
         $phar = new PharData('/var/work/sbc.tar');
         exec('rm -rf /var/work/sbc'); // Force to delete old dir
         $phar->extractTo('/var/work/sbc'); // extract all files
-        foreach (Storage::disk('work')->allFiles('sbc/packages_contest') as $file) {
+        foreach (Storage::disk('work')->allFiles('sbc') as $file) {
             if (str_ends_with($file, '.zip')) {
                 try {
                     DB::transaction(function () use ($file) {
