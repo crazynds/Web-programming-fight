@@ -30,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
             if (config('app.env') === 'production' && $query->time < 50) {
                 return;
             }
-            if (!str_contains($query->sql, 'select * from `jobs`'))
+            if (!str_contains($query->sql, '`jobs`' && !str_contains($query->sql, '`pulse_values`')))
                 Log::channel('database')->info(
                     sprintf('%6.2fms -- %s', $query->time, $query->sql),
                     $query->bindings
