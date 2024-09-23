@@ -23,4 +23,5 @@ final class SubmitResult extends Enum
     const InvalidUtf8File = 9;
     const LanguageNotSupported = 10;
     const NoTestCase = 11;
+    const InternalCompilationError = 12;
 }

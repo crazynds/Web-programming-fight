@@ -147,7 +147,7 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
         $this->submit->execution_memory = null;
         $this->submit->execution_time = null;
         $this->submit->save();
-        $result = $executor->buildProgram($file, $this->submit->language);
+        $result = $executor->setup($this->submit->problem, $file, $this->submit->language);
         $this->submit->result = $result;
         if ($result == SubmitResult::NoResult)
             $this->executeAllTestCases($executor);

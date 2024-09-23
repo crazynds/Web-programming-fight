@@ -25,9 +25,7 @@ class ProblemObserver
     /**
      * Handle the Problem "deleted" event.
      */
-    public function deleting(Problem $problem): void
-    {
-    }
+    public function deleting(Problem $problem): void {}
 
     /**
      * Handle the Problem "restored" event.
@@ -50,6 +48,9 @@ class ProblemObserver
         }
         foreach ($problem->scores()->lazy() as $scorer) {
             $scorer->delete();
+        }
+        if ($problem->diffProgram) {
+            $problem->diffProgram->delete();
         }
     }
 }

@@ -36,11 +36,18 @@ return [
             'throw' => false,
         ],
 
-        'nsjail' => [
+        'work' => [
             'driver' => 'local',
             'root' => '/var/work',
             'throw' => false,
         ],
+
+        'nsjail' => [
+            'driver' => 'local',
+            'root' => '/var/nsjail',
+            'throw' => false,
+        ],
+
 
         'public' => [
             'driver' => 'local',
