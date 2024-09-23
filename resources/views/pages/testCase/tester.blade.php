@@ -19,25 +19,22 @@
     </div>
 
     <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data"
-        action="{{ route('problem.testCase.store.manual', ['problem' => $problem->id]) }}">
+        action="{{ route('problem.testCase.store', ['problem' => $problem->id]) }}">
         @csrf
 
         <div class="row">
-            <div class="col">
-                <label for="name" class="form-label">Title: </label><br />
-                <input type="text" class="form-control" id="name" name="name"
-                    value="{{ old('name', $testCase->name) }}" />
-            </div>
-        </div>
-
-        <div class="row">
             <div class="col-6">
-                <label for="name" class="form-label">Input: </label><br />
-                <textarea name="input" id="input" rows="20" style="width: 100%">{{ old('input', $testCase->inputFile?->get()) }}</textarea>
+                <h3>
+                    Arquivos de input
+                </h3>
+                <input type="file" id="files1" name="code" style="max-width:100%" />
             </div>
             <div class="col-6">
-                <label for="name" class="form-label">Output: </label><br />
-                <textarea name="output" id="output" rows="20" style="width: 100%">{{ old('output', $testCase->outputFile?->get()) }}</textarea>
+                <h3>
+                    Arquivos de output
+                </h3>
+                <input type="file" id="files2" name="outputs[]" style="max-width:100%" multiple="multiple" />
+                <ul class="list-group output-preview m-4"></ul>
             </div>
         </div>
 
@@ -55,6 +52,9 @@
 
         <div class="row">
             <strong>
+                *Each input file need an output file with the same name to create a test case.
+            </strong>
+            <strong>
                 *Test cases with the same name as an existent text case will be replace the old one.
             </strong>
         </div>
@@ -65,7 +65,4 @@
             ]) !!}
         </p>
     </form>
-@endsection
-
-@section('script')
 @endsection

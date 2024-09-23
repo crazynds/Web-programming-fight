@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:1.1-php8.3 AS php_base
+FROM dunglas/frankenphp:1.2-php8.3 AS php_base
 
 LABEL maintainer="Crazynds"
 
@@ -25,6 +25,7 @@ RUN apt-get update && \
     make \
     pkg-config \
     protobuf-compiler \
+    poppler-utils \
     python3.11 python3-pip
 
 RUN mkdir /langs
