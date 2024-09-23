@@ -63,7 +63,7 @@
                         <li>Added option to import SBC maraton problems.</li>
                         <li>Added diff program to test differents outcomes.</li>
                         <li>Added tags to problems, even if you don't see them.</li>
-                        <li></li>
+                        <li>Added ability to add an explanation for each test case.</li>
                     </ul>
                     </p>
                     <p>
