@@ -103,7 +103,7 @@
                 </div>
 
                 @foreach ($testCases as $testCase)
-                    <div class="row justify-content-center pt-3">
+                    <div class="row justify-content-center pt-2">
                         <div class="col-4 px-1 mx-2"
                             style="background: #efefef;border: 1px gray solid; min-height: 60px; position: relative">
                             <button style="position: absolute; top: 5px; right: 5px"
@@ -130,7 +130,7 @@
                             </p>
                         </div>
                     @endif
-                    <hr style="max-width: 70%; margin: auto">
+                    <hr style="max-width: 70%; margin-left: auto; margin-right: auto;" class="mt-2">
                 @endforeach
             @endif
         </div>
