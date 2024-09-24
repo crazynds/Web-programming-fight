@@ -130,7 +130,7 @@
                             </p>
                         </div>
                     @endif
-                    <hr style="max-width: 70%; margin-left: auto; margin-right: auto;" class="mt-2">
+                    <hr style="max-width: 70%; margin-left: auto; margin-right: auto;" class="mt-1">
                 @endforeach
             @endif
         </div>
