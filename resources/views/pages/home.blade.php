@@ -70,7 +70,7 @@
                         Changes ⚙️
                     <ul>
                         <li>Now when you edit a test case you cannot change its name unless you know our tricks... 👀</li>
-                        <li></li>
+                        <li>Standardized execution within NSJail.</li>
                     </ul>
                     </p>
                     <p>

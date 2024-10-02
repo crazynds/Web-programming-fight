@@ -122,6 +122,7 @@ class ExecutorService
 
 
             exec("chmod 0644 /var/work/problems -R"); // Give access to problem input/output folder
+            exec("chmod 0777 /var/work/problems"); // Give access to problem input/output folder
             exec("cp /var/work/diff_exec /var/nsjail/exec 2>&1 > /dev/null");   // Copy program to correct place
             $this->output = [];
             exec($command, $this->output, $this->retval); // Execute
