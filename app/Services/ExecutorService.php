@@ -50,7 +50,7 @@ class ExecutorService
             case "C++":
             case "C":
             case "BINARY":
-                return '--conf /var/nsjail/basic.conf';
+                return '--conf /var/nsjail/basic.conf -R /var/nsjail/runBinary.sh --exec_file /var/nsjail/runBinary.sh';
             case "PyPy3.10":
                 return '--conf /var/nsjail/python.conf -R /var/nsjail/runPypy3.10.sh --exec_file /var/nsjail/runPypy3.10.sh';
             case "Python3.11":
@@ -114,15 +114,17 @@ class ExecutorService
         } else {
             // Limit to 1 Mbytes
             $limitOutput = 1024 * 1024;
-            // TODO: Fazer isso utilizar o .conf ao invez dessa gambiarra q so funciona com binario
-            $command = "command time -v --output=/var/work/time -p nsjail -R /var/work/user_output -R /var/work/problems/input -R /var/work/problems/output -R /var/nsjail/exec \
-                --log /dev/null --max_cpus 1 --time_limit=4 --rlimit_as=1024 \
-                -- /var/nsjail/exec /var/work/user_output /var/work/problems/output /var/work/problems/input 2>&1 \
-                | head -c " . $limitOutput;
+            $command = 'command time -v --output=/var/work/time -p nsjail ' . $this->diffConfig
+                . ' --max_cpus 1 --log /var/work/nsjail_out --time_limit=4 --rlimit_as=1024'
+                . ' -R /var/nsjail/runBinary.sh -R /var/work/problems -R /var/work/user_output'
+                . ' diff /var/work/user_output /var/work/problems/output /var/work/problems/input'
+                . ' 2>&1 | head -c ' . $limitOutput;
 
+
+            exec("chmod 0644 /var/work/problems -R"); // Give access to problem input/output folder
             exec("cp /var/work/diff_exec /var/nsjail/exec 2>&1 > /dev/null");   // Copy program to correct place
             $this->output = [];
-            exec($command, $this->output, $this->retval);
+            exec($command, $this->output, $this->retval); // Execute
             foreach (explode(PHP_EOL, Storage::disk('work')->get('time')) as $line) {
                 $arr = explode(': ', trim($line));
                 switch ($arr[0]) {
