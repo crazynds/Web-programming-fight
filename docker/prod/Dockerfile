@@ -61,6 +61,7 @@ RUN chmod 0777 /var/nsjail
 COPY ./docker/config/ /var/nsjail/
 RUN chmod +x /var/nsjail/runPypy3.10.sh
 RUN chmod +x /var/nsjail/runPython3.11.sh
+RUN chmod +x /var/nsjail/runBinary.sh
 
 
 # Add php additional extensions 
