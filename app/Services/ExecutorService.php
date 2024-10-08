@@ -47,17 +47,16 @@ class ExecutorService
     private function getConfig($language)
     {
         switch ($language) {
-            case "C++":
-            case "C":
-            case "BINARY":
-                return '--conf /var/nsjail/basic.conf -R /var/nsjail/runBinary.sh --exec_file /var/nsjail/runBinary.sh';
             case "PyPy3.10":
                 return '--conf /var/nsjail/python.conf -R /var/nsjail/runPypy3.10.sh --exec_file /var/nsjail/runPypy3.10.sh';
             case "Python3.11":
                 return '--conf /var/nsjail/python.conf -R /var/nsjail/runPython3.11.sh --exec_file /var/nsjail/runPython3.11.sh';
+            case "C++":
+            case "C":
+            case "BINARY":
             default:
                 // USE C++
-                return '--conf /var/nsjail/basic.conf';
+                return '--conf /var/nsjail/basic.conf -R /var/nsjail/runBinary.sh --exec_file /var/nsjail/runBinary.sh';
         }
     }
 
