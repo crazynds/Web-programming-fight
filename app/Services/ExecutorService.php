@@ -232,10 +232,8 @@ class ExecutorService
                     $this->retval = intval($arr[1]);
                     if ($this->retval != 0) {
                         $nsjailOut = Storage::disk('work')->get('nsjail_out');
-                        if (str_contains($nsjailOut, 'Killing it')) {
-                            if (str_contains($nsjailOut, 'run time >= time limit')) {
-                                $exectime = $time_limit;
-                            }
+                        if (str_contains($nsjailOut, 'Killing it') && str_contains($nsjailOut, 'run time >= time limit')) {
+                            $exectime = $time_limit * 1000;
                         }
                     }
                     break;
