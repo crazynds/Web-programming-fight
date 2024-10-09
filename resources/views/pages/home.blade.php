@@ -81,12 +81,15 @@
                         <li></li>
                     </ul>
                     </p>
-
                     <p>
                         Fixes 🐛
                     <ul>
-                        <li>Fix a bug when you try to add a new test case you get a error 500 page.</li>
-                        <li>Fix a bug to show preview of image in file manager.</li>
+                        <li>Fixed a bug when you try to add a new test case you get a error 500 page.</li>
+                        <li>Fixed a bug to show preview of image in file manager.</li>
+                        <li>Fixed a bug when a submission get stuck in some loop resulting in a 'runtime error' instead of 'time
+                            limit'.</li>
+                        <li>Fixed a bug that stuck any submission in 'C', resulting in a 'runtime error'.</li>
+                        <li></li>
                     </ul>
                     </p>
                 </div>
@@ -141,6 +144,7 @@
                         <li>Now the server won't save the file if it's not a valid text file.</li>
                         <li>Fixed a bug when you couldn't download or see a old code.</li>
                         <li>Fixed a bug when you couldn't see why compilation error happens.</li>
+                        <li></li>
                     </ul>
                     </p>
                 </div>
