@@ -144,7 +144,6 @@
                         <li>Now the server won't save the file if it's not a valid text file.</li>
                         <li>Fixed a bug when you couldn't download or see a old code.</li>
                         <li>Fixed a bug when you couldn't see why compilation error happens.</li>
-                        <li></li>
                     </ul>
                     </p>
                 </div>
