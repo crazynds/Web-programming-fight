@@ -50,30 +50,32 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
             $this->submit->execution_memory = max($this->submit->execution_memory ?? 0, $executor->execution_memory);
         }
         if ($executor->execution_time > $timeLimit) {
-            $this->submit->execution_time = $timeLimit + 0.1;
+            if ($testCase->validated)
+                $this->submit->execution_time = $timeLimit + 0.1;
             return SubmitResult::TimeLimit;
         }
         if ($executor->execution_memory > $memoryLimit) {
-            $this->submit->execution_memory = $memoryLimit + 0.1;
+            if ($testCase->validated)
+                $this->submit->execution_memory = $memoryLimit + 0.1;
             return SubmitResult::MemoryLimit;
         }
         if ($executor->retval != 0) {
             // TODO: Um RuntimeError pode ser causado por memory limit, mas não tem como saber nesses casos
             // Buscar solução alternativa
             // Por enquanto funciona em python ok.
-            $this->submit->output = $executor->output;
+            if ($testCase->validated)
+                $this->submit->output = $executor->output;
             return SubmitResult::RuntimeError;
         } else {
 
             $executor->testOutputFile($testCase);
 
             if ($executor->retval != 0) {
-                $this->submit->output = 'Test case: ' . $testCase->name . "\n" . implode(PHP_EOL, $executor->output);
+                if ($testCase->validated)
+                    $this->submit->output = 'Test case: ' . $testCase->name . "\n" . implode(PHP_EOL, $executor->output);
                 return SubmitResult::WrongAnswer;
             }
         }
-        $this->submit->execution_time = max($this->submit->execution_time | 0, $executor->execution_time);
-        $this->submit->execution_memory = max($this->submit->execution_memory | 0, $executor->execution_memory);
         return SubmitResult::Accepted;
     }
 
