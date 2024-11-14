@@ -68,9 +68,10 @@
                         <td>
                             <input type="hidden" class="star-rating rating" data-show-clear="false"
                                 data-problem-id="{{ $problem->id }}" data-show-caption="false" data-size="xs"
-                                @if ($problem->my_accepted_submissions == 0) value="{{ $problem->rating / 2.0 }}" data-readonly="true" 
+                                value="{{ $problem->rating / 2.0 }}" data-readonly="true">
+                            {{-- @if ($problem->my_accepted_submissions == 0) value="{{ $problem->rating / 2.0 }}" data-readonly="true" 
                             @else
-                            value="{{ (\App\Models\Rating::where('problem_id', $problem->id)->where('user_id', Auth::id())->first()?->value ??$problem->rating) /2.0 }}" @endif>
+                            value="{{ (\App\Models\Rating::where('problem_id', $problem->id)->where('user_id', Auth::id())->first()?->value ??$problem->rating) /2.0 }}" @endif> --}}
                         </td>
                     @endif
                     <td class="px-2 text-center">
