@@ -76,6 +76,9 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
                 return SubmitResult::WrongAnswer;
             }
         }
+        // We need this line of code when we are validating a test case
+        $this->submit->execution_time = max($this->submit->execution_time ?? 0, $executor->execution_time);
+        $this->submit->execution_memory = max($this->submit->execution_memory ?? 0, $executor->execution_memory);
         return SubmitResult::Accepted;
     }
 
