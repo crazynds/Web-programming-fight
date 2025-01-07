@@ -22,7 +22,6 @@
 /.git
 /.github
 .*
-!.env
 Dockerfile
 docker-compose.yml
 docker-production.yml

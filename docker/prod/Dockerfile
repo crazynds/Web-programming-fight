@@ -2,7 +2,7 @@ FROM dunglas/frankenphp:1.2-php8.3 AS php_base
 
 LABEL maintainer="Crazynds"
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC-3
 ENV NODE_VERSION=18
 
