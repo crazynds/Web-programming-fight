@@ -1,4 +1,4 @@
-FROM ubuntu:22.04 as php_base
+FROM ubuntu:22.04 AS php_base
 
 ARG WWWGROUP
 
@@ -52,7 +52,7 @@ RUN chmod +x /usr/local/bin/start-container
 ENTRYPOINT ["start-container"]
 
 
-FROM php_base as php_schedule 
+FROM php_base AS php_schedule 
 
 #Copy Starter
 COPY ./docker/start-container-scheduler /usr/local/bin/start-container
