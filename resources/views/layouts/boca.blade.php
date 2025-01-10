@@ -11,6 +11,17 @@
     @vite(['resources/css/boca.css'])
     @vite(['resources/css/custom.css'])
 
+    <script>
+        window.env = {
+            REVERB_APP_KEY: '{{ config('reverb.apps.apps.0.key') }}',
+            REVERB_HOST: '{{ config('reverb.apps.apps.0.frontend.host') }}',
+            REVERB_SCHEME: '{{ config('reverb.apps.apps.0.frontend.scheme') }}',
+            REVERB_PORT: '{{ config('reverb.apps.apps.0.frontend.port') }}',
+            REVERB_PATH: '',
+        }
+
+    </script>
+
     <style>
         .sm-github {
             background-image: url({{ asset('img/socialmediasHorizontal.webp') }});

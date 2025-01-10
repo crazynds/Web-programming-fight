@@ -76,9 +76,15 @@ return [
                 'app_id' => env('REVERB_APP_ID'),
                 'options' => [
                     'host' => env('REVERB_HOST'),
+                    'frontend_host' => env('REVERB_FRONTEND_HOST'),
                     'port' => env('REVERB_PORT', 443),
                     'scheme' => env('REVERB_SCHEME', 'https'),
                     'useTLS' => env('REVERB_SCHEME', 'https') === 'https',
+                ],
+                'frontend' => [
+                    'host' => env('REVERB_FRONTEND_HOST','localhost'),
+                    'port' => env('REVERB_FRONTEND_PORT', 443),
+                    'scheme' => env('REVERB_FRONTEND_SCHEME', 'https'),
                 ],
                 'allowed_origins' => ['*'],
                 'ping_interval' => env('REVERB_APP_PING_INTERVAL', 60),
