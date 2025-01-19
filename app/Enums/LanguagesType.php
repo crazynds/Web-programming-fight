@@ -15,6 +15,7 @@ final class LanguagesType extends Enum
     const PyPy3_10 = 1;
     const Python3_11 = 2;
     const C = 4;
+    const Python3_13 = 6;
 
     const BINARY = 99;
 
@@ -26,7 +27,8 @@ final class LanguagesType extends Enum
             'C++' => LanguagesType::CPlusPlus,
             'C (-std=c17)' => LanguagesType::C,
             'PyPy3.10' => LanguagesType::PyPy3_10,
-            'Python3.11' => LanguagesType::Python3_11,
+            'Python3.11' => LanguagesType::Python3_11,    
+            //'Python3.13' => LanguagesType::Python3_13,    // Not installed yet
         ];
     }
 
@@ -40,6 +42,7 @@ final class LanguagesType extends Enum
             'C (-std=c17)' => [1, 1],
             'PyPy3.10' => [1.8, 2], // 1.8x more time for pypy and 2x more memory
             'Python3.11' => [2, 2], // 2x more time for python and 2x more memory
+            'Python3.13' => [1.8, 2], // 1.8x more time for python and 2x more memory
         ];
     }
 
@@ -58,6 +61,7 @@ final class LanguagesType extends Enum
             case self::CPlusPlus:
             case self::PyPy3_10:
             case self::Python3_11:
+            case self::Python3_13:
             case self::C:
             case self::Auto_detect:
                 return [
