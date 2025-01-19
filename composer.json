@@ -23,8 +23,9 @@
         "livewire/livewire": "^3.4",
         "opcodesio/log-viewer": "^3.10",
         "paulo-hortelan/requests-graph-pulse": "^1.1",
-        "predis/predis": "^2.2",
+        "predis/predis": "^2.3",
         "schmeits/pulse-database-table-info": "^1.7",
+        "spatie/laravel-web-tinker": "^1.10",
         "spatie/pdf-to-text": "^1.53",
         "stechstudio/laravel-zipstream": "^4.14",
         "sysatom/php-bloom-filter": "^1.0"
