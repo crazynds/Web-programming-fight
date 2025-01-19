@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Contest\ClarificationController;
 use App\Http\Controllers\ContestController;
+use App\Http\Controllers\DiffController;
 use App\Http\Controllers\IOProblemController;
 use App\Http\Controllers\ProblemController;
 use App\Http\Controllers\RatingController;
@@ -62,6 +63,9 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
     Route::resource('problem.rating', RatingController::class)
         ->only('store');
 
+
+    Route::resource('problem.diff', DiffController::class)
+        ->only(['create','store','destroy']);
 
     Route::resource('problem.scorer', ScorerController::class)
         ->except(['edit', 'update']);

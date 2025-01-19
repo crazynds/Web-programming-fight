@@ -96,7 +96,6 @@ class ExecutorService
         $fileData = null;   // free memory
 
         $foutput = '/var/work/' . $output_file;
-
         if (is_null($this->diffConfig)) {
             // a => compare text mode
             // b => ignore multiples blank lines (\n\r == \r\n == \n)
@@ -120,9 +119,11 @@ class ExecutorService
                 . ' 2>&1 | head -c ' . $limitOutput;
 
 
+
             exec("chmod 0644 /var/work/problems -R"); // Give access to problem input/output folder
             exec("chmod 0777 /var/work/problems"); // Give access to problem input/output folder
             exec("cp /var/work/diff_exec /var/nsjail/exec 2>&1 > /dev/null");   // Copy program to correct place
+            exec("chmod +x /var/nsjail/exec 2>&1 > /dev/null");
             $this->output = [];
             exec($command, $this->output, $this->retval); // Execute
             foreach (explode(PHP_EOL, Storage::disk('work')->get('time')) as $line) {
@@ -211,7 +212,7 @@ class ExecutorService
 
         exec("rm /var/work/nsjail_out 2> /dev/null");
         exec("cp /var/work/'$programName' /var/nsjail/exec 2>&1 > /dev/null");   // Copy program to correct place
-        //dump($command);
+        exec("chmod +x /var/nsjail/exec 2>&1 > /dev/null");
         exec($command, $this->output, $this->retval);
 
 
@@ -276,7 +277,7 @@ class ExecutorService
             case "PyPy3.10":
             case "Python3.11":
                 Storage::disk('work')->writeStream($outputName, $code->readStream());
-                exec('mv /var/work/' . $outputName . ' /var/work/' . $outputName, $this->output, $this->retval);
+                exec("sed -i '1s/^/from sys import exit\\n\\n/' /var/work/".$outputName); // Add import to exit
                 break;
             case "BINARY":
                 Storage::disk('work')->writeStream($outputName, $code->readStream());

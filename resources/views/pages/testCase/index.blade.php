@@ -8,9 +8,21 @@
                 Test Cases:
             </b>
 
-            <a style="margin-right: 5px;" href="{{ route('problem.testCase.index', ['problem' => $problem->id]) }}">
-                <button>New Tester +</button>
-            </a>
+            @can('update', $problem)
+                <a style="margin-right: 5px;text-decoration:none !important;" href="{{ route('problem.diff.create', ['problem' => $problem->id]) }}">
+                    <button>New Diff Program +</button>
+                </a>
+                @if($problem->diffProgram()->exists())
+                    <a href="#">  
+                        <form action="{{ route('problem.diff.destroy', ['problem' => $problem->id, 'diff'=> 0]) }}" method="POST" style="display: inline;">
+                            @method('DELETE')
+                            @csrf
+                            <button type="submit">❌</button>
+
+                        </form>
+                    </a>
+                @endif
+            @endcan
         </div>
         <div class="col" style="text-align:center;">
             <h1>

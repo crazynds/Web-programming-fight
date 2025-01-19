@@ -185,7 +185,6 @@
             MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
 
             var trackChange = function(element) {
-                console.log(element)
                 var observer = new MutationObserver(function(mutations, observer) {
                     if (mutations[0].attributeName == "value") {
                         $(element).trigger("change");

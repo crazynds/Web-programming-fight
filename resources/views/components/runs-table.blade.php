@@ -444,7 +444,6 @@
             default:
                 style = "grey"
         }
-        console.log(style)
         resulttag.css('color', style);
         testCasestag.css('color', style);
 
