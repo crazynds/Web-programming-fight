@@ -4,7 +4,7 @@ cd /app
 echo "== Starting application =="
 
 # Startup default
-printf "\nPULSE_SERVER_NAME=$FUNCTION\n" >> .env
+PULSE_SERVER_NAME=$FUNCTION
 
 php artisan storage:link
 
