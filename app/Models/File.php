@@ -84,7 +84,10 @@ class File extends Model
 
         if ($size < self::MAX_DB_CONTENT && !$forceDisk) {
             $file->path = $path . '/' . $hashName . '_streamed_db';
-            $file->content = fread($stream, $size);
+            $file->content = '';
+            do{
+                $file->content .= fread($stream, $size);
+            }while(strlen($file->content) < $size);
             $file->compact();
             fclose($stream);
         } else {
