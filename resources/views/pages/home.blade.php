@@ -52,7 +52,7 @@
                         v1.0.2 - Default Update!
                     </h3>
                     <p>
-                        Date: XX-XX-2024
+                        Date: 20-01-2025
                         By: Crazynds
                     </p>
                     <p>
