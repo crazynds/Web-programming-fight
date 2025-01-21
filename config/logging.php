@@ -57,6 +57,11 @@ return [
             'path' => storage_path('logs/database.log'),
             'level' => env('LOG_LEVEL', 'debug'),
         ],
+        'events' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/events.log'),
+            'level' => 'debug',
+        ],
         'stack' => [
             'driver' => 'stack',
             'channels' => ['single'],

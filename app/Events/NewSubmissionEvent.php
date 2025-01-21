@@ -10,6 +10,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Mockery\Undefined;
 
 class NewSubmissionEvent implements ShouldBroadcast
@@ -47,6 +48,7 @@ class NewSubmissionEvent implements ShouldBroadcast
             'resources' => ((isset($submitRun->execution_time) && $submitRun->status == 'Judged') ? number_format($submitRun->execution_time / 1000, 2, '.', ',') . 's' : '--') . ' | ' . ((isset($submitRun->execution_memory) && $submitRun->status == 'Judged') ? $submitRun->execution_memory . ' MB' : '--'),
             'contest' => $submitRun->contest_id ? $contestData : null,
         ];
+        Log::channel('events')->info('New Submission: '. $submitRun->id);
     }
 
     /**

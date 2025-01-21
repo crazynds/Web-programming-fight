@@ -17,6 +17,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
@@ -94,6 +95,8 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
                 'result' => $result
             ];
             $this->submit->result = $result;
+
+            Log::channel('events')->info('Executing test case (' . $testCase->id. ') - '.$this->submit->result);
             dump($this->submit->result);
             if ($result == SubmitResult::Accepted) {
                 $num += 1;
@@ -144,7 +147,7 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
      */
     public function handle(ExecutorService $executor): void
     {
-
+        Log::channel('events')->info('Executing submit ' . $this->submit->id);
         $file = $this->submit->file;
         $this->submit->status = SubmitStatus::Judging;
         $this->submit->result = SubmitResult::NoResult;
@@ -176,6 +179,8 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
             // Synchronously
             ContestComputeScore::dispatchSync($this->submit, $this->submit->contest, $competidor);
         }
+
+        Log::channel('events')->info('Ending submit ' . $this->submit->id. ' with result ' . $this->submit->result);
     }
 
     public function failed(Throwable $exception): void

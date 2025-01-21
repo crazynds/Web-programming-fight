@@ -8,6 +8,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class UpdateSubmissionEvent implements ShouldBroadcast
 {
@@ -45,6 +46,7 @@ class UpdateSubmissionEvent implements ShouldBroadcast
             'suspense' => ($submitRun->status == 'Judged' ? ($submitRun->num_test_cases + 1) / ($submitRun->problem->testCases()->count() + 1) : 0) > 0.4,
             'contest' => $submitRun->contest_id ? $contestData : null,
         ];
+        Log::channel('events')->info('Update Submission: '. $submitRun->id);
     }
 
     /**
