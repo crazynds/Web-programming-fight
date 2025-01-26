@@ -14,9 +14,9 @@
     <script>
         window.env = {
             REVERB_APP_KEY: '{{ config('reverb.apps.apps.0.key') }}',
-            REVERB_HOST: '{{ config('reverb.apps.apps.0.frontend.host') }}',
-            REVERB_SCHEME: '{{ config('reverb.apps.apps.0.frontend.scheme') }}',
-            REVERB_PORT: '{{ config('reverb.apps.apps.0.frontend.port') }}',
+            REVERB_HOST: '{{ config('reverb.apps.apps.0.options.host') }}',
+            REVERB_SCHEME: '{{ config('reverb.apps.apps.0.options.scheme') }}',
+            REVERB_PORT: '{{ config('reverb.apps.apps.0.options.port') }}',
             REVERB_PATH: '',
         }
 
