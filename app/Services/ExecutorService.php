@@ -261,7 +261,7 @@ class ExecutorService
             case "C++":
                 $program = 'prog.cpp';
                 Storage::disk('work')->writeStream($program, $code->readStream());
-                exec("g++ -std=c++20 -mtune=native -static -march=native -w -O2 /var/work/'$program' -o /var/work/'$outputName' 2>&1", $this->output, $this->retval);
+                exec("g++ -std=c++20 -mtune=native -Wreturn-type -static -march=native -w -O2 /var/work/'$program' -o /var/work/'$outputName' 2>&1", $this->output, $this->retval);
                 if ($this->retval != 0) {
                     return SubmitResult::CompilationError;
                 }
