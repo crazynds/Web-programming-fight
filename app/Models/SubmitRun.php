@@ -15,7 +15,7 @@ class SubmitRun extends Model
     public $timestamps = true;
     protected $casts = [
         'created_at' => 'datetime',
-        'updated_at' => 'timestamp',
+        'updated_at' => 'datetime',
     ];
 
     protected function language(): Attribute

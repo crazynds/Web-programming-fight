@@ -19,13 +19,14 @@ class RunsTable extends Component
     public function __construct(
         public bool $global,
         public Contest|null $contest,
+        public bool $livewire,
         protected ContestService $contestService,
     ) {
         if ($contestService->inContest)
             $this->contest = $contestService->contest;
     }
 
-    private function getQuery()
+    protected function getQuery()
     {
         if ($this->global) {
             if ($this->contest) {
@@ -72,7 +73,7 @@ class RunsTable extends Component
             ->orderByDesc('id');
     }
 
-    private function getChannel()
+    protected function getChannel()
     {
         if ($this->contestService->inContest) {
             if ($this->global)
@@ -91,7 +92,9 @@ class RunsTable extends Component
         return view('components.runs-table', [
             'limit' => \Illuminate\Support\Facades\RateLimiter::remaining('resubmission:' . Auth::user()->id, 5),
             'submitRuns' => $this->getQuery()->get(),
-            'channel' => $this->getChannel()
+            'channel' => $this->getChannel(),
+            'livewire'=> $this->livewire,
+            'contest' => $this->contest
         ]);
     }
 }

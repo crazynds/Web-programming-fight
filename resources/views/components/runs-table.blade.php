@@ -58,8 +58,13 @@
                     </div>
                 </td>
             </tr>
-
+            @php
+            $lastUpdated = \Illuminate\Support\Carbon::now()->subHour();
+            @endphp
             @foreach ($submitRuns as $submitRun)
+                @php
+                $lastUpdated = max($submitRun->updated_at,$lastUpdated);
+                @endphp
                 <tr id="row{{ $submitRun->id }}" data-id="{{ $submitRun->id }}"
                     @if ($submitRun->status != 'Judged' && $submitRun->status != 'Error') class="notJudged blink" @endif>
                     <td>
@@ -236,12 +241,14 @@
             </div>
         </div>
     </div>
+    @if($livewire)
+    <livewire:runs-table-component :global="$global" :contest="$contest ?? ($contestService->contest ?? null)" :lastCheck="$lastUpdated"/>
+    @endif
 </div>
 
 <script>
     const userId = {{ $global ? 'null' : \Auth::user()->id }}
     const channel = "{{ $channel }}";
-    console.log(channel)
 
     function copyCode() {
         var range = document.createRange();
@@ -385,6 +392,7 @@
                 $('#codeModal').find('#code').text(data.code)
         });
     }
+    
     const updateRow = function(row, data) {
         const idtag = row.find('#id');
         const datetimetag = row.find('#datetime');
@@ -397,7 +405,7 @@
         const resourcestag = row.find('#resources');
 
         if (data.user_id == userId) {
-            idtag.html(`
+        idtag.html(`
                 <a href="#" onclick="openModal(${data.id})">
                     #${data.id}
                 </a>
@@ -457,111 +465,95 @@
         else
             row.removeClass('notJudged blink');
     }
+    const updateSubmission = function(data) {
+        console.log('update sub', data)
+        var row = $('#row' + data.id);
+        console.log(userId,row)
+        if (row.length == 0) {
+            if (userId != null && userId != data.user_id) return
+            row = $('#template-row').clone();
+            updateRow(row, data);
+            $('#table-body').prepend(row);
+        }
+        if (data.status != 'Judged' && data.status != 'Error') {
+            updateRow(row, data);
+        } else {
+            row.removeClass('blink')
+            row.find('#status').text(data.status);
+            row.find('#testCases').text('--');
+            switch (data.result) {
+                case 'Wrong answer':
+                case 'Time limit':
+                case 'Memory limit':
+                case 'Runtime error':
+                case 'Accepted':
+                    suspense = data.suspense;
+                    break;
+                case 'Compilation error':
+                case 'Error':
+                default:
+                    failed()
+                    suspense = false;
+                    break;
+            }
+
+            const geraResultado = function() {
+                updateRow(row, data);
+                switch (data.result) {
+                    case 'Compilation error':
+                    case 'Runtime error':
+                    case 'Error':
+                    case 'Wrong answer':
+                    case 'Time limit':
+                    case 'Memory limit':
+                    default:
+                        failed()
+                        break;
+                    case 'Accepted':
+                        confeti();
+                        break;
+                }
+            }
+            const bateria = function() {
+                const text = row.find("#result").text();
+                if (text.length < 5) {
+                    row.find("#result").text(text + '🥁')
+                    setTimeout(bateria, 800 + text.length * 100)
+                } else {
+                    if (data.result != 'Accepted') {
+                        setTimeout(() => failed(), 400)
+                    }
+                    setTimeout(geraResultado, 1000)
+                }
+            }
+
+
+            if (suspense) {
+                row.find("#result").text('');
+                setTimeout(bateria, 500)
+            } else {
+                geraResultado();
+            }
+        }
+    }
+</script>
+@if(!$livewire)
+<script>
     window.addEventListener("load", function() {
         window.Echo.private(channel)
             .listen('NewSubmissionEvent', (data) => {
-                data = data.data
-                console.log('NewSubmissionEvent', data)
-                var row = $('#row' + data.id);
-                if (row.length == 0) {
-                    if (userId != null && userId != data.user_id) return
-                    row = $('#template-row').clone();
-                    updateRow(row, data);
-                    $('#table-body').prepend(row);
-                } else {
-                    updateRow(row, data);
-                }
+                updateSubmission(data.data)
             })
 
         window.Echo.private(channel)
             .listen('UpdateSubmissionTestCaseEvent', (data) => {
-                data = data.data
-                console.log(data)
-                var row = $('#row' + data.id);
-                if (row.length == 0) {
-                    if (userId != null && userId != data.user_id) return
-                    row = $('#template-row').clone();
-                    updateRow(row, data);
-                    $('#table-body').prepend(row);
-                    return;
-                }
-                if (row.find('#result').text().toLowerCase() == 'No result'.toLowerCase()) {
-                    updateRow(row, data);
-                }
+                updateSubmission(data.data)
             })
 
         window.Echo.private(channel)
             .listen('UpdateSubmissionEvent', (data) => {
-                console.log('UpdateSubmissionEvent', data)
-                data = data.data
-                var row = $('#row' + data.id);
-                if (row.length == 0) {
-                    if (userId != null && userId != data.user_id) return
-                    row = $('#template-row').clone();
-                    updateRow(row, data);
-                    $('#table-body').prepend(row);
-                    return;
-                }
-                if (data.status != 'Judged' && data.status != 'Error') {
-                    updateRow(row, data);
-                } else {
-                    row.removeClass('blink')
-                    row.find('#status').text(data.status);
-                    row.find('#testCases').text('--');
-                    switch (data.result) {
-                        case 'Wrong answer':
-                        case 'Time limit':
-                        case 'Memory limit':
-                        case 'Runtime error':
-                        case 'Accepted':
-                            suspense = data.suspense;
-                            break;
-                        case 'Compilation error':
-                        case 'Error':
-                        default:
-                            failed()
-                            suspense = false;
-                            break;
-                    }
-
-                    const geraResultado = function() {
-                        updateRow(row, data);
-                        switch (data.result) {
-                            case 'Compilation error':
-                            case 'Runtime error':
-                            case 'Error':
-                            case 'Wrong answer':
-                            case 'Time limit':
-                            case 'Memory limit':
-                            default:
-                                failed()
-                                break;
-                            case 'Accepted':
-                                confeti();
-                                break;
-                        }
-                    }
-                    const bateria = function() {
-                        const text = row.find("#result").text();
-                        if (text.length < 5) {
-                            row.find("#result").text(text + '🥁')
-                            setTimeout(bateria, 800 + text.length * 100)
-                        } else {
-                            if (data.result != 'Accepted') {
-                                setTimeout(() => failed(), 400)
-                            }
-                            setTimeout(geraResultado, 1000)
-                        }
-                    }
-
-
-                    if (suspense) {
-                        row.find("#result").text('');
-                        setTimeout(bateria, 500)
-                    } else {
-                        geraResultado();
-                    }
-                }
+                updateSubmission(data.data)
             });
     })
 </script>
+@endif
