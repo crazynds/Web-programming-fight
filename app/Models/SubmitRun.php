@@ -12,10 +12,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class SubmitRun extends Model
 {
-    const UPDATED_AT = null;
     public $timestamps = true;
     protected $casts = [
         'created_at' => 'datetime',
+        'updated_at' => 'timestamp',
     ];
 
     protected function language(): Attribute

@@ -8,8 +8,6 @@ use App\Models\File;
 use App\Models\Problem;
 use App\Models\Scorer;
 use App\Models\TestCase;
-use Exception;
-use Faker\Calculator\Ean;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 

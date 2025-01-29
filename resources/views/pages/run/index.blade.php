@@ -62,7 +62,10 @@
         </div>
     @endif
 
-    {{-- <livewire:runs-table-component :global="$global" /> --}}
-    <x-runs-table :global="$global" :contest="$contest ?? ($contestService->contest ?? null)" />
+    @if(config('app.livewire'))
+        <livewire:runs-table-component :global="$global" :contest="$contest ?? ($contestService->contest ?? null)" />
+    @else
+        <x-runs-table :global="$global" :contest="$contest ?? ($contestService->contest ?? null)" />
+    @endif
 
 @endsection

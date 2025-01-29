@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Enums\LanguagesType;
 use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
+use App\Events\UpdateSubmissionTestCaseEvent;
 use App\Models\Competitor;
 use App\Models\SubmitRun;
 use App\Models\TestCase;
@@ -97,9 +98,9 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
             $this->submit->result = $result;
 
             Log::channel('events')->info('Executing test case (' . $testCase->id. ') - '.$this->submit->result);
-            dump($this->submit->result);
             if ($result == SubmitResult::Accepted) {
                 $num += 1;
+                UpdateSubmissionTestCaseEvent::dispatch($this->submit, $num);
             } else {
                 break;
             }

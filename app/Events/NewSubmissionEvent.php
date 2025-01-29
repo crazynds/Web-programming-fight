@@ -3,15 +3,11 @@
 namespace App\Events;
 
 use App\Models\SubmitRun;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
-use Mockery\Undefined;
 
 class NewSubmissionEvent implements ShouldBroadcast
 {
@@ -30,7 +26,7 @@ class NewSubmissionEvent implements ShouldBroadcast
                 'contest_id' => $submitRun->contest_id,
                 'competitor_id' => $submitRun->contest_id ? $submitRun->competitor?->id : null,
                 'competitor' => $submitRun->contest_id ? $submitRun->competitor?->acronym : null,
-                'blind' => $submitRun->contest->blindTime()->lt(now()),
+                'blind' => $submitRun->contest->blindTime()->lt(now()) && $submitRun->contest->endTimeWithExtra()->gt(now()),
             ];
         $this->data = [
             'id' => $submitRun->id,
@@ -44,11 +40,11 @@ class NewSubmissionEvent implements ShouldBroadcast
             'language' => $submitRun->language,
             'status' => $submitRun->status,
             'result' => $submitRun->result,
-            'testCases' => $submitRun->num_test_cases + 1,
+            'testCases' => $submitRun->status != 'Judged' ? '---' : $submitRun->num_test_cases + 1,
             'resources' => ((isset($submitRun->execution_time) && $submitRun->status == 'Judged') ? number_format($submitRun->execution_time / 1000, 2, '.', ',') . 's' : '--') . ' | ' . ((isset($submitRun->execution_memory) && $submitRun->status == 'Judged') ? $submitRun->execution_memory . ' MB' : '--'),
+            'suspense' => ($submitRun->status == 'Judged' ? ($submitRun->num_test_cases + 1) / ($submitRun->problem->testCases()->count() + 1) : 0) > 0.4,
             'contest' => $submitRun->contest_id ? $contestData : null,
         ];
-        Log::channel('events')->info('New Submission: '. $submitRun->id);
     }
 
     /**

@@ -193,8 +193,8 @@
                             @if ($submitRun->status == 'Judged' || $submitRun->status == 'Error')
                                 @can('update', $submitRun)
                                     @if ($limit && $submitRun->status != 'Compilation error')
-                                        <a href="{{ route('submitRun.rejudge', ['submitRun' => $submitRun->id], false) }}"
-                                            class="d-flex action-btn">
+                                        <a href="{{ route('api.submitRun.rejudge', ['submitRun' => $submitRun->id], false) }}"
+                                            class="d-flex action-btn single-silent-click">
                                             <i class="las la-redo-alt"></i>
                                         </a>
                                     @endif
@@ -241,6 +241,7 @@
 <script>
     const userId = {{ $global ? 'null' : \Auth::user()->id }}
     const channel = "{{ $channel }}";
+    console.log(channel)
 
     function copyCode() {
         var range = document.createRange();
@@ -410,6 +411,7 @@
         langtag.text(data.language);
         statustag.text(data.status);
         resulttag.text(data.result);
+        console.log(data.testCases);
         testCasestag.text(data.testCases ?? '---');
         resourcestag.text(data.resources);
         titletag.attr('href', "{{ route('problem.show', ['problem' => -1], false) }}".replace('-1', data.problem
@@ -459,6 +461,7 @@
         window.Echo.private(channel)
             .listen('NewSubmissionEvent', (data) => {
                 data = data.data
+                console.log('NewSubmissionEvent', data)
                 var row = $('#row' + data.id);
                 if (row.length == 0) {
                     if (userId != null && userId != data.user_id) return
@@ -471,7 +474,25 @@
             })
 
         window.Echo.private(channel)
+            .listen('UpdateSubmissionTestCaseEvent', (data) => {
+                data = data.data
+                console.log(data)
+                var row = $('#row' + data.id);
+                if (row.length == 0) {
+                    if (userId != null && userId != data.user_id) return
+                    row = $('#template-row').clone();
+                    updateRow(row, data);
+                    $('#table-body').prepend(row);
+                    return;
+                }
+                if (row.find('#result').text().toLowerCase() == 'No result'.toLowerCase()) {
+                    updateRow(row, data);
+                }
+            })
+
+        window.Echo.private(channel)
             .listen('UpdateSubmissionEvent', (data) => {
+                console.log('UpdateSubmissionEvent', data)
                 data = data.data
                 var row = $('#row' + data.id);
                 if (row.length == 0) {
@@ -486,6 +507,7 @@
                 } else {
                     row.removeClass('blink')
                     row.find('#status').text(data.status);
+                    row.find('#testCases').text('--');
                     switch (data.result) {
                         case 'Wrong answer':
                         case 'Time limit':

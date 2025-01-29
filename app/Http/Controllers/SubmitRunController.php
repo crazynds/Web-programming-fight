@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use App\Enums\LanguagesType;
 use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
+use App\Events\NewSubmissionEvent;
 use App\Http\Requests\StoreSubmitRunRequest;
 use App\Http\Resources\SubmitRunResultResource;
 use App\Jobs\AutoDetectLangSubmitRun;
 use App\Jobs\ExecuteSubmitJob;
-use App\Models\Competitor;
 use App\Models\Contest;
 use App\Models\SubmitRun;
 use App\Models\File;
@@ -19,7 +19,6 @@ use App\Services\ContestService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
@@ -91,39 +90,36 @@ class SubmitRunController extends Controller
         $run = DB::transaction(function () use ($request, $user, $problem) {
 
             $originalFile = $request->file('code');
+            $run = new SubmitRun();
+            $run->language = $request->input('lang');
+            $run->problem()->associate($problem);
+            $run->user()->associate($user);
 
             // 4 MB
             if ($originalFile->getSize() > 1024 * 1024 * 4 || !mb_check_encoding($originalFile->get(), 'UTF-8')) {
-                $run = new SubmitRun();
-                $run->language = $request->input('lang');
-                $run->problem()->associate($problem);
-                $run->user()->associate($user);
                 $run->status = SubmitStatus::Judged;
                 if ($originalFile->getSize() > 1024 * 1024 * 4)
                     $run->result = SubmitResult::FileTooLarge;
                 else
                     $run->result = SubmitResult::InvalidUtf8File;
-                $run->save();
             } else {
                 $file = File::createFile($originalFile, 'users/' . $user->id . "/attempts" . '/' . $request->problem);
-
-                $run = new SubmitRun();
-                $run->language = $request->input('lang');
-                $run->problem()->associate($problem);
                 $run->file()->associate($file);
-                $run->user()->associate($user);
                 $run->status = SubmitStatus::WaitingInLine;
+            }
+            $run->save();
+            if ($this->contestService->started && $this->contestService->inContest) {
+                $run->contest()->associate($this->contestService->contest);
+                $this->contestService->competitor->submissions()->attach($run);
+                if (isset($job)) $job->onQueue('contest');
                 $run->save();
+            }
+            if($run->status == SubmitStatus::fromValue(SubmitStatus::WaitingInLine)->description){
                 if ($run->language == LanguagesType::name(LanguagesType::Auto_detect)) {
                     $job = AutoDetectLangSubmitRun::dispatch($run)->afterCommit();
                 } else $job = ExecuteSubmitJob::dispatch($run)->delay(now()->addSeconds(5))->afterCommit();
             }
-            if ($this->contestService->started && $this->contestService->inContest) {
-                $run->contest()->associate($this->contestService->contest);
-                $run->save();
-                $this->contestService->competitor->submissions()->attach($run);
-                if (isset($job)) $job->onQueue('contest');
-            }
+            NewSubmissionEvent::dispatch($run);
             return $run;
         });
 
@@ -163,7 +159,10 @@ class SubmitRunController extends Controller
         /** @var User */
         $user = Auth::user();
         if (RateLimiter::tooManyAttempts('resubmission:' . $user->id, 5)) {
-            return Redirect::back()->withErrors(['msg' => 'Too many attempts! Wait a moment and try again!']);
+            return response()->json([
+                'status' => 'error',
+                'msg' => 'Too many attempts! Wait a moment and try again!'
+            ], 429);
         }
         // 10 minutes
         if (!$user->isAdmin())
@@ -178,7 +177,9 @@ class SubmitRunController extends Controller
                 AutoDetectLangSubmitRun::dispatch($submitRun)->onQueue('low')->afterCommit();
             } else ExecuteSubmitJob::dispatch($submitRun)->onQueue('low')->afterCommit();
         }
-        return redirect()->back();
+        return response()->json([
+            'status' => 'ok'
+        ]);
     }
 
     public function show(SubmitRun $submitRun)

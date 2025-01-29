@@ -2,7 +2,6 @@
 
 namespace App\Observers;
 
-use App\Events\NewSubmissionEvent;
 use App\Events\UpdateSubmissionEvent;
 use App\Models\SubmitRun;
 
@@ -13,8 +12,6 @@ class SubmitRunObserver
      */
     public function created(SubmitRun $submitRun): void
     {
-        //Broadcast event to all connected clients
-        NewSubmissionEvent::dispatch($submitRun);
     }
 
     /**

@@ -108,12 +108,9 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
                 ->name('scorer.reavaliate');
         });
 
-    // Todo fazer polices para submissions, somente o dono pode gerenciar
     // run routes
     Route::resource('submitRun', SubmitRunController::class)
         ->only(['index', 'store', 'create', 'show']);
-    Route::get('/submitRun/{submitRun}/rejudge', [SubmitRunController::class, 'rejudge'])
-        ->name('submitRun.rejudge');
     Route::get('/submitRun/global/live', [SubmitRunController::class, 'global'])
         ->name('submitRun.global');
     Route::get('/submitRun/{submitRun}/download', [SubmitRunController::class, 'download'])

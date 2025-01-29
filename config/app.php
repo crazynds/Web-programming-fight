@@ -186,4 +186,8 @@ return [
         'ReCaptcha' => Biscolab\ReCaptcha\Facades\ReCaptcha::class,
     ])->toArray(),
 
+
+
+    'livewire' => env('LIVEWIRE',false),
+
 ];

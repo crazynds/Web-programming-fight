@@ -1,4 +1,4 @@
-<div wire:poll.1s>
+<div>
     <table border="1">
         <thead>
             <tr>
@@ -14,18 +14,12 @@
                 <th style="text-align: end;"><b>Actions</b></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody wire:poll.3000ms.visible="refresh">
             @foreach ($submitRuns as $submitRun)
                 <tr wire:key="run-{{ $submitRun->id }}" data-id="{{ $submitRun->id }}"
                     @if ($submitRun->status != 'Judged' && $submitRun->status != 'Error') class="notJudged blink" @endif>
                     <td>
-                        @can('view', $submitRun)
-                            <a href="#" onclick="openModal({{ $submitRun->id }})">
-                                #{{ $submitRun->id }}
-                            </a>
-                        @else
-                            #{{ $submitRun->id }}
-                        @endcan
+                        #{{ $submitRun->id }}
                     </td>
                     <td class="px-1 text-center">
                         <small>
@@ -36,8 +30,8 @@
                             @endif
                         </small>
                     </td>
-                    <td class="px-1">
-                        {{ $submitRun->user->name }}
+                    <td class="px-1">                        
+                        {{ $submitRun->name }}
                     </td>
                     <td class="px-1">
                         <a href="{{ route('problem.show', ['problem' => $submitRun->problem->id], false) }}">
@@ -75,15 +69,19 @@
                             @default
                                 style="color:grey"
                         @endswitch>
-                            {{ $submitRun->result }}
+                            @if($waitingToBeJudged[$submitRun->id] ?? false)
+                                @for ($i = 1; $i < $waitingToBeJudged[$submitRun->id] && $i < 4; $i++)
+                                    🥁
+                                @endfor
+                            @else
+                                {{ $submitRun->result }}
+                            @endif
                         </span>
                     </td>
                     <td class="px-2 text-center">
                         <small id="testCases">
                             @isset($waitingToBeJudged[$submitRun->id])
-                                @for ($i = 1; $i < $waitingToBeJudged[$submitRun->id] && $i < 4; $i++)
-                                    🥁
-                                @endfor
+                                -- 
                             @else
                                 @switch($submitRun->result)
                                     @case('Accepted')
@@ -137,8 +135,8 @@
                             @if ($submitRun->status == 'Judged' || $submitRun->status == 'Error')
                                 @if ($submitRun->can_update)
                                     @if ($limit && $submitRun->status != 'Compilation error')
-                                        <a href="{{ route('submitRun.rejudge', ['submitRun' => $submitRun->id], false) }}"
-                                            class="d-flex action-btn">
+                                        <a href="{{ route('api.submitRun.rejudge', ['submitRun' => $submitRun->id], false) }}"
+                                            class="d-flex action-btn silent-click">
                                             <i class="las la-redo-alt"></i>
                                         </a>
                                     @endif
@@ -312,27 +310,8 @@
                 startVelocity: 45,
             });
         }
-        var openModal = function() {}
-        window.addEventListener("load", function() {
-
-            openModal = function(id) {
-                var url = '{{ route('api.submitRun.code', ['submitRun' => -1]) }}'.replace('-1', id)
-                $('#codeModal').modal("show")
-                $('#codeModal').find('#code').html(`
-                <div class="d-flex justify-content-center">
-                    <div class="spinner-grow" role="status">
-                        <span class="sr-only">Loading...</span>
-                    </div>
-                </div>
-            `)
-                $.get(url, function(data) {
-                    if (data.code)
-                        $('#codeModal').find('#code').text(data.code)
-                });
-            }
-        })
         $wire.on('myRunAccepted', () => {
-            confeti()
+            confeti()   
         });
         $wire.on('myRunFailed', () => {
             failed()

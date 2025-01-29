@@ -26,4 +26,6 @@ Route::middleware('auth:web')->group(function(){
         ->name('submitRun.code');
     Route::get('/run/{submitRun}/result',[SubmitRunController::class,'result'])
         ->name('submitRun.result');
+    Route::get('/submitRun/{submitRun}/rejudge', [SubmitRunController::class, 'rejudge'])
+        ->name('submitRun.rejudge');
 });
