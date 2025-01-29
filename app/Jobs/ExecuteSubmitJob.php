@@ -97,7 +97,7 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
             ];
             $this->submit->result = $result;
 
-            Log::channel('events')->info('Executing test case (' . $testCase->id. ') - '.$this->submit->result);
+            //Log::channel('events')->info('Executing test case (' . $testCase->id. ') - '.$this->submit->result);
             if ($result == SubmitResult::Accepted) {
                 $num += 1;
                 UpdateSubmissionTestCaseEvent::dispatch($this->submit, $num);
@@ -148,7 +148,7 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
      */
     public function handle(ExecutorService $executor): void
     {
-        Log::channel('events')->info('Executing submit ' . $this->submit->id);
+        //Log::channel('events')->info('Executing submit ' . $this->submit->id);
         $file = $this->submit->file;
         $this->submit->status = SubmitStatus::Judging;
         $this->submit->result = SubmitResult::NoResult;
@@ -181,7 +181,7 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
             ContestComputeScore::dispatchSync($this->submit, $this->submit->contest, $competidor);
         }
 
-        Log::channel('events')->info('Ending submit ' . $this->submit->id. ' with result ' . $this->submit->result);
+        //Log::channel('events')->info('Ending submit ' . $this->submit->id. ' with result ' . $this->submit->result);
     }
 
     public function failed(Throwable $exception): void
