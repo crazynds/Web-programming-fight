@@ -10,6 +10,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use ZipArchive;
 
 class BackupJob implements ShouldQueue, ShouldBeUnique
@@ -43,8 +44,8 @@ class BackupJob implements ShouldQueue, ShouldBeUnique
             mkdir($backupPath, 0777, true);
         }
         $backupFile = $backupPath.'/last_backup.zip';
-        if(file_exists($backupFile)){
-            unlink($backupFile);
+        if(Storage::exists('backup.zip')){
+            Storage::delete('backup.zip');
         }
 
         $zip = new ZipArchive;
@@ -71,6 +72,8 @@ class BackupJob implements ShouldQueue, ShouldBeUnique
             $this->log('Closing backup');
             $zip->close();
             $this->log('Backup ended');
+            Storage::put('backup.zip', fopen($backupFile, 'r+'));
+            unlink($backupFile);
             unlink($dumpFile);
         }else{
             $this->log('Backup failed');

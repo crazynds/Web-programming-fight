@@ -32,12 +32,18 @@
 
         </div>
         <div class="col">
-            <label for="backup" class="form-label">Current Backup: </label><br />
+            <label for="backup" class="form-label">Current Backup: </label>
+            @if(Storage::exists('backup.zip'))            
+                <b>
+                    {{ date('d-m-Y H:i', Storage::lastModified('backup.zip')) }}
+                </b>
+            @endif
+            <br />
             <div class="hstack gap-1">
                 <a href="{{ route('api.backup.start')}}" title="Start Backup" class="d-flex action-btn">
                     <button>Start Backup</button>
                 </a>
-                @if(file_exists(storage_path('backup').'/last_backup.zip'))
+                @if(Storage::exists('backup.zip'))
                 <a href="{{ route('api.backup.download')}}" title="Download backup" class="d-flex action-btn">
                     <button>Download Backup</button>
                 </a>

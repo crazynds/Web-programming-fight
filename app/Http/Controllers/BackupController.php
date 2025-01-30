@@ -26,9 +26,9 @@ class BackupController extends Controller
     }
 
     public function download(){
-        $backupFile = storage_path('backup').'/last_backup.zip';
-        if(file_exists($backupFile)){
-            return response()->download($backupFile)->deleteFileAfterSend(true);
+        $backupFile = 'backup.zip';
+        if(Storage::exists($backupFile)){
+            return Storage::download($backupFile);
         }
         return response()->json([
             'status' => 404,
