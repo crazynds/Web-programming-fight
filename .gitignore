@@ -5,6 +5,7 @@
 /public/*.zip
 /public/storage
 /storage/*.key
+/storage/backup
 /vendor
 .env
 .env.backup

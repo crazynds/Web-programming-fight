@@ -14,8 +14,6 @@ use App\Services\ContestService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use ZipArchive;
-use Zip;
 
 class ProblemController extends Controller
 {

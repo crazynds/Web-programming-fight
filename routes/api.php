@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BackupController;
 use App\Http\Controllers\SubmitRunController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,4 +29,17 @@ Route::middleware('auth:web')->group(function(){
         ->name('submitRun.result');
     Route::get('/submitRun/{submitRun}/rejudge', [SubmitRunController::class, 'rejudge'])
         ->name('submitRun.rejudge');
+
+
+    Route::middleware('can:viewPulse')->group(function () {
+        Route::get('/backup',[BackupController::class,'start'])
+            ->name('backup.start');
+        Route::get('/backup/download',[BackupController::class,'download'])
+            ->name('backup.download');
+        Route::get('/backup/now',[BackupController::class,'backupNow'])
+            ->name('backup.now');
+        Route::post('/backup/upload',[BackupController::class,'upload'])
+            ->name('backup.upload');
+    });
+
 });

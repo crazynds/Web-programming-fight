@@ -48,9 +48,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('viewPulse', function (User $user) {
             return $user->isAdmin();
         });
-        Gate::define('viewLogViewer', function (User $user) {
-            return $user->isAdmin();
-        });
         $this->app->singleton(ContestService::class, function () {
             return new ContestService();
         });

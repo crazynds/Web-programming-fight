@@ -42,12 +42,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/auth/changeUser', [AuthController::class, 'changeUser'])
         ->name('auth.changeUser');
 
-    Route::get('/files', function () {
-        return view('vendor.filemanager.index');
-    })->middleware('auth')->can('viewPulse');
-
     // Rotas de dentro do contest
     Route::name('contest.')->prefix('contest/')->group(base_path('routes/contest.php'));
+    Route::name('admin.')->group(base_path('routes/admin.php'))->middleware('can:viewPulse');
 });
 
 // Rotas do sistema normal
