@@ -38,6 +38,7 @@ class BackupJob implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
+        set_time_limit(0);
         $this->log('Starting backup');
         $backupPath = storage_path('backup');
         if (!file_exists($backupPath)) {
