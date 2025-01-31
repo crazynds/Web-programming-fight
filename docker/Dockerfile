@@ -29,7 +29,7 @@ RUN apt-get update \
 
 RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.2
 
-RUN apt-get install -y dos2unix
+RUN apt-get install -y dos2unix mysql-client
 
 RUN groupadd --force -g $WWWGROUP sail
 RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
@@ -112,7 +112,7 @@ RUN cd /nsjail && make && mv /nsjail/nsjail /bin && rm -rf -- /nsjail
 
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Copy nsjail config
+# Copy nsjail confign
 RUN mkdir /var/nsjail
 RUN chmod 0777 /var/nsjail
 

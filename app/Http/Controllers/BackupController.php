@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\BackupJob;
+use App\Jobs\RestoreBackupJob;
 use App\Models\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -43,78 +44,12 @@ class BackupController extends Controller
 
         // Salvar o arquivo temporariamente
         $backupFile = $request->file('backup');
-        $backupPath = storage_path('storage/backup/temp_backup.zip');
-        $backupFile->move(storage_path('storage/backup'), 'temp_backup.zip');
+        $backupFile->storeAs('/','restore_backup.zip');
+        
+        RestoreBackupJob::dispatch($backupFile)->onQueue('high');
 
-        defer(function () use ($backupPath) {
-            unlink($backupPath);
-        });
-
-        // Extrair o ZIP
-        $zip = new ZipArchive;
-        if ($zip->open($backupPath) !== true) {
-            return response()->json(['error' => 'Não foi possível abrir o arquivo ZIP'], 400);
-        }
-
-        $extractPath = storage_path('storage/backup_extract');
-        if (!file_exists($extractPath)) {
-            mkdir($extractPath, 0777, true);
-        }
-        $zip->extractTo($extractPath);
-        $zip->close();
-
-        // Restaurar o banco de dados
-        $sqlFile = "$extractPath/database.sql";
-        if (file_exists($sqlFile)) {
-            $this->restoreDatabase($sqlFile);
-        }
-
-        // Restaurar os arquivos para o S3
-        $this->restoreS3Files($extractPath);
-
-        // Remover arquivos temporários
-        unlink($backupPath);
-        $this->deleteFolder($extractPath);
-
-        return response()->json(['message' => 'Backup restaurado com sucesso!']);
+        return response()->json(['message' => 'Job para restaurar backup agendado!']);
     }
-
-    private function restoreDatabase($sqlFile)
-    {
-        // Apaga todas as tabelas antes de restaurar
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        $tables = DB::select("SHOW TABLES");
-        foreach ($tables as $tableObj) {
-            $table = array_values((array) $tableObj)[0];
-            DB::statement("DROP TABLE IF EXISTS `$table`;");
-        }
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
-        // // Ler e executar cada comando do SQL
-        // $sql = file_get_contents($sqlFile);
-        // DB::unprepared($sql);
-    }
-
-    private function restoreS3Files($extractPath)
-    {
-        $s3Path = "$extractPath/s3";
-        if (!file_exists($s3Path)) {
-            return;
-        }
-
-        foreach(Storage::allFiles() as $file) {
-            Storage::delete($file);
-        }
-
-        // $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($s3Path));
-        // foreach ($files as $file) {
-        //     if (!$file->isFile()) continue;
-
-        //     $relativePath = str_replace("$s3Path/", '', $file->getPathname());
-        //     Storage::put($relativePath, file_get_contents($file->getPathname()));
-        // }
-    }
-
 
     public function backupNow()
     {
@@ -146,29 +81,15 @@ class BackupController extends Controller
     }
     private function generateSqlDump(string $dumpFile)
     {
-        $tables = DB::select("SHOW TABLES"); // Lista todas as tabelas
-        $database = env('DB_DATABASE');
-
-        $sql = "-- Backup do banco de dados: $database\n\n";
-        
-        foreach ($tables as $tableObj) {
-            $table = array_values((array) $tableObj)[0];
-
-            // Criação da tabela
-            $createTable = DB::select("SHOW CREATE TABLE $table")[0]->{"Create Table"};
-            $sql .= "DROP TABLE IF EXISTS `$table`;\n";
-            $sql .= "$createTable;\n\n";
-
-            // Inserção de dados
-            $rows = DB::table($table)->get();
-            foreach ($rows as $row) {
-                $values = array_map(fn($val) => is_null($val) ? "NULL" : "'" . addslashes($val) . "'", (array) $row);
-                $sql .= "INSERT INTO `$table` VALUES (" . implode(", ", $values) . ");\n";
-            }
-            $sql .= "\n";
-        }
-
-        file_put_contents($dumpFile, $sql);
+        $command = sprintf(
+            'mysqldump --host=%s --user=%s --password=%s --no-tablespaces %s > %s',
+            escapeshellarg(env('DB_HOST')),
+            escapeshellarg(env('DB_USERNAME')),
+            escapeshellarg(env('DB_PASSWORD')),
+            escapeshellarg(env('DB_DATABASE')),
+            escapeshellarg($dumpFile)
+        );
+        system($command, $output);
     }
 
 }

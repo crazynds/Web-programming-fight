@@ -81,29 +81,18 @@ class BackupJob implements ShouldQueue, ShouldBeUnique
     }
     private function generateSqlDump(string $dumpFile)
     {
-        $tables = DB::select("SHOW TABLES"); // Lista todas as tabelas
-        $database = env('DB_DATABASE');
-
-        $sql = "-- Backup do banco de dados: $database\n\n";
-        
-        foreach ($tables as $tableObj) {
-            $table = array_values((array) $tableObj)[0];
-
-            // Criação da tabela
-            $createTable = DB::select("SHOW CREATE TABLE $table")[0]->{"Create Table"};
-            $sql .= "DROP TABLE IF EXISTS `$table`;\n";
-            $sql .= "$createTable;\n\n";
-
-            // Inserção de dados
-            $rows = DB::table($table)->get();
-            foreach ($rows as $row) {
-                $values = array_map(fn($val) => is_null($val) ? "NULL" : "'" . addslashes($val) . "'", (array) $row);
-                $sql .= "INSERT INTO `$table` VALUES (" . implode(", ", $values) . ");\n";
-            }
-            $sql .= "\n";
+        $command = sprintf(
+            'mysqldump --host=%s --user=%s --password=%s %s > %s',
+            escapeshellarg(env('DB_HOST')),
+            escapeshellarg(env('DB_USERNAME')),
+            escapeshellarg(env('DB_PASSWORD')),
+            escapeshellarg(env('DB_DATABASE')),
+            escapeshellarg($dumpFile)
+        );
+        system($command, $output);
+        if ($output !== 0) {
+            return $this->fail('Error on create dump of database');
         }
-
-        file_put_contents($dumpFile, $sql);
     }
     private function log(string $text){
         dump($text);
