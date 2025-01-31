@@ -66,7 +66,6 @@ class BackupJob implements ShouldQueue, ShouldBeUnique
                     $tempFile = tempnam(sys_get_temp_dir(), 's3_');
                     file_put_contents($tempFile,$file->get());
                     $zip->addFile($tempFile, 's3/' . $file->path);
-                    $this->log('Backup - File stored: ' . $file->path);
                 }
             }
             $this->log('Closing backup');
@@ -90,6 +89,7 @@ class BackupJob implements ShouldQueue, ShouldBeUnique
             escapeshellarg(env('DB_DATABASE')),
             escapeshellarg($dumpFile)
         );
+        $this->log('Backup - ' .  $command);
         system($command, $output);
     }
     private function log(string $text){
