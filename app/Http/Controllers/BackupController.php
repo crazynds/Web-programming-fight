@@ -53,6 +53,7 @@ class BackupController extends Controller
 
     public function backupNow()
     {
+        set_time_limit(0);
         $backupPath = storage_path('backup');
         if (!file_exists($backupPath)) {
             mkdir($backupPath, 0777, true);
