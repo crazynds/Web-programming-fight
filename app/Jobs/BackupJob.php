@@ -82,17 +82,15 @@ class BackupJob implements ShouldQueue, ShouldBeUnique
     private function generateSqlDump(string $dumpFile)
     {
         $command = sprintf(
-            'mysqldump --host=%s --user=%s --password=%s %s > %s',
+            'mysqldump --host=%s --user=%s --password=%s --port=%s --no-tablespaces %s > %s',
             escapeshellarg(env('DB_HOST')),
             escapeshellarg(env('DB_USERNAME')),
             escapeshellarg(env('DB_PASSWORD')),
+            escapeshellarg(env('DB_PORT')),
             escapeshellarg(env('DB_DATABASE')),
             escapeshellarg($dumpFile)
         );
         system($command, $output);
-        if ($output !== 0) {
-            return $this->fail('Error on create dump of database');
-        }
     }
     private function log(string $text){
         dump($text);

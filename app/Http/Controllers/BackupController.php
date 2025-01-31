@@ -83,10 +83,11 @@ class BackupController extends Controller
     private function generateSqlDump(string $dumpFile)
     {
         $command = sprintf(
-            'mysqldump --host=%s --user=%s --password=%s --no-tablespaces %s > %s',
+            'mysqldump --host=%s --user=%s --password=%s --port=%s --no-tablespaces %s > %s',
             escapeshellarg(env('DB_HOST')),
             escapeshellarg(env('DB_USERNAME')),
             escapeshellarg(env('DB_PASSWORD')),
+            escapeshellarg(env('DB_PORT')),
             escapeshellarg(env('DB_DATABASE')),
             escapeshellarg($dumpFile)
         );
