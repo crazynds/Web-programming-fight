@@ -38,24 +38,24 @@ class RestoreBackupJob implements ShouldQueue
             dump('Iniciou a restauração');
 
             $backupPath = storage_path('backup');
-            if (file_exists($backupPath))
-                system('rm -rf -- ' . escapeshellarg($backupPath), $retval);
-            if (!file_exists($backupPath)) 
-                mkdir($backupPath, 0777, true);
+            // if (file_exists($backupPath))
+            //     system('rm -rf -- ' . escapeshellarg($backupPath), $retval);
+            // if (!file_exists($backupPath)) 
+            //     mkdir($backupPath, 0777, true);
             
-            file_put_contents($backupPath.'/restore_backup.zip', Storage::readStream('restore_backup.zip'));
+            // file_put_contents($backupPath.'/restore_backup.zip', Storage::readStream('restore_backup.zip'));
             dump('Copiou o backup pro storage');
-            $zip = new ZipArchive;
-            if ($zip->open($backupPath.'/restore_backup.zip') !== true) {
-                $this->fail('Could not open backup file.');
-            }
+            // $zip = new ZipArchive;
+            // if ($zip->open($backupPath.'/restore_backup.zip') !== true) {
+            //     $this->fail('Could not open backup file.');
+            // }
 
             $extractPath = storage_path('backup/extract');
-            if (!file_exists($extractPath)) {
-                mkdir($extractPath, 0777, true);
-            }
-            $zip->extractTo($extractPath);
-            $zip->close();
+            // if (!file_exists($extractPath)) {
+            //     mkdir($extractPath, 0777, true);
+            // }
+            // $zip->extractTo($extractPath);
+            // $zip->close();
             dump('Extraiu zip');
             
             // unlink($backupPath.'/restore_backup.zip');
@@ -96,9 +96,20 @@ class RestoreBackupJob implements ShouldQueue
 
         // Ler e executar cada comando do SQL
         
-        exec('mysql --user=' . env('DB_USERNAME') . ' --password=' . env('DB_PASSWORD') . ' --host=' . env('DB_HOST') . ' --port=' . env('DB_PORT') . ' ' . env('DB_DATABASE') . ' < ' . $sqlFile);
+        $command = sprintf(
+            'mysql --host=%s --user=%s --password=%s --port=%s %s < %s',
+            escapeshellarg(config('database.connections.mysql.host')),
+            escapeshellarg(config('database.connections.mysql.username')),
+            escapeshellarg(config('database.connections.mysql.password')),
+            escapeshellarg(config('database.connections.mysql.port')),
+            escapeshellarg(config('database.connections.mysql.database')),
+            escapeshellarg($sqlFile)
+        );
+        dump($command);
+        exec($command);
         dump('Restaurou o banco de dados');
     }
+
 
     private function restoreS3Files($s3Path)
     {

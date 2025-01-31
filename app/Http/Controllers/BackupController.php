@@ -81,9 +81,20 @@ class BackupController extends Controller
         return $zip;
     }
     private function generateSqlDump(string $dumpFile)
-    {
+    {   
+        $database = config('database.connections.mysql.database');
         $command = sprintf(
-            'mysqldump --host=%s --user=%s --password=%s --port=%s --no-tablespaces %s > %s',
+            'mysqldump --host=%s --user=%s --password=%s --port=%s --no-tablespaces --no-data --skip-triggers %s > %s',
+            escapeshellarg(config('database.connections.mysql.host')),
+            escapeshellarg(config('database.connections.mysql.username')),
+            escapeshellarg(config('database.connections.mysql.password')),
+            escapeshellarg(config('database.connections.mysql.port')),
+            escapeshellarg(config('database.connections.mysql.database')),
+            escapeshellarg($dumpFile)
+        ); 
+        system($command, $output);
+        $command = sprintf(
+            "mysqldump --host=%s --user=%s --password=%s --port=%s --no-tablespaces --no-create-info --ignore-table=$database.pulse_aggregates --ignore-table=$database.jobs --ignore-table=$database.pulse_entries --ignore-table=$database.pulse_values --ignore-table=$database.failed_jobs %s >> %s",
             escapeshellarg(config('database.connections.mysql.host')),
             escapeshellarg(config('database.connections.mysql.username')),
             escapeshellarg(config('database.connections.mysql.password')),
