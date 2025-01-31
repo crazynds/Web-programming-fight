@@ -1,4 +1,4 @@
-<div wire:poll.2000ms.visible="refresh">
+<div wire:poll.2000ms="refresh">
 </div>
 
 

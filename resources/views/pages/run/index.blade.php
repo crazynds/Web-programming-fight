@@ -61,6 +61,6 @@
             </div>
         </div>
     @endif
-    <x-runs-table :global="$global" :contest="$contest ?? ($contestService->contest ?? null)" :livewire="config('app.livewire')"/>
+    <x-runs-table :global="$global" :contest="$contest ?? ($contestService->contest ?? null)"/>
 
 @endsection

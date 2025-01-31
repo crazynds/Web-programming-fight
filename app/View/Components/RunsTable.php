@@ -19,7 +19,6 @@ class RunsTable extends Component
     public function __construct(
         public bool $global,
         public Contest|null $contest,
-        public bool $livewire,
         protected ContestService $contestService,
     ) {
         if ($contestService->inContest)
@@ -93,7 +92,6 @@ class RunsTable extends Component
             'limit' => \Illuminate\Support\Facades\RateLimiter::remaining('resubmission:' . Auth::user()->id, 5),
             'submitRuns' => $this->getQuery()->get(),
             'channel' => $this->getChannel(),
-            'livewire'=> $this->livewire,
             'contest' => $this->contest
         ]);
     }

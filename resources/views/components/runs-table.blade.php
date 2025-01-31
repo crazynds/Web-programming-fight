@@ -241,7 +241,7 @@
             </div>
         </div>
     </div>
-    @if($livewire)
+    @if(config('app.livewire'))
     <livewire:runs-table-component :global="$global" :contest="$contest ?? ($contestService->contest ?? null)" :lastCheck="$lastUpdated"/>
     @endif
 </div>
@@ -537,7 +537,7 @@
         }
     }
 </script>
-@if(!$livewire)
+@if(!config('app.livewire'))
 <script>
     window.addEventListener("load", function() {
         window.Echo.private(channel)
