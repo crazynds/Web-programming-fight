@@ -84,11 +84,11 @@ class BackupController extends Controller
     {
         $command = sprintf(
             'mysqldump --host=%s --user=%s --password=%s --port=%s --no-tablespaces %s > %s',
-            escapeshellarg(env('DB_HOST')),
-            escapeshellarg(env('DB_USERNAME')),
-            escapeshellarg(env('DB_PASSWORD')),
-            escapeshellarg(env('DB_PORT')),
-            escapeshellarg(env('DB_DATABASE')),
+            escapeshellarg(config('database.connections.mysql.host')),
+            escapeshellarg(config('database.connections.mysql.username')),
+            escapeshellarg(config('database.connections.mysql.password')),
+            escapeshellarg(config('database.connections.mysql.port')),
+            escapeshellarg(config('database.connections.mysql.database')),
             escapeshellarg($dumpFile)
         );
         system($command, $output);
