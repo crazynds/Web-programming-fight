@@ -210,14 +210,16 @@ class TestCaseController extends Controller
 
         if (!$t || !$comparator($t->inputfile->get(), $data['input'])) {
             $inputFile = File::createFileByData($data['input'], "problems/{$problem->id}/input");
-            $filesToDelete[] = $t->input_file;
+            if($t)
+                $filesToDelete[] = $t->input_file;
             $changed = true;
         } else {
             $inputFile = $t->inputfile;
         }
         if (!$t || !$comparator($t->outputfile->get(), $data['output'])) {
             $outputFile = File::createFileByData($data['output'], "problems/{$problem->id}/output");
-            $filesToDelete[] = $t->output_file;
+            if($t)
+                $filesToDelete[] = $t->output_file;
             $changed = true;
         } else {
             $outputFile = $t->outputfile;
@@ -230,7 +232,7 @@ class TestCaseController extends Controller
             'input_file' => $inputFile->id,
             'output_file' => $outputFile->id,
             'explanation' => $data['explanation'] ?? null,
-            'validated' => $changed ? false : $t->validated,
+            'validated' => $changed ? false : ($t?->validated ?? false),
             'position' => $t ? $t->position : $problem->testCases()->count() + 1,
         ]);
 

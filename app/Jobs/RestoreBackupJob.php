@@ -38,24 +38,24 @@ class RestoreBackupJob implements ShouldQueue
             dump('Iniciou a restauração');
 
             $backupPath = storage_path('backup');
-            // if (file_exists($backupPath))
-            //     system('rm -rf -- ' . escapeshellarg($backupPath), $retval);
-            // if (!file_exists($backupPath)) 
-            //     mkdir($backupPath, 0777, true);
+            if (file_exists($backupPath))
+                system('rm -rf -- ' . escapeshellarg($backupPath), $retval);
+            if (!file_exists($backupPath)) 
+                mkdir($backupPath, 0777, true);
             
-            // file_put_contents($backupPath.'/restore_backup.zip', Storage::readStream('restore_backup.zip'));
+            file_put_contents($backupPath.'/restore_backup.zip', Storage::readStream('restore_backup.zip'));
             dump('Copiou o backup pro storage');
-            // $zip = new ZipArchive;
-            // if ($zip->open($backupPath.'/restore_backup.zip') !== true) {
-            //     $this->fail('Could not open backup file.');
-            // }
+            $zip = new ZipArchive;
+            if ($zip->open($backupPath.'/restore_backup.zip') !== true) {
+                $this->fail('Could not open backup file.');
+            }
 
             $extractPath = storage_path('backup/extract');
-            // if (!file_exists($extractPath)) {
-            //     mkdir($extractPath, 0777, true);
-            // }
-            // $zip->extractTo($extractPath);
-            // $zip->close();
+            if (!file_exists($extractPath)) {
+                mkdir($extractPath, 0777, true);
+            }
+            $zip->extractTo($extractPath);
+            $zip->close();
             dump('Extraiu zip');
             
             // unlink($backupPath.'/restore_backup.zip');
@@ -64,8 +64,10 @@ class RestoreBackupJob implements ShouldQueue
             $this->restoreDatabase("$extractPath/database.sql");
 
             // Restaurar os arquivos para o S3
-            //$this->restoreS3Files("$extractPath/s3");
-            //system('rm -rf -- ' . escapeshellarg($backupPath), $retval);
+            $this->restoreS3Files("$extractPath/s3");
+            system('rm -rf -- ' . escapeshellarg($backupPath), $retval);
+
+            Storage::delete('restore_backup.zip');
         } catch(Exception $ex){
             dump($ex);
             throw $ex;
@@ -122,14 +124,17 @@ class RestoreBackupJob implements ShouldQueue
             if($file == 'backup.zip') continue;
             Storage::delete($file);
         }
+        dump('Removeu os arquivos do storage');
 
-        // $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($s3Path));
-        // foreach ($files as $file) {
-        //     if (!$file->isFile()) continue;
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($s3Path));
+        foreach ($files as $file) {
+            if (!$file->isFile()) continue;
 
-        //     $relativePath = str_replace("$s3Path/", '', $file->getPathname());
-        //     Storage::put($relativePath, file_get_contents($file->getPathname()));
-        // }
+            $relativePath = str_replace("$s3Path/", '', $file->getPathname());
+            Storage::put($relativePath, file_get_contents($file->getPathname()));
+            
+            dump('Adicionou arquivo: ' . $relativePath);
+        }
     }
 
 }
