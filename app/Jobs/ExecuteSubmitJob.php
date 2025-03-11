@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
+class ExecuteSubmitJob implements ShouldBeUnique, ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -41,46 +41,59 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
         return $this->submit->id;
     }
 
-    private function executeTestCase(ExecutorService $executor, TestCase $testCase, $modifiers)
+    private function executeTestCase(ExecutorService $executor, TestCase $testCase, $modifiers, bool $failOnTimelimt = false)
     {
         $timeLimit = $this->submit->problem->time_limit * $modifiers[0];
         $memoryLimit = $this->submit->problem->memory_limit * $modifiers[1];
         $executor->executeTestCase($testCase, $timeLimit, $memoryLimit);
+        // Execute 2 times the test case when time limit
+        if ($executor->execution_time > $timeLimit && ! $failOnTimelimt && $testCase->validated) {
+            return $this->executeTestCase($executor, $testCase, $modifiers, true);
+        }
 
         if ($testCase->validated) {
             $this->submit->execution_time = max($this->submit->execution_time ?? 0, $executor->execution_time);
             $this->submit->execution_memory = max($this->submit->execution_memory ?? 0, $executor->execution_memory);
         }
         if ($executor->execution_time > $timeLimit) {
-            if ($testCase->validated)
+            if ($testCase->validated) {
                 $this->submit->execution_time = $timeLimit + 0.1;
+            }
+
             return SubmitResult::TimeLimit;
         }
         if ($executor->execution_memory > $memoryLimit) {
-            if ($testCase->validated)
+            if ($testCase->validated) {
                 $this->submit->execution_memory = $memoryLimit + 0.1;
+            }
+
             return SubmitResult::MemoryLimit;
         }
         if ($executor->retval != 0) {
             // TODO: Um RuntimeError pode ser causado por memory limit, mas não tem como saber nesses casos
             // Buscar solução alternativa
             // Por enquanto funciona em python ok.
-            if ($testCase->validated)
+            if ($testCase->validated) {
                 $this->submit->output = $executor->output;
+            }
+
             return SubmitResult::RuntimeError;
         } else {
 
             $executor->testOutputFile($testCase);
 
             if ($executor->retval != 0) {
-                if ($testCase->validated)
-                    $this->submit->output = 'Test case: ' . $testCase->name . "\n" . implode(PHP_EOL, $executor->output);
+                if ($testCase->validated) {
+                    $this->submit->output = 'Test case: '.$testCase->name."\n".implode(PHP_EOL, $executor->output);
+                }
+
                 return SubmitResult::WrongAnswer;
             }
         }
         // We need this line of code when we are validating a test case
         $this->submit->execution_time = max($this->submit->execution_time ?? 0, $executor->execution_time);
         $this->submit->execution_memory = max($this->submit->execution_memory ?? 0, $executor->execution_memory);
+
         return SubmitResult::Accepted;
     }
 
@@ -93,11 +106,11 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
         foreach ($testCases as $testCase) {
             $result = $this->executeTestCase($executor, $testCase, $modifiers);
             $testCasesRel[$testCase->id] = [
-                'result' => $result
+                'result' => $result,
             ];
             $this->submit->result = $result;
 
-            //Log::channel('events')->info('Executing test case (' . $testCase->id. ') - '.$this->submit->result);
+            // Log::channel('events')->info('Executing test case (' . $testCase->id. ') - '.$this->submit->result);
             if ($result == SubmitResult::Accepted) {
                 $num += 1;
                 UpdateSubmissionTestCaseEvent::dispatch($this->submit, $num);
@@ -111,12 +124,12 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
         ) {
             // Tenta validar os casos de testes não validados até então...
             try {
-                $lock = Cache::lock('problem:validating:' . $this->submit->problem->id, 60);
+                $lock = Cache::lock('problem:validating:'.$this->submit->problem->id, 60);
                 $lock->block(5);
                 foreach ($this->submit->problem->testCases()->where('validated', '=', false)->with(['inputfile', 'outputfile'])->get() as $testCase) {
                     $result = $this->executeTestCase($executor, $testCase, $modifiers);
                     $testCasesRel[$testCase->id] = [
-                        'result' => $result
+                        'result' => $result,
                     ];
                     if ($result == SubmitResult::Accepted) {
                         $num += 1;
@@ -131,12 +144,13 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
             } finally {
                 $lock?->release();
             }
-            if ($num > 0)
+            if ($num > 0) {
                 $this->submit->result = SubmitResult::Accepted;
-            else if ($testCases->count() == 0)
+            } elseif ($testCases->count() == 0) {
                 $this->submit->result = SubmitResult::NoTestCase;
-            else
+            } else {
                 $this->submit->result = SubmitResult::WrongAnswer;
+            }
             $this->submit->output = null;
         }
         $this->submit->testCases()->sync($testCasesRel);
@@ -148,7 +162,7 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
      */
     public function handle(ExecutorService $executor): void
     {
-        //Log::channel('events')->info('Executing submit ' . $this->submit->id);
+        // Log::channel('events')->info('Executing submit ' . $this->submit->id);
         $file = $this->submit->file;
         $this->submit->status = SubmitStatus::Judging;
         $this->submit->result = SubmitResult::NoResult;
@@ -158,9 +172,9 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
         $this->submit->save();
         $result = $executor->setup($this->submit->problem, $file, $this->submit->language);
         $this->submit->result = $result;
-        if ($result == SubmitResult::NoResult)
+        if ($result == SubmitResult::NoResult) {
             $this->executeAllTestCases($executor);
-        else if ($result == SubmitResult::CompilationError) {
+        } elseif ($result == SubmitResult::CompilationError) {
             $this->submit->output = implode(PHP_EOL, $executor->output);
         }
         $this->submit->status = SubmitStatus::Judged;
@@ -181,7 +195,7 @@ class ExecuteSubmitJob implements ShouldQueue, ShouldBeUnique
             ContestComputeScore::dispatchSync($this->submit, $this->submit->contest, $competidor);
         }
 
-        //Log::channel('events')->info('Ending submit ' . $this->submit->id. ' with result ' . $this->submit->result);
+        // Log::channel('events')->info('Ending submit ' . $this->submit->id. ' with result ' . $this->submit->result);
     }
 
     public function failed(Throwable $exception): void
