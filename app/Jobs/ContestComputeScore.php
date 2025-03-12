@@ -4,7 +4,6 @@ namespace App\Jobs;
 
 use App\Enums\SubmitResult;
 use App\Models\Competitor;
-use App\Models\CompetitorScore;
 use App\Models\Contest;
 use App\Models\SubmitRun;
 use Illuminate\Bus\Queueable;
@@ -12,7 +11,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class ContestComputeScore extends RecalculateCompetitorScore implements ShouldQueue
@@ -23,7 +21,7 @@ class ContestComputeScore extends RecalculateCompetitorScore implements ShouldQu
      * Create a new job instance.
      */
     public function __construct(
-        protected SubmitRun|null $submitRun,
+        protected SubmitRun $submitRun,
         protected Contest $contest,
         protected Competitor $competitor
     ) {
@@ -32,10 +30,6 @@ class ContestComputeScore extends RecalculateCompetitorScore implements ShouldQu
 
     protected function compute(): void
     {
-        if (!$this->submitRun) {
-            return;
-        }
-
         switch ($this->submitRun->result) {
             case SubmitResult::fromValue(SubmitResult::Accepted)->description:
                 $computedPontuation = $this->calculateScore($this->contest, $this->submitRun);
@@ -47,7 +41,7 @@ class ContestComputeScore extends RecalculateCompetitorScore implements ShouldQu
                 $this->updateCompetitorScore($this->submitRun, $computedPontuation, $penality);
 
                 // Clear leaderboard cache
-                Cache::forget('contest:leaderboard:' . $this->contest->id);
+                Cache::forget('contest:leaderboard:'.$this->contest->id);
                 break;
             case SubmitResult::fromValue(SubmitResult::TimeLimit)->description:
             case SubmitResult::fromValue(SubmitResult::MemoryLimit)->description:
@@ -56,11 +50,11 @@ class ContestComputeScore extends RecalculateCompetitorScore implements ShouldQu
                 if ($this->contest->parcial_solution && false) {
                     // TODO: COMPUTE IF IS PARCIAL SOLUTION
                 }
-                Cache::forget('contest:leaderboard:' . $this->contest->id);
+                Cache::forget('contest:leaderboard:'.$this->contest->id);
                 break;
             case SubmitResult::fromValue(SubmitResult::CompilationError)->description:
             default:
-                Cache::forget('contest:leaderboard:' . $this->contest->id);
+                Cache::forget('contest:leaderboard:'.$this->contest->id);
                 break;
         }
     }
