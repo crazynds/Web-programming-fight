@@ -11,7 +11,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt-get update \
     && mkdir -p /etc/apt/keyrings \
-    && apt-get install -y gnupg gosu curl ca-certificates git zip unzip libcap2-bin librsvg2-bin fswatch \
+    && apt-get install -y gnupg gosu curl ca-certificates git zip unzip libcap2-bin librsvg2-bin fswatch libcap-dev \
     && curl -sS 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x14aa40ec0831756756d7f66c4f4ea0aae5267a6c' | gpg --dearmor | tee /etc/apt/keyrings/ppa_ondrej_php.gpg > /dev/null \
     && echo "deb [signed-by=/etc/apt/keyrings/ppa_ondrej_php.gpg] https://ppa.launchpadcontent.net/ondrej/php/ubuntu jammy main" > /etc/apt/sources.list.d/ppa_ondrej_php.list
 
@@ -113,13 +113,16 @@ RUN cd /nsjail && make && mv /nsjail/nsjail /bin && rm -rf -- /nsjail
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Copy nsjail confign
-RUN mkdir /var/nsjail
-RUN chmod 0777 /var/nsjail
+RUN mkdir /var/config
+RUN chmod 0777 /var/config
 
-COPY ./docker/config/ /var/nsjail/
-RUN chmod +x /var/nsjail/runPypy3.10.sh
-RUN chmod +x /var/nsjail/runPython3.11.sh
-RUN chmod +x /var/nsjail/runBinary.sh
+
+# RUN git clone https://github.com/ioi/isolate.git /isolate
+# RUN cd /isolate && make isolate && mv /isolate/isolate /bin && rm -rf /isolate
+# COPY ./docker/config/isolate.conf /usr/local/etc/isolate
+
+# COPY ./docker/config/ /var/config
+# RUN chmod +x /var/config/*.sh
 
 ENTRYPOINT ["php", "/var/www/html/artisan", "queue:work", "--queue=high,contest,submit,rank,low","--sleep=2","--tries=2","--backoff=15,30,60","--max-jobs=300"]
 
