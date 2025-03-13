@@ -18,7 +18,7 @@
             REVERB_SCHEME: '{{ config('reverb.apps.apps.0.options.scheme') }}',
             REVERB_PORT: '{{ config('reverb.apps.apps.0.options.port') }}',
             REVERB_PATH: '',
-            LIVEWIRE: {{ config('app.livewire')}},
+            LIVEWIRE: {{ config('app.livewire')? 'true' : 'false'}},
         }
 
     </script>

@@ -115,7 +115,6 @@ class SubmitRunController extends Controller
                 if (isset($job)) {
                     $job->onQueue('contest');
                 }
-                $run->save();
             }
             if ($run->status == SubmitStatus::fromValue(SubmitStatus::WaitingInLine)->description) {
                 if ($run->language == LanguagesType::name(LanguagesType::Auto_detect)) {
@@ -140,10 +139,11 @@ class SubmitRunController extends Controller
 
                     }
                 }
-                if (! $job) {
+                if (! isset($job)) {
                     $job = ExecuteSubmitJob::dispatch($run)->delay(now()->addSeconds(5))->afterCommit();
                 }
             }
+            $run->save();
             NewSubmissionEvent::dispatch($run);
 
             return $run;

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python3.11 -Su /var/nsjail/exec "$@"
+python3.11 -u /var/config/exec "$@"

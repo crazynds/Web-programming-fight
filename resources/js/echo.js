@@ -1,17 +1,17 @@
-import Echo from 'laravel-echo';
+import Echo from "laravel-echo";
 
-import Pusher from 'pusher-js';
+import Pusher from "pusher-js";
 window.Pusher = Pusher;
 
-if(!window.env.LIVEWIRE){
+if (!window.env.LIVEWIRE) {
     window.Echo = new Echo({
-        broadcaster: 'reverb',
+        broadcaster: "reverb",
         key: window.env.REVERB_APP_KEY,
         wsHost: window.env.REVERB_HOST,
         wsPort: window.env.REVERB_PORT ?? 80,
         wssPort: window.env.REVERB_PORT ?? 443,
         wsPath: window.env.REVERB_PATH ?? "/",
-        forceTLS: (window.env.REVERB_SCHEME ?? 'https') === 'https',
-        enabledTransports: ['ws', 'wss'],
+        forceTLS: (window.env.REVERB_SCHEME ?? "https") === "https",
+        enabledTransports: ["ws", "wss"],
     });
 }

@@ -1,0 +1,41 @@
+#!/bin/bash
+
+LINGUAGEM=$1
+ARQUIVO=$2
+OUTPUT=$3
+
+if [ ! -f "$ARQUIVO" ]; then
+    echo "Erro: Arquivo '$ARQUIVO' não encontrado."
+    exit 1
+fi
+
+case "$LINGUAGEM" in
+    python)
+        ;;
+    c)
+        echo "Compilando código C..."
+        #OUTPUT="/var/config/exec"  # Remove a extensão do arquivo
+        gcc -std=c17 -mtune=native -lm -static -march=native --stack=268435456 -w -O2 "$ARQUIVO" -o "$OUTPUT" 2>&1
+        if [ $? -eq 0 ]; then
+            echo "Compilado com sucesso"
+        else
+            echo "Erro na compilação do código C."
+            exit 1
+        fi
+        ;;
+    c++)
+        echo "Compilando código C++..."
+        #OUTPUT="/var/config/exec"  # Remove a extensão do arquivo
+        g++ -std=c++20 -mtune=native -Wreturn-type -static -march=native -w -O2 "$ARQUIVO" -o "$OUTPUT" 2>&1
+        if [ $? -eq 0 ]; then
+            echo "Compilado com sucesso"
+        else
+            echo "Erro na compilação do código C++."
+            exit 1
+        fi
+        ;;
+    *)
+        echo "Erro: Linguagem não suportada. Use 'python', 'c' ou 'c++'."
+        exit 1
+        ;;
+esac

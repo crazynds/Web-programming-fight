@@ -55,13 +55,11 @@ RUN git clone https://github.com/google/nsjail.git  /nsjail
 RUN cd /nsjail && make && mv /nsjail/nsjail /bin && rm -rf -- /nsjail
 
 # Copy nsjail config
-RUN mkdir /var/nsjail
-RUN chmod 0777 /var/nsjail
+RUN mkdir /var/config
+RUN chmod 0777 /var/config
 
-COPY ./docker/config/ /var/nsjail/
-RUN chmod +x /var/nsjail/runPypy3.10.sh
-RUN chmod +x /var/nsjail/runPython3.11.sh
-RUN chmod +x /var/nsjail/runBinary.sh
+COPY ./docker/config/ /var/config/
+RUN chmod +x /var/config/*.sh
 
 
 # Add php additional extensions 
