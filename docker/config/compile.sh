@@ -9,13 +9,15 @@ if [ ! -f "$ARQUIVO" ]; then
     exit 1
 fi
 
+ulimit -v 1073741824
+
 case "$LINGUAGEM" in
     python)
         ;;
     c)
         echo "Compilando código C..."
         #OUTPUT="/var/config/exec"  # Remove a extensão do arquivo
-        gcc -std=c17 -mtune=native -lm -static -march=native --stack=268435456 -w -O2 "$ARQUIVO" -o "$OUTPUT" 2>&1
+        gcc -std=c17 -mtune=native -lm -static -march=native -w -O2 "$ARQUIVO" -o "$OUTPUT" 2>&1
         if [ $? -eq 0 ]; then
             echo "Compilado com sucesso"
         else

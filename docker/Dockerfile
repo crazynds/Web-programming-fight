@@ -121,8 +121,8 @@ RUN chmod 0777 /var/config
 # RUN cd /isolate && make isolate && mv /isolate/isolate /bin && rm -rf /isolate
 # COPY ./docker/config/isolate.conf /usr/local/etc/isolate
 
-# COPY ./docker/config/ /var/config
-# RUN chmod +x /var/config/*.sh
+COPY ./docker/config/ /var/config
+RUN chmod +x /var/config/*.sh
 
 ENTRYPOINT ["php", "/var/www/html/artisan", "queue:work", "--queue=high,contest,submit,rank,low","--sleep=2","--tries=2","--backoff=15,30,60","--max-jobs=300"]
 

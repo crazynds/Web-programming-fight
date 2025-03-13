@@ -15,7 +15,7 @@
 /storage/framework/sessions/*
 /storage/framework/views/*
 /bootstrap/cache/*
-/vendor
+#/vendor
 /node_modules
 /doc
 /stubs
