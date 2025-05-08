@@ -33,33 +33,32 @@ class PrepareSBCProblemsJob implements ShouldQueue
         $this->onQueue('high');
     }
 
-
     public function adicionaProblema(string $path)
     {
         // Extrair arquivo
-        $zp = new ZipArchive();
-        $zp->open('/var/work/' . $path, ZipArchive::RDONLY);
+        $zp = new ZipArchive;
+        $zp->open('/var/work/'.$path, ZipArchive::RDONLY);
         $problemInfo = $zp->getFromName('description/problem.info');
         $problemInfo = explode("\n", $problemInfo);
-        $problemInfo = array_column(array_map(fn($x) => explode('=', $x), $problemInfo), 1, 0);
+        $problemInfo = array_column(array_map(fn ($x) => explode('=', $x), $problemInfo), 1, 0);
         // Pegar informações de titulo/descrição/input/output
         $title = substr($problemInfo['fullname'], 1, strlen($problemInfo['fullname']) - 2);
         $letter = $problemInfo['basename'];
-        $data = $zp->getFromName('description/' . $problemInfo['descfile']);
+        $data = $zp->getFromName('description/'.$problemInfo['descfile']);
         if (str_ends_with($problemInfo['descfile'], '.pdf')) {
             Storage::disk('work')->put('sbc.pdf', $data);
             $text = Pdf::getText('/var/work/sbc.pdf', options: [
                 'x 0',
                 'y 50',
                 'H 10000',
-                'W 10000'
+                'W 10000',
             ]);
             $text = explode(PHP_EOL, $text, 4)[3];
-            $text = explode('Entrada' . PHP_EOL, $text, 2);
+            $text = explode('Entrada'.PHP_EOL, $text, 2);
             $descricao = $text[0];
-            $text = explode('Saı́da' . PHP_EOL, $text[1], 2);
+            $text = explode('Saı́da'.PHP_EOL, $text[1], 2);
             $input = $text[0];
-            $text = explode('Exemplo de entrada 1' . PHP_EOL, $text[1], 2);
+            $text = explode('Exemplo de entrada 1'.PHP_EOL, $text[1], 2);
             $output = $text[0];
         } else {
             // Significa que não é um pdf e não sei oq fazer com isso.
@@ -79,14 +78,14 @@ class PrepareSBCProblemsJob implements ShouldQueue
             'output_description' => $output,
             'user_id' => $this->user->id,
             'time_limit' => $timelimit,
-            'memory_limit' => $memorylimit
+            'memory_limit' => $memorylimit,
         ]);
 
         // Pegar os testes cases
         $num = 0;
-        while ($inputTestCase = $zp->getFromName('input/' . $letter . '_' . ++$num)) {
-            $file = $letter . '_' . $num;
-            $outputTestCase = $zp->getFromName('output/' . $file);
+        while ($inputTestCase = $zp->getFromName('input/'.$letter.'_'.++$num)) {
+            $file = $letter.'_'.$num;
+            $outputTestCase = $zp->getFromName('output/'.$file);
             $inputFile = File::createFileByData($inputTestCase, "problems/{$problem->id}/input");
             $outputFile = File::createFileByData($outputTestCase, "problems/{$problem->id}/output");
             $problem->testCases()->create([
@@ -134,7 +133,7 @@ class PrepareSBCProblemsJob implements ShouldQueue
         Storage::disk('work')->put('sbc.tar', $this->zip->readStream());
         $phar = new PharData('/var/work/sbc.tar');
         exec('rm -rf /var/work/sbc'); // Force to delete old dir
-        $phar->extractTo('/var/work/sbc'); // extract all files
+        $phar->extractTo('/var/work/sbc', null, true); // Force extract all files
         foreach (Storage::disk('work')->allFiles('sbc') as $file) {
             if (str_ends_with($file, '.zip')) {
                 try {
