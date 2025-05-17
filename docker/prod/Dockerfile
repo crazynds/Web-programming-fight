@@ -35,24 +35,25 @@ RUN chmod 0777 /var/scripts
 COPY ./docker/scripts /var/scripts
 
 # Download and install pypy 3.10
-RUN wget https://buildbot.pypy.org/nightly/py3.10/pypy-c-jit-184945-79a57c5ea141-linux64.tar.bz2 -P /langs
-RUN tar -xf /langs/pypy-c-jit-184945-79a57c5ea141-linux64.tar.bz2 -C /langs && \
-    mv /langs/pypy-c-jit-184945-79a57c5ea141-linux64 /langs/pypy3.10 && \
-    rm /langs/pypy-c-jit-184945-79a57c5ea141-linux64.tar.bz2 && \
+RUN wget https://buildbot.pypy.org/nightly/py3.10/pypy-c-jit-186045-8708da3ee078-linux64.tar.bz2 -P /langs && \
+    tar -xf /langs/pypy-c-jit-186045-8708da3ee078-linux64.tar.bz2 -C /langs && \
+    mv /langs/pypy-c-jit-186045-8708da3ee078-linux64 /langs/pypy3.10 && \
+    rm /langs/pypy-c-jit-186045-8708da3ee078-linux64.tar.bz2 && \
     rm /langs/pypy3.10/bin/python* && \
     cp /langs/pypy3.10/bin/* /usr/bin -r && \
     cp /langs/pypy3.10/lib/* /usr/lib -r && \
     cp /langs/pypy3.10/include/* /usr/include -r
 
 # Download and install pypy 3.11
-RUN wget https://buildbot.pypy.org/nightly/py3.11/pypy-c-jit-latest-linux64.tar.bz2 -P /langs
-RUN tar -xf /langs/pypy-c-jit-latest-linux64.tar.bz2 -C /langs && \
-    mv /langs/pypy-c-jit-latest-linux64 /langs/pypy3.11 && \
-    rm /langs/pypy-c-jit-latest-linux64.tar.bz2 && \
+RUN wget https://buildbot.pypy.org/nightly/py3.11/pypy-c-jit-186687-ff94ca720f36-linux64.tar.bz2 -P /langs && \
+    tar -xf /langs/pypy-c-jit-186687-ff94ca720f36-linux64.tar.bz2 -C /langs && \
+    mv /langs/pypy-c-jit-186687-ff94ca720f36-linux64 /langs/pypy3.11 && \
+    rm /langs/pypy-c-jit-186687-ff94ca720f36-linux64.tar.bz2 && \
     rm /langs/pypy3.11/bin/python* && \
     cp /langs/pypy3.11/bin/* /usr/bin -r && \
     cp /langs/pypy3.11/lib/* /usr/lib -r && \
     cp /langs/pypy3.11/include/* /usr/include -r
+
 
 # Download and install python 
 RUN wget https://www.python.org/ftp/python/3.13.3/Python-3.13.3.tar.xz -P /langs
