@@ -11,18 +11,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_21.x | tap | bash && \
     apt-get update && \
     apt-get install -y tzdata dos2unix npm bash supervisor mariadb-client \
     nano time wget \
-    autoconf \
-    bison \
-    flex \
-    gcc \
-    g++ \
-    libprotobuf-dev \
-    libnl-route-3-dev \
-    libtool \
-    make \
-    pkg-config \
-    protobuf-compiler \
-    poppler-utils \
+    gcc g++ build-essential \
     python3.11 python3-pip && \ 
     install-php-extensions redis pdo_mysql pdo_pgsql mbstring exif pcntl curl zip intl sockets xml gd && \
     php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer && \
@@ -33,13 +22,13 @@ RUN mkdir /langs
 # Download and install python 
 RUN wget https://www.python.org/ftp/python/3.13.3/Python-3.13.3.tar.xz -P /langs && \
     tar -xf /langs/Python-3.13.3.tar.xz -C /langs && \
-    apt-get install -y build-essential libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev && \
+    apt-get install -y libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev && \
     mv /langs/Python-3.13.3 /langs/python3.13 && \
     rm /langs/Python-3.13.3.tar.xz && \
     cd /langs/python3.13 && \
     ./configure --enable-optimizations --without-ensurepip --disable-ipv6 && \
     make altinstall && \
-    apt-get purge -y build-essential libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev
+    apt-get purge -y libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev
 
 # Download and install pypy 3.10
 RUN wget https://buildbot.pypy.org/nightly/py3.10/pypy-c-jit-186045-8708da3ee078-linux64.tar.bz2 -P /langs && \
@@ -62,8 +51,10 @@ RUN wget https://buildbot.pypy.org/nightly/py3.11/pypy-c-jit-186687-ff94ca720f36
     cp /langs/pypy3.11/include/* /usr/include -r
 
 # Download and install NSJail
-RUN git clone https://github.com/google/nsjail.git  /nsjail
-RUN cd /nsjail && make && mv /nsjail/nsjail /bin && rm -rf -- /nsjail
+RUN git clone https://github.com/google/nsjail.git  /nsjail && \
+    apt-get install -y libprotobuf-dev protobuf-compiler libnl-3-dev libnl-genl-3-dev libcap-dev libseccomp-dev pkg-config && \
+    cd /nsjail && make && mv /nsjail/nsjail /bin && rm -rf -- /nsjail && \
+    apt-get purge -y libprotobuf-dev protobuf-compiler libnl-3-dev libnl-genl-3-dev libcap-dev libseccomp-dev pkg-config
 
 # Copy nsjail config
 RUN mkdir /var/config && chmod 0777 /var/config
