@@ -11,6 +11,7 @@ ENV NODE_VERSION=18
 
 # Install node UBUNTU
 RUN curl -fsSL https://deb.nodesource.com/setup_21.x | tap | bash
+RUN add-apt-repository ppa:deadsnakes/ppa 
 RUN apt-get update && \
     apt-get install -y tzdata dos2unix npm bash supervisor mariadb-client \
     nano time wget \
