@@ -53,9 +53,9 @@ RUN wget https://buildbot.pypy.org/nightly/py3.11/pypy-c-jit-186687-ff94ca720f36
 
 # Download and install NSJail
 RUN git clone https://github.com/google/nsjail.git  /nsjail && \
-    apt-get install -y libprotobuf-dev bison flex protobuf-compiler libnl-3-dev libnl-genl-3-dev libcap-dev libseccomp-dev pkg-config && \
+    apt-get install -y libprotobuf-dev bison flex protobuf-compiler libnl-3-dev libnl-genl-3-dev libcap-dev libseccomp-dev pkg-config libnl-route-3-dev && \
     cd /nsjail && make && mv /nsjail/nsjail /bin && rm -rf -- /nsjail && \
-    apt-get purge -y libprotobuf-dev bison flex protobuf-compiler libnl-3-dev libnl-genl-3-dev libcap-dev libseccomp-dev pkg-config
+    apt-get purge -y libprotobuf-dev bison flex protobuf-compiler libnl-3-dev libnl-genl-3-dev libcap-dev libseccomp-dev pkg-configlibnl-route-3-dev
 
 # Copy nsjail config
 RUN mkdir /var/config && chmod 0777 /var/config
