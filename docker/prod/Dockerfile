@@ -28,7 +28,9 @@ RUN apt-get update && \
     poppler-utils \
     software-properties-common python3-apt
 
-RUN add-apt-repository ppa:deadsnakes/ppa 
+# Adiciona a chave GPG do PPA
+RUN curl -fsSL https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x6A755776 | gpg --dearmor -o /etc/apt/trusted.gpg.d/deadsnakes.gpg && \
+    echo "deb http://ppa.launchpad.net/deadsnakes/ppa/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/deadsnakes-ppa.list
 
 RUN apt-get update && \
     apt-get install -y \
