@@ -26,7 +26,8 @@ RUN apt-get update && \
     pkg-config \
     protobuf-compiler \
     poppler-utils \
-    software-properties-common
+    software-properties-common python3-apt
+
 RUN add-apt-repository ppa:deadsnakes/ppa 
 
 RUN apt-get update && \
