@@ -61,7 +61,7 @@ RUN tar -xf /langs/Python-3.13.3.tar.xz -C /langs && \
     apt-get install -y build-essential libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev && \
     mv /langs/Python-3.13.3 /langs/python3.13 && \
     rm /langs/Python-3.13.3.tar.xz && \
-    cd /langs/Python-3.13.3 && \
+    cd /langs/Python-3.13 && \
     ./configure --enable-optimizations && \
     make altinstall && \
     apt-get purge -y build-essential libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev
