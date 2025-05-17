@@ -49,16 +49,16 @@
             <div class="row">
                 <div class="col-8">
                     <h3>
-                        v1.1.0 - Access to Multiple Online Judges 🌎
+                        v1.1.0 - Fancy Update!
                     </h3>
                     <p>
-                        Date: XX-03-2025
+                        Date: 17-05-2025
                         By: Crazynds
                     </p>
                     <p>
                         Features ✨
                     <ul>
-                        <li>Integration with most online judges using VJudge.</li>
+                        <li>Integration with VJudge. (Not available yet)</li>
                         <li>Livewire can be used instead of WebSockets.</li>
                         <li>Added pagination in problem list.</li>
                         <li>Added title search in problem list.</li>
@@ -68,8 +68,8 @@
                         Changes ⚙️
                     <ul>
                         <li>Python and PyPy is now compiled before execution.</li>
-                        <li></li>
-                        <li></li>
+                        <li>Python is now version 3.13</li>
+                        <li>Pypy is now version 3.11</li>
                     </ul>
                     </p>
                     <p>
@@ -77,12 +77,13 @@
                     <ul>
                         <li>JQuery is not imported manually anymore.</li>
                         <li>Select2 plugin is now used.</li>
+                        <li>Contest leaderboad now auto updates itself and has some fancy animations.</li>
                     </ul>
                     </p>
                     <p>
                         Fixes 🐛
                     <ul>
-                        <li>Compilation time and memory is now limited.</li>
+                        <li>Compilation time and compilation memory is now limited.</li>
                         <li></li>
                     </ul>
                     </p>
