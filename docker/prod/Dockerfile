@@ -13,6 +13,7 @@ ENV NODE_VERSION=18
 RUN curl -fsSL https://deb.nodesource.com/setup_21.x | tap | bash
 RUN apt-get update && \
     apt-get install -y tzdata dos2unix npm bash supervisor mariadb-client \
+    build-essential libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev \
     nano time wget \
     autoconf \
     bison \
@@ -26,14 +27,7 @@ RUN apt-get update && \
     pkg-config \
     protobuf-compiler \
     poppler-utils \
-    software-properties-common python3-launchpadlib
-
-# Adiciona a chave GPG do PPA
-RUN add-apt-repository ppa:deadsnakes/ppa
-
-RUN apt-get update && \
-    apt-get install -y \
-    python3.11 python3-pip python3.13
+    python3.11 python3-pip
 
 RUN mkdir /langs
 
@@ -61,6 +55,14 @@ RUN tar -xf /langs/pypy-c-jit-latest-linux64.tar.bz2 -C /langs && \
     cp /langs/pypy3.11/lib/* /usr/lib -r && \
     cp /langs/pypy3.11/include/* /usr/include -r
 
+# Download and install python 
+RUN wget https://www.python.org/ftp/python/3.13.3/Python-3.13.3.tar.xz -P /langs
+RUN tar -xf /langs/Python-3.13.3.tar.xz -C /langs && \
+    mv /langs/Python-3.13.3 /langs/python3.13 && \
+    rm /langs/Python-3.13.3.tar.xz && \
+    cd /langs/Python-3.13.3 && \
+    ./configure --enable-optimizations && \
+    make altinstall
 
 # Download and install NSJail
 RUN git clone https://github.com/google/nsjail.git  /nsjail
