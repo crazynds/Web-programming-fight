@@ -26,11 +26,10 @@ RUN apt-get update && \
     pkg-config \
     protobuf-compiler \
     poppler-utils \
-    software-properties-common python3-apt
+    software-properties-common python3-launchpadlib
 
 # Adiciona a chave GPG do PPA
-RUN curl -fsSL https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x6A755776 | gpg --dearmor -o /etc/apt/trusted.gpg.d/deadsnakes.gpg && \
-    echo "deb http://ppa.launchpad.net/deadsnakes/ppa/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/deadsnakes-ppa.list
+RUN add-apt-repository ppa:deadsnakes/ppa
 
 RUN apt-get update && \
     apt-get install -y \
