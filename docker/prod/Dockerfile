@@ -22,6 +22,7 @@ RUN mkdir /langs
 # Download and install python 
 RUN wget https://www.python.org/ftp/python/3.13.3/Python-3.13.3.tar.xz -P /langs && \
     tar -xf /langs/Python-3.13.3.tar.xz -C /langs && \
+    apt-get update && \
     apt-get install -y libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev && \
     mv /langs/Python-3.13.3 /langs/python3.13 && \
     rm /langs/Python-3.13.3.tar.xz && \
