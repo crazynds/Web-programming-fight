@@ -142,6 +142,10 @@
         }
 
         /* Orquídea */
+
+        #tr {
+            transition: all 1s ease;
+        }
     </style>
 @endsection
 @section('content')
@@ -159,10 +163,13 @@
         </div>
     </div>
 
-    <table border="1"@if ($blind) style="background-color: #0002" @endif>
+    <table border="1"@if ($blind) style="background-color: #0002" @endif id="ranking">
         <thead>
             <tr>
-                <th class="px-1"><b>#</b></th>
+                <th class="px-1">#</th>
+                @if (!$contest->individual)
+                    <th></th>
+                @endif
                 <th class="text-center px-2" style="min-width:200px;"><b>Name</b></th>
                 @php($letter = 'A')
                 @foreach ($problems as $problem)
@@ -174,20 +181,29 @@
         <tbody>
             @foreach ($competitors as $competitor)
                 <tr id="row{{ $competitor->id }}" data-id="{{ $competitor->id }}">
-                    <td>
-                        {{ $competitor->acronym }}
+                    <td class="px-1">
+                        {{ $loop->iteration }}⁰
                     </td>
+                    @if (!$contest->individual)
+                        <td class="px-1">
+                            {{ $competitor->team->institution_acronym ?? '' }}
+                        </td>
+                    @endif
                     <td class="px-2">
-                        {{ $competitor->name }}
+                        {{ $competitor->fullName() }}
                     </td>
                     @php($letter = 'A')
                     @php($questions = 0)
                     @foreach ($problems as $problem)
                         <td class="px-2">
-                            <span class="d-flex" id="score-{{ $competitor->id }}-{{ $problem }}">
-                                @if (isset($competitor->scores[$problem]))
-                                    @php($questions++)
-                                    @php($score = $competitor->scores[$problem])
+                            @php($questions++)
+                            @php($score = $competitor->scores[$problem] ?? null)
+
+                            <span class="d-flex @if (isset($competitor->scores[$problem])) scored @endif"
+                                id="score-{{ $competitor->id }}-{{ $problem }}"
+                                data-attempts="{{ $competitor->__get('sum_submissions_' . $problem) }}"
+                                data-penality="{{ $score->penality ?? 0 }}">
+                                @if ($score)
                                     <div style="position:relative; width: 20px; height: 32px">
                                         <div class="balloon balloon-{{ $letter }}"></div>
                                         <div class="balloon-shadow"></div>
@@ -204,123 +220,200 @@
                     @endforeach
 
                     <td class="text-center" style="padding-left: 10px; padding-right: 4px">
-                        @if ($contest->time_based_points || $contest->parcial_solution)
-                            {{ $competitor->scores_sum_score ?? 0 }} <small>({{ $questions ?? 0 }})</small>
-                        @else
+                        <span id="score">
                             {{ $competitor->scores_sum_score ?? 0 }}
-                            <small>({{ $competitor->scores_sum_penality ?? 0 }})</small>
+                        </span>
+
+                        @if ($contest->time_based_points || $contest->parcial_solution)
+                            (<small id="questions">{{ $questions ?? 0 }}</small>)
+                        @else
+                            (<small id="penality">{{ $competitor->scores_sum_penality ?? 0 }}</small>)
                         @endif
                     </td>
                 </tr>
             @endforeach
         </tbody>
     </table>
+    @if (config('app.livewire'))
+        @php($global = true)
+        @php($lastUpdated = \Illuminate\Support\Carbon::now())
+        <livewire:sync-submission-component :global="$global" :contest="$contest" :lastCheck="$lastUpdated" />
+    @endif
 @endsection
 
 @section('script')
-    <script>
+    <script type='module'>
         const channel = '{{ $channel }}'
 
-        function confeti() {
+        function confeti(el = null) {
+
             var duration = 10 * 1000;
             var animationEnd = Date.now() + duration;
             var defaults = {
-                startVelocity: 30,
-                spread: 360,
-                ticks: 60,
+                startVelocity: 10,
+                spread: 60,
+                ticks: 45,
                 zIndex: 0
             };
+            var lastTime = Date.now();
 
             function randomInRange(min, max) {
                 return Math.random() * (max - min) + min;
             }
-            setTimeout(function() {
-                var interval = setInterval(function() {
-                    var timeLeft = animationEnd - Date.now();
-
-                    if (timeLeft <= 0) {
-                        return clearInterval(interval);
-                    }
-
-                    var particleCount = 50 * (timeLeft / duration);
-                    // since particles fall down, start a bit higher than random
-                    window.confetti({
-                        ...defaults,
-                        particleCount,
-                        origin: {
-                            x: randomInRange(0.1, 0.3),
-                            y: Math.random() - 0.2
-                        }
-                    });
-                    window.confetti({
-                        ...defaults,
-                        particleCount,
-                        origin: {
-                            x: randomInRange(0.7, 0.9),
-                            y: Math.random() - 0.2
-                        }
-                    });
-                }, 250);
-            }, 500)
-            var count = 200;
-            const defaults2 = {
-                origin: {
-                    y: 0.9
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (document.hidden) {
+                    animationEnd += Date.now() - lastTime;
+                    lastTime = Date.now();
+                    return;
                 }
-            };
+                lastTime = Date.now();
 
-            function fire(particleRatio, opts) {
-                confetti({
-                    ...defaults2,
-                    ...opts,
-                    particleCount: Math.floor(count * particleRatio)
+                if (timeLeft <= 0) {
+                    $(el).removeClass('blink')
+                    return clearInterval(interval);
+                } else {
+                    $(el).addClass('blink')
+                }
+                if (el) {
+                    const rect = el.getBoundingClientRect();
+                    defaults.origin = {
+                        x: (rect.left + rect.width / 2) / window.innerWidth,
+                        y: (rect.top + rect.height / 2) / window.innerHeight
+                    }
+                }
+                var particleCount = 10 * (timeLeft / duration) * randomInRange(0.6, 1.2) + 1;
+                // since particles fall down, start a bit higher than random
+                window.confetti({
+                    origin: {
+                        x: randomInRange(0.1, 0.3),
+                        y: Math.random() - 0.2
+                    },
+                    ...defaults,
+                    particleCount,
                 });
-            }
-
-            fire(0.25, {
-                spread: 26,
-                startVelocity: 55,
-            });
-            fire(0.2, {
-                spread: 60,
-            });
-            fire(0.35, {
-                spread: 100,
-                decay: 0.91,
-                scalar: 0.8
-            });
-            fire(0.1, {
-                spread: 120,
-                startVelocity: 25,
-                decay: 0.92,
-                scalar: 1.2
-            });
-            fire(0.1, {
-                spread: 120,
-                startVelocity: 45,
-            });
+                window.confetti({
+                    origin: {
+                        x: randomInRange(0.7, 0.9),
+                        y: Math.random() - 0.2
+                    },
+                    ...defaults,
+                    particleCount,
+                });
+            }, 500);
+        }
+        const problemNumber = {
+            @php($letter = 'A')
+            @foreach ($problems as $problem)
+                '{{ $problem }}': '{{ $letter++ }}',
+            @endforeach
+        }
+        const fix = {
+            'a': 2
         }
         const updateRow = function(row, data) {
-            row.css('display', 'table-row');
-            row.attr('id', 'row' + data.id);
+            row.text('⏱︎');
             if (data.status != 'Judged' && data.status != 'Error')
                 row.addClass('notJudged blink');
-            else
+            else {
                 row.removeClass('notJudged blink');
-        }
-        window.addEventListener("load", function() {
-            window.Echo.private(channel)
-                .listen('NewSubmissionEvent', (data) => {
-                    /*data = data.data
-                    var row = $('#row' + data.contest.competitor_id);
-                    if (row.length != 0) {
-                        updateRow(row, data);
-                    } */
-                })
+                const attempts = Number(row.data('attempts'));
+                switch (data.result) {
+                    case 'Accepted':
+                        const ballon = problemNumber[data.problem.id]
+                        const submissao = new Date(data.full_datetime.replace(' ', 'T'));
+                        const inicio = new Date('{{ $contest->start_time }}');
+                        const diffMs = submissao - inicio;
+                        const diffMin = Math.floor(diffMs / 1000 / 60);
+                        const ballonHtml =
+                            '<div style="position:relative; width: 20px; height: 32px"><div class="balloon balloon-' +
+                            ballon + '"></div><div class="balloon-shadow"></div></div>' +
+                            '<span style="padding-top: 14px;font-size: smaller">' +
+                            (attempts + 1) + '/' + diffMin +
+                            '</span>'
 
-            window.Echo.private(channel)
-                .listen('UpdateSubmissionEvent', (data) => {
-                    data = data.data
+                        row.html(ballonHtml);
+
+
+                        row.data('penality', attempts * {{ $contest->penality }} + diffMin);
+                        break;
+                    default:
+                        row.data('attempts', attempts + 1);
+                        row.attr('data-attempts', attempts + 1);
+                        row.text('-- (' + (attempts + 1) + ')');
+
+                }
+            }
+
+        }
+
+        function orderRanking() {
+            const $rows = $('#ranking tbody tr');
+            const sorted = $rows.toArray().sort((a, b) => {
+                const $a = $(a),
+                    $b = $(b);
+                const scoreA = parseInt($a.find('#score').text(), 10);
+                const scoreB = parseInt($b.find('#score').text(), 10);
+
+
+                @if ($contest->time_based_points || $contest->parcial_solution)
+                    const penA = -parseInt($a.find('#questions').text(), 10);
+                    const penB = -parseInt($b.find('#questions').text(), 10);
+                @else
+                    const penA = parseInt($a.find('#penality').text(), 10);
+                    const penB = parseInt($b.find('#penality').text(), 10);
+                @endif
+
+                if (scoreB !== scoreA) return scoreB - scoreA;
+                return penA - penB;
+            });
+            // Aplica a nova ordem com animação
+            const $tbody = $('#ranking tbody');
+            $tbody.empty();
+            sorted.forEach(row => $tbody.append(row));
+        }
+        const updateLeaderboard = function(competitor_id) {
+            const count = $('#row' + competitor_id + ' .scored').length;
+            @if ($contest->time_based_points || $contest->parcial_solution)
+                // caso em que a pontuação é baseada em tempo ou pode ser solução parcial
+                $('#row' + competitor_id + ' #questions').text(count);
+            @else
+                $('#row' + competitor_id + ' #score').text(count);
+                var tot = 0
+                Object.keys(problemNumber).forEach((key) => {
+                    const num = $('#score-' + competitor_id + '-' + key).data('penality');
+                    tot += Number(num);
+                })
+                $('#row' + competitor_id + ' #penality').text(tot);
+            @endif
+            setTimeout(orderRanking, 100);
+        }
+        const updateSubmission = function(data) {
+            if (!data.contest) return;
+            var row = $('#score-' + data.contest.competitor_id + '-' + data.problem.id);
+            if (row.length == 0 || row.hasClass('scored2')) return;
+            if (data.status != 'Judged' && data.status != 'Error') {
+                updateRow(row, data);
+            } else {
+                var suspense = false
+                row.removeClass('blink')
+                switch (data.result) {
+                    case 'Wrong answer':
+                    case 'Time limit':
+                    case 'Memory limit':
+                    case 'Runtime error':
+                    case 'Accepted':
+                        suspense = data.suspense;
+                        break;
+                    case 'Compilation error':
+                    case 'Error':
+                    default:
+                        suspense = false;
+                        break;
+                }
+
+                const geraResultado = function() {
+                    updateRow(row, data);
                     switch (data.result) {
                         case 'Compilation error':
                         case 'Runtime error':
@@ -328,70 +421,32 @@
                         case 'Wrong answer':
                         case 'Time limit':
                         case 'Memory limit':
+                        default:
+                            break;
                         case 'Accepted':
-                            location.reload();
+                            row.addClass('scored');
+                            confeti(row[0]);
                             break;
                     }
-                    /*
-                    var row = $('#row' + data.contest.competitor_id);
-                    if (row.length == 0) {
-                        if (userId != null && userId != data.user_id) return
-                        row = $('#template-row').clone();
-                        updateRow(row, data);
-                        $('#table-body').prepend(row);
-                        return;
-                    }
-                    if (data.status != 'Judged' && data.status != 'Error') {
-                        updateRow(row, data);
-                    } else {
-                        row.removeClass('blink')
-                        row.find('#status').text(data.status);
-                        switch (data.result) {
-                            case 'Wrong answer':
-                            case 'Time limit':
-                            case 'Memory limit':
-                            case 'Runtime error':
-                            case 'Accepted':
-                                suspense = data.suspense;
-                                break;
-                            case 'Compilation error':
-                            case 'Error':
-                            default:
-                                failed()
-                                suspense = false;
-                                break;
-                        }
-
-                        const geraResultado = function() {
-                            updateRow(row, data);
-                            switch (data.result) {
-                                case 'Compilation error':
-                                case 'Runtime error':
-                                case 'Error':
-                                case 'Wrong answer':
-                                case 'Time limit':
-                                case 'Memory limit':
-                                default:
-                                    break;
-                                case 'Accepted':
-                                    confeti();
-                                    break;
-                            }
-                        }
-                        geraResultado();
-                    }*/
-                });
-        })
-
-        function reiniciarPagina() {
-            location.reload();
+                    updateLeaderboard(data.contest.competitor_id)
+                }
+                setTimeout(geraResultado, 500)
+            }
         }
+        @if (!config('app.livewire'))
+            window.addEventListener("load", function() {
+                window.Echo.private(channel)
+                    .listen('NewSubmissionEvent', (data) => {
+                        updateSubmission(data.data)
+                    })
 
-        // Definir um temporizador para reiniciar a página a cada 5 minutos
-        setTimeout(reiniciarPagina, 1000 * 60 * 5);
-    </script>
-    @if ($blind && $contest->endTime()->lt(now()))
-        <script>
+                window.Echo.private(channel)
+                    .listen('UpdateSubmissionEvent', (data) => {
+                        updateSubmission(data.data)
+                    });
+            })
+        @endif
+        @if ($blind && $contest->endTime()->lt(now()))
             // Set the date we're counting down to
             var countDownDate = new Date("{{ $contest->endTimeWithExtra() }}").getTime();
 
@@ -440,6 +495,6 @@
 
             clock();
             var x = setInterval(clock, 1000);
-        </script>
-    @endif
+        @endif
+    </script>
 @endsection

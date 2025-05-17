@@ -3,7 +3,7 @@
 
 
 @script
-    <script>
+    <script type='module'>
         $wire.on('updateSubmissionEvent', (data) => {
             data.forEach(updateSubmission)
         });

@@ -50,8 +50,12 @@ class ExecutorService
         switch ($language) {
             case 'PyPy3.10':
                 return '--conf /var/config/python.conf -R /var/config/runPypy3.10.sh --exec_file /var/config/runPypy3.10.sh';
+            case 'PyPy3.11':
+                return '--conf /var/config/python.conf -R /var/config/runPypy3.11.sh --exec_file /var/config/runPypy3.11.sh';
             case 'Python3.11':
                 return '--conf /var/config/python.conf -R /var/config/runPython3.11.sh --exec_file /var/config/runPython3.11.sh';
+            case 'Python3.13':
+                return '--conf /var/config/python.conf -R /var/config/runPython3.13.sh --exec_file /var/config/runPython3.13.sh';
             case 'C++':
             case 'C':
             case 'BINARY':
@@ -287,10 +291,23 @@ class ExecutorService
                     return SubmitResult::CompilationError;
                 }
                 break;
-            case 'PyPy3.10':
             case 'Python3.11':
+                Storage::disk('work')->deleteDirectory('__pycache__');
                 Storage::disk('work')->writeStream($outputName, $code->readStream());
                 // exec("sed -i '1s/^/from sys import exit\\n\\n/' /var/work/".$outputName); // Add import to exit
+                exec('python3 -m py_compile /var/work/'.$outputName); // Compile pypy
+                break;
+            case 'PyPy3.10':
+                Storage::disk('work')->deleteDirectory('__pycache__');
+                Storage::disk('work')->writeStream($outputName, $code->readStream());
+                // exec("sed -i '1s/^/from sys import exit\\n\\n/' /var/work/".$outputName); // Add import to exit
+                exec('pypy3.10 -m py_compile /var/work/'.$outputName);  // Compile pypy
+                break;
+            case 'PyPy3.11':
+                Storage::disk('work')->deleteDirectory('__pycache__');
+                Storage::disk('work')->writeStream($outputName, $code->readStream());
+                // exec("sed -i '1s/^/from sys import exit\\n\\n/' /var/work/".$outputName); // Add import to exit
+                exec('pypy3.11 -m py_compile /var/work/'.$outputName);  // Compile pypy
                 break;
             case 'BINARY':
                 Storage::disk('work')->writeStream($outputName, $code->readStream());

@@ -36,7 +36,7 @@
             <div class="col">
                 <label for="lang" class="form-label">Language: </label><br />
                 <select name="lang" class="form-select" required>
-                    @foreach (App\Enums\LanguagesType::list() as $name => $code)
+                    @foreach (App\Enums\LanguagesType::enabled() as $name => $code)
                         <option value="{{ $code }}">{{ $name }}</option>
                     @endforeach
                 </select>
@@ -81,5 +81,5 @@
 @endsection
 
 @section('script')
-    <script></script>
+    <script type='module'></script>
 @endsection

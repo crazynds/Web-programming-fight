@@ -4,12 +4,15 @@ namespace App\Providers;
 
 use App\Models\User;
 use App\Services\ContestService;
+use App\Services\VJudgeService;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,11 +33,12 @@ class AppServiceProvider extends ServiceProvider
             if (config('app.env') === 'production' && $query->time < 50) {
                 return;
             }
-            if (!str_contains($query->sql, '`jobs`' && !str_contains($query->sql, '`pulse_values`')))
+            if (! str_contains($query->sql, '`jobs`' && ! str_contains($query->sql, '`pulse_values`'))) {
                 Log::channel('database')->info(
                     sprintf('%6.2fms -- %s', $query->time, $query->sql),
                     $query->bindings
                 );
+            }
         });
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
@@ -48,8 +52,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('viewPulse', function (User $user) {
             return $user->isAdmin();
         });
+        Paginator::useBootstrap();
+        View::share('vjudgeService', new VJudgeService);
         $this->app->singleton(ContestService::class, function () {
-            return new ContestService();
+            return new ContestService;
         });
     }
 }

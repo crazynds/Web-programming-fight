@@ -11,7 +11,7 @@
                 <th class="text-center"><b>Result</b></th>
                 <th class="text-center"><b>Cases</b></th>
                 <th class="text-center"><b>Resources</b></th>
-                <th style="text-align: end;"><b>Actions</b></th>
+                <th class="text-center"><b>Actions</b></th>
             </tr>
         </thead>
         <tbody id="table-body">
@@ -59,11 +59,11 @@
                 </td>
             </tr>
             @php
-            $lastUpdated = \Illuminate\Support\Carbon::now()->subHour();
+                $lastUpdated = \Illuminate\Support\Carbon::now()->subHour();
             @endphp
             @foreach ($submitRuns as $submitRun)
                 @php
-                $lastUpdated = max($submitRun->updated_at,$lastUpdated);
+                    $lastUpdated = max($submitRun->updated_at, $lastUpdated);
                 @endphp
                 <tr id="row{{ $submitRun->id }}" data-id="{{ $submitRun->id }}"
                     @if ($submitRun->status != 'Judged' && $submitRun->status != 'Error') class="notJudged blink" @endif>
@@ -87,10 +87,15 @@
                     </td>
                     <td class="px-2">
                         @if ($submitRun->competitor)
-                            {{ $submitRun->competitor?->acronym }}
+                            @php
+                                $nickName = $submitRun->competitor->fullName();
+                            @endphp
                         @else
-                            {{ $submitRun->user->name }}
+                            @php
+                                $nickName = $submitRun->user->name;
+                            @endphp
                         @endif
+                        {{ strlen($nickName) > 20 ? substr($nickName, 0, 20) . '...' : $nickName }}
                     </td>
                     <td class="px-2">
                         <a href="{{ route('problem.show', ['problem' => $submitRun->problem->id], false) }}">
@@ -241,14 +246,13 @@
             </div>
         </div>
     </div>
-    @if(config('app.livewire'))
-    <livewire:runs-table-component :global="$global" :contest="$contest ?? ($contestService->contest ?? null)" :lastCheck="$lastUpdated"/>
+    @if (config('app.livewire'))
+        <livewire:sync-submission-component :global="$global" :contest="$contest ?? ($contestService->contest ?? null)" :lastCheck="$lastUpdated" />
     @endif
 </div>
 
-<script>
+<script type='module'>
     const userId = {{ $global ? 'null' : \Auth::user()->id }}
-    const channel = "{{ $channel }}";
 
     function copyCode() {
         var range = document.createRange();
@@ -377,8 +381,9 @@
             startVelocity: 45,
         });
     }
-    const openModal = function(id) {
+    window.openModal = function(id) {
         var url = '{{ route('api.submitRun.code', ['submitRun' => -1]) }}'.replace('-1', id)
+        console.log($('#codeModal'))
         $('#codeModal').modal("show")
         $('#codeModal').find('#code').html(`
                 <div class="d-flex justify-content-center">
@@ -392,7 +397,7 @@
                 $('#codeModal').find('#code').text(data.code)
         });
     }
-    
+
     const updateRow = function(row, data) {
         const idtag = row.find('#id');
         const datetimetag = row.find('#datetime');
@@ -405,7 +410,7 @@
         const resourcestag = row.find('#resources');
 
         if (data.user_id == userId) {
-        idtag.html(`
+            idtag.html(`
                 <a href="#" onclick="openModal(${data.id})">
                     #${data.id}
                 </a>
@@ -414,12 +419,12 @@
             idtag.text('#' + data.id);
         }
         datetimetag.text(data.datetime);
-        usertag.text({{ $contestService->inContest || $contest ? 'data.contest.competitor' : 'data.user' }});
+        const userName = {{ $contestService->inContest || $contest ? 'data.contest.competitor' : 'data.user' }};
+        usertag.text(userName.length > 20 ? userName.substring(0, 20) + '...' : userName);
         titletag.text(data.problem.title);
         langtag.text(data.language);
         statustag.text(data.status);
         resulttag.text(data.result);
-        console.log(data.testCases);
         testCasestag.text(data.testCases ?? '---');
         resourcestag.text(data.resources);
         titletag.attr('href', "{{ route('problem.show', ['problem' => -1], false) }}".replace('-1', data.problem
@@ -466,9 +471,7 @@
             row.removeClass('notJudged blink');
     }
     const updateSubmission = function(data) {
-        console.log('update sub', data)
         var row = $('#row' + data.id);
-        console.log(userId,row)
         if (row.length == 0) {
             if (userId != null && userId != data.user_id) return
             row = $('#template-row').clone();
@@ -478,6 +481,7 @@
         if (data.status != 'Judged' && data.status != 'Error') {
             updateRow(row, data);
         } else {
+            var suspense = false;
             row.removeClass('blink')
             row.find('#status').text(data.status);
             row.find('#testCases').text('--');
@@ -536,24 +540,23 @@
             }
         }
     }
-</script>
-@if(!config('app.livewire'))
-<script>
-    window.addEventListener("load", function() {
-        window.Echo.private(channel)
-            .listen('NewSubmissionEvent', (data) => {
-                updateSubmission(data.data)
-            })
+    @if (!config('app.livewire'))
+        const channel = "{{ $channel }}";
+        window.addEventListener("load", function() {
+            window.Echo.private(channel)
+                .listen('NewSubmissionEvent', (data) => {
+                    updateSubmission(data.data)
+                })
 
-        window.Echo.private(channel)
-            .listen('UpdateSubmissionTestCaseEvent', (data) => {
-                updateSubmission(data.data)
-            })
+            window.Echo.private(channel)
+                .listen('UpdateSubmissionTestCaseEvent', (data) => {
+                    updateSubmission(data.data)
+                })
 
-        window.Echo.private(channel)
-            .listen('UpdateSubmissionEvent', (data) => {
-                updateSubmission(data.data)
-            });
-    })
+            window.Echo.private(channel)
+                .listen('UpdateSubmissionEvent', (data) => {
+                    updateSubmission(data.data)
+                });
+        })
+    @endif
 </script>
-@endif

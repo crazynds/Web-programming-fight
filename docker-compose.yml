@@ -20,6 +20,7 @@ services:
         volumes:
             - './vendor:/var/www/vendor'
             - '.:/var/www/html'
+            - './docker/scripts:/var/scripts'
         networks:
             - app-network
         depends_on:

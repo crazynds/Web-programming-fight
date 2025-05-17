@@ -49,6 +49,48 @@
             <div class="row">
                 <div class="col-8">
                     <h3>
+                        v1.1.0 - Access to Multiple Online Judges 🌎
+                    </h3>
+                    <p>
+                        Date: XX-03-2025
+                        By: Crazynds
+                    </p>
+                    <p>
+                        Features ✨
+                    <ul>
+                        <li>Integration with most online judges using VJudge.</li>
+                        <li>Livewire can be used instead of WebSockets.</li>
+                        <li>Added pagination in problem list.</li>
+                        <li>Added title search in problem list.</li>
+                    </ul>
+                    </p>
+                    <p>
+                        Changes ⚙️
+                    <ul>
+                        <li>Python and PyPy is now compiled before execution.</li>
+                        <li></li>
+                        <li></li>
+                    </ul>
+                    </p>
+                    <p>
+                        Styles 🎨
+                    <ul>
+                        <li>JQuery is not imported manually anymore.</li>
+                        <li>Select2 plugin is now used.</li>
+                    </ul>
+                    </p>
+                    <p>
+                        Fixes 🐛
+                    <ul>
+                        <li>Compilation time and memory is now limited.</li>
+                        <li></li>
+                    </ul>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-8">
+                    <h3>
                         v1.0.2 - Default Update!
                     </h3>
                     <p>

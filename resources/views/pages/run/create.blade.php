@@ -20,7 +20,7 @@
         <div class="row">
             <div class="col">
                 <label for="problem" class="form-label">Problem: </label><br />
-                <select name="problem" class="form-select" required>
+                <select name="problem" class="form-select select2" required>
                     @php($letter = 'A')
                     @foreach ($problems as $problem)
                         <option value="{{ $problem->id }}" @if (isset($selected) && $problem->id == $selected) selected @endif>
@@ -35,8 +35,8 @@
             </div>
             <div class="col">
                 <label for="lang" class="form-label">Language: </label><br />
-                <select name="lang" class="form-select" required>
-                    @foreach (App\Enums\LanguagesType::list() as $name => $code)
+                <select name="lang" class="form-select select2" required>
+                    @foreach (App\Enums\LanguagesType::enabled() as $name => $code)
                         @if (!$contestService->inContest || in_array($code, $contestService->contest->languages))
                             <option value="{{ $code }}">{{ $name }}</option>
                         @endif
@@ -87,7 +87,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (App\Enums\LanguagesType::list() as $name => $code)
+            @foreach (App\Enums\LanguagesType::enabled() as $name => $code)
                 @if (!$contestService->inContest || in_array($code, $contestService->contest->languages))
                     @if (array_key_exists($name, App\Enums\LanguagesType::modifiers()))
                         <tr>

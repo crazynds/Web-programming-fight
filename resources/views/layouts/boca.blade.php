@@ -6,10 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <script src="{{ asset('js/jquery.min.js') }}"></script>
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
-    @vite(['resources/css/boca.css'])
-    @vite(['resources/css/custom.css'])
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <script>
         window.env = {
@@ -18,10 +15,13 @@
             REVERB_SCHEME: '{{ config('reverb.apps.apps.0.options.scheme') }}',
             REVERB_PORT: '{{ config('reverb.apps.apps.0.options.port') }}',
             REVERB_PATH: '',
-            LIVEWIRE: {{ config('app.livewire')? 'true' : 'false'}},
+            LIVEWIRE: {{ config('app.livewire') ? 'true' : 'false' }},
         }
-
     </script>
+
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    @vite(['resources/css/boca.css'])
+    @vite(['resources/css/custom.css'])
 
     <style>
         .sm-github {
@@ -44,33 +44,35 @@
         }
 
         .blink {
-            -webkit-animation: blink 0.9s step-end infinite;
-            -moz-animation: blink 0.9s step-end infinite;
-            -o-animation: blink 0.9s step-end infinite;
-            animation: blink 0.9s step-end infinite;
+            -webkit-animation: blink 2s infinite both;
+            animation: blink 2s infinite both;
         }
 
         @-webkit-keyframes blink {
-            90% {
-                opacity: 0
-            }
-        }
 
-        @-moz-keyframes blink {
-            90% {
-                opacity: 0
+            0%,
+            50%,
+            100% {
+                opacity: 1;
             }
-        }
 
-        @-o-keyframes blink {
-            90% {
-                opacity: 0
+            25%,
+            75% {
+                opacity: 0.4;
             }
         }
 
         @keyframes blink {
-            90% {
-                opacity: 0
+
+            0%,
+            50%,
+            100% {
+                opacity: 1;
+            }
+
+            25%,
+            75% {
+                opacity: 0.4;
             }
         }
     </style>
@@ -194,7 +196,7 @@
     {{-- @livewireScripts --}}
     @yield('script')
     @if ($contestService->inContest)
-        <script>
+        <script type='module'>
             // Set the date we're counting down to
             var countDownDate = new Date(
                 "{{ $contestService->started ? $contestService->contest->start_time->addMinutes($contestService->contest->duration) : $contestService->contest->start_time }}"

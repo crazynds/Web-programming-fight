@@ -35,11 +35,11 @@ class AutoDetectLangSubmitRun implements ShouldQueue
         $this->submitRun->status = SubmitStatus::DetectingLang;
         $this->submitRun->save();
         Storage::disk('work')->writeStream('0.code', $this->submitRun->file->readStream());
-        $comand = "python3 /var/scripts/autolang.py < /var/work/0.code";
+        $comand = 'python3 /var/scripts/autolang.py < /var/work/0.code';
         exec($comand, $output, $retval);
         switch ($output[0]) {
             case 'Python':
-                $this->submitRun->language = LanguagesType::PyPy3_10;
+                $this->submitRun->language = LanguagesType::PyPy3_11;
                 break;
             case 'C':
             case 'C++':
@@ -50,6 +50,7 @@ class AutoDetectLangSubmitRun implements ShouldQueue
                 $this->submitRun->status = SubmitStatus::Error;
                 $this->submitRun->result = SubmitResult::LanguageNotSupported;
                 $this->submitRun->save();
+
                 return;
         }
         $this->submitRun->status = SubmitStatus::WaitingInLine;

@@ -157,7 +157,7 @@
 @endsection
 
 @section('script')
-    <script>
+    <script type='module'>
         const copyCode = function() {
             var range = document.createRange();
             range.selectNode(document.getElementById("code"));
@@ -165,9 +165,9 @@
             window.getSelection().addRange(range); // to select text
             document.execCommand("copy");
         }
-        var openModal = function() {}
+        window.openModal = function() {}
         window.addEventListener("load", function() {
-            openModal = function(id) {
+            window.openModal = function(id) {
                 var url = '{{ route('api.submitRun.code', ['submitRun' => -1]) }}'.replace('-1', id)
                 $('#codeModal').modal("show")
                 $('#codeModal').find('#code').html(`

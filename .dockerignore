@@ -11,6 +11,7 @@
 !/docker/prod/reverb-supervisord.conf
 !/docker/prod/start.sh
 !/docker/scripts/autolang.py
+!/docker/scripts/vjudge.py
 /storage/framework/cache/*
 /storage/framework/sessions/*
 /storage/framework/views/*

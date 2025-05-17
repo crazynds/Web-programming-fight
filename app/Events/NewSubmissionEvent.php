@@ -21,16 +21,18 @@ class NewSubmissionEvent implements ShouldBroadcast
     public function __construct(SubmitRun $submitRun)
     {
         $submitRun->refresh();
-        if ($submitRun->contest_id)
+        if ($submitRun->contest_id) {
             $contestData = [
                 'contest_id' => $submitRun->contest_id,
-                'competitor_id' => $submitRun->contest_id ? $submitRun->competitor?->id : null,
-                'competitor' => $submitRun->contest_id ? $submitRun->competitor?->acronym : null,
+                'competitor_id' => $submitRun->competitor?->id,
+                'competitor' => $submitRun->competitor->fullName(),
                 'blind' => $submitRun->contest->blindTime()->lt(now()) && $submitRun->contest->endTimeWithExtra()->gt(now()),
             ];
+        }
         $this->data = [
             'id' => $submitRun->id,
             'datetime' => \Carbon\Carbon::parse($submitRun->created_at)->format('H:i:s'),
+            'full_datetime' => \Carbon\Carbon::parse($submitRun->created_at)->format('Y-m-d H:i:s'),
             'user_id' => $submitRun->user->id,
             'user' => $submitRun->user->name,
             'problem' => [
@@ -41,7 +43,7 @@ class NewSubmissionEvent implements ShouldBroadcast
             'status' => $submitRun->status,
             'result' => $submitRun->result,
             'testCases' => $submitRun->status != 'Judged' ? '---' : $submitRun->num_test_cases + 1,
-            'resources' => ((isset($submitRun->execution_time) && $submitRun->status == 'Judged') ? number_format($submitRun->execution_time / 1000, 2, '.', ',') . 's' : '--') . ' | ' . ((isset($submitRun->execution_memory) && $submitRun->status == 'Judged') ? $submitRun->execution_memory . ' MB' : '--'),
+            'resources' => ((isset($submitRun->execution_time) && $submitRun->status == 'Judged') ? number_format($submitRun->execution_time / 1000, 2, '.', ',').'s' : '--').' | '.((isset($submitRun->execution_memory) && $submitRun->status == 'Judged') ? $submitRun->execution_memory.' MB' : '--'),
             'suspense' => ($submitRun->status == 'Judged' ? ($submitRun->num_test_cases + 1) / ($submitRun->problem->testCases()->count() + 1) : 0) > 0.4,
             'contest' => $submitRun->contest_id ? $contestData : null,
         ];
@@ -54,17 +56,19 @@ class NewSubmissionEvent implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        if (!is_null($this->data['contest'])) {
-            if ($this->data['contest']['blind'])
+        if (! is_null($this->data['contest'])) {
+            if ($this->data['contest']['blind']) {
                 return [
-                    new PrivateChannel('contest.submissions.' . $this->data['contest']['contest_id'] . '.' . $this->data['contest']['competitor_id']),
+                    new PrivateChannel('contest.submissions.'.$this->data['contest']['contest_id'].'.'.$this->data['contest']['competitor_id']),
                 ];
-            else
+            } else {
                 return [
-                    new PrivateChannel('contest.submissions.' . $this->data['contest']['contest_id']),
-                    new PrivateChannel('contest.submissions.' . $this->data['contest']['contest_id'] . '.' . $this->data['contest']['competitor_id']),
+                    new PrivateChannel('contest.submissions.'.$this->data['contest']['contest_id']),
+                    new PrivateChannel('contest.submissions.'.$this->data['contest']['contest_id'].'.'.$this->data['contest']['competitor_id']),
                 ];
+            }
         }
+
         return [
             new PrivateChannel('submissions'),
         ];

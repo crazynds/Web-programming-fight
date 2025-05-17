@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:1.3-php8.3 AS php_base
+FROM dunglas/frankenphp:1.4-php8.3 AS php_base
 
 LABEL maintainer="Crazynds"
 
@@ -26,20 +26,16 @@ RUN apt-get update && \
     pkg-config \
     protobuf-compiler \
     poppler-utils \
-    python3.11 python3-pip
+    software-properties-common \
+    python3.11 python3-pip python3.13
 
 RUN mkdir /langs
 
-# Prepare AI environment
-RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --break-system-packages
-RUN pip install transformers optimum[onnxruntime] optimum --break-system-packages
 RUN mkdir /var/scripts
 RUN chmod 0777 /var/scripts
 COPY ./docker/scripts /var/scripts
-## Run one time to load the model
-RUN python3 /var/scripts/autolang.py < /var/scripts/autolang.py
 
-# Download and install pypy
+# Download and install pypy 3.10
 RUN wget https://buildbot.pypy.org/nightly/py3.10/pypy-c-jit-184945-79a57c5ea141-linux64.tar.bz2 -P /langs
 RUN tar -xf /langs/pypy-c-jit-184945-79a57c5ea141-linux64.tar.bz2 -C /langs && \
     mv /langs/pypy-c-jit-184945-79a57c5ea141-linux64 /langs/pypy3.10 && \
@@ -48,6 +44,16 @@ RUN tar -xf /langs/pypy-c-jit-184945-79a57c5ea141-linux64.tar.bz2 -C /langs && \
     cp /langs/pypy3.10/bin/* /usr/bin -r && \
     cp /langs/pypy3.10/lib/* /usr/lib -r && \
     cp /langs/pypy3.10/include/* /usr/include -r
+
+# Download and install pypy 3.11
+RUN wget https://buildbot.pypy.org/nightly/py3.11/pypy-c-jit-latest-linux64.tar.bz2 -P /langs
+RUN tar -xf /langs/pypy-c-jit-latest-linux64.tar.bz2 -C /langs && \
+    mv /langs/pypy-c-jit-latest-linux64 /langs/pypy3.11 && \
+    rm /langs/pypy-c-jit-latest-linux64.tar.bz2 && \
+    rm /langs/pypy3.11/bin/python* && \
+    cp /langs/pypy3.11/bin/* /usr/bin -r && \
+    cp /langs/pypy3.11/lib/* /usr/lib -r && \
+    cp /langs/pypy3.11/include/* /usr/include -r
 
 
 # Download and install NSJail

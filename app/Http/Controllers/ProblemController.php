@@ -5,19 +5,18 @@ namespace App\Http\Controllers;
 use App\Enums\SubmitResult;
 use App\Http\Requests\StoreProblemRequest;
 use App\Models\Contest;
-use App\Models\File;
 use App\Models\Problem;
 use App\Models\Rating;
-use App\Models\SubmitRun;
 use App\Models\User;
 use App\Services\ContestService;
+use App\Services\VJudgeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class ProblemController extends Controller
 {
-
     public function __construct(protected ContestService $contestService)
     {
         $this->authorizeResource(Problem::class, 'problem');
@@ -30,21 +29,26 @@ class ProblemController extends Controller
         if ($problem->testCases()->where('validated', true)->count() < $mininun) {
             $problem->visible = false;
             $problem->save();
+
             return redirect()->route('problem.testCase.index', [
-                'problem' => $problem->id
-            ])->withErrors(['msg' => 'To enable a problem, you need to validate at least ' . $mininun . ' test cases']);
+                'problem' => $problem->id,
+            ])->withErrors(['msg' => 'To enable a problem, you need to validate at least '.$mininun.' test cases']);
         }
-        $problem->visible = !$problem->visible;
+        $problem->visible = ! $problem->visible;
         $problem->save();
+
         return redirect()->route('problem.index');
     }
-
 
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
+        $onlineJudge = $request->input('onlineJudge', '');
+        $search = $request->input('search', '');
+        $page = $request->input('page', 0);
+
         if ($this->contestService->inContest) {
             $problems = $this->contestService->contest->problems()
                 ->withCount([
@@ -63,7 +67,7 @@ class ProblemController extends Controller
                     },
                 ])
                 ->orderBy('id')->get();
-        } else {
+        } elseif (! isset($onlineJudge) || empty($onlineJudge) || strtolower($onlineJudge) == 'local') {
             $problems = Problem::withCount([
                 'submissions',
                 'submissions as accepted_submissions' => function ($query) {
@@ -74,16 +78,24 @@ class ProblemController extends Controller
                         ->where('submit_runs.user_id', Auth::user()->id)
                         ->limit(1);
                 },
-                'ranks'
-            ])
+                'ranks',
+            ])->whereNull('problems.online_judge')
                 ->where(function ($query) {
                     /** @var User */
                     $user = Auth::user();
-                    if (!$user->isAdmin())
+                    if (! $user->isAdmin()) {
                         $query->where('user_id', $user->id)
                             ->orWhere('visible', true);
+                    }
                 })
                 ->orderBy('id');
+            if ($search) {
+                if (DB::getDriverName() == 'pgsql') {
+                    $problems->where('title', 'ilike', '%'.$search.'%');
+                } elseif (DB::getDriverName() == 'mysql') {
+                    $problems->whereRaw("LOWER(title) LIKE '%".strtolower($search)."%'");
+                }
+            }
             if ($request->input('contest')) {
                 /** @var Contest */
                 $contest = Contest::find($request->input('contest'));
@@ -92,10 +104,25 @@ class ProblemController extends Controller
                         ->where('contest_id', $request->input('contest'));
                 }
             }
-            $problems = $problems->get();
+            $problems = $problems->paginate(40);
+            $vjudge = new VJudgeService;
+        } else {
+            $vjudge = new VJudgeService;
+            // $vjudgeProblems = $vjudge->searchProblems($onlineJudge, $search, $page);
+            // $problems = Problem::whereIn('vjudge_id', $vjudgeProblems->pluck('id')->toArray())->get();
+            // $diffs = array_diff($vjudgeProblems->pluck('id')->toArray(), $problems->pluck('vjudge_id')->toArray());
+            // foreach ($vjudgeProblems as $vjudgeProblem) {
+            //     dd($vjudgeProblem, $diffs);
+            //     if (in_array($vjudgeProblem->id, $diffs)) {
+
+            //     }
+            // }
         }
+
         return view('pages.problem.index', [
             'problems' => $problems,
+            'onlineJudge' => $onlineJudge ?? null,
+            'search' => $search ?? null,
         ]);
     }
 
@@ -104,7 +131,7 @@ class ProblemController extends Controller
      */
     public function create()
     {
-        return view('pages.problem.create')->with('problem', new Problem());
+        return view('pages.problem.create')->with('problem', new Problem);
     }
 
     /**
@@ -121,9 +148,9 @@ class ProblemController extends Controller
             'memory_limit',
             'description',
             'input_description',
-            'output_description'
+            'output_description',
         ]);
-        if (!$user->isAdmin()) {
+        if (! $user->isAdmin()) {
             $data['description'] = strip_tags($data['description']);
             $data['input_description'] = strip_tags($data['input_description']);
             $data['output_description'] = strip_tags($data['output_description']);
@@ -133,38 +160,40 @@ class ProblemController extends Controller
         return redirect()->route('problem.show', ['problem' => $problem->id]);
     }
 
-
     public function podium(Problem $problem)
     {
         Gate::authorize('view', $problem);
-        $categories = $problem->ranks()->pluck("category")->unique();
+        $categories = $problem->ranks()->pluck('category')->unique();
+
         return view('pages.problem.podium', [
             'problem' => $problem,
-            'categories' => $categories
+            'categories' => $categories,
         ]);
     }
-
 
     /**
      * Display the specified resource.
      */
     public function show(Problem $problem)
     {
-        if ($this->contestService->inContest && $this->contestService->contest->problems()->where('id', $problem->id)->count() == 0)
+        if ($this->contestService->inContest && $this->contestService->contest->problems()->where('id', $problem->id)->count() == 0) {
             return back();
-        if ($this->contestService->inContest)
+        }
+        if ($this->contestService->inContest) {
             $clarifications = $this->contestService->contest->clarifications()->where('problem_id', $problem->id)
                 ->where(function ($query) {
                     $query->where('competitor_id', $this->contestService->competitor->id)
                         ->orWhere('public', true);
                 })
                 ->orderBy('id')->get();
+        }
         /** @var User */
         $user = Auth::user();
         $rating = Rating::find([
             'user_id' => $user->id,
             'problem_id' => $problem->id,
         ]);
+
         return view('pages.problem.show', [
             'problem' => $problem,
             'testCases' => $problem->testCases()->orderBy('position')->where('public', true)->where('validated', true)->get(),
@@ -196,15 +225,18 @@ class ProblemController extends Controller
             'memory_limit',
             'description',
             'input_description',
-            'output_description'
+            'output_description',
         ]);
-        if (!$user->isAdmin()) {
-            if (isset($data['description']))
+        if (! $user->isAdmin()) {
+            if (isset($data['description'])) {
                 $data['description'] = strip_tags($data['description']);
-            if (isset($data['input_description']))
+            }
+            if (isset($data['input_description'])) {
                 $data['input_description'] = strip_tags($data['input_description']);
-            if (isset($data['output_description']))
+            }
+            if (isset($data['output_description'])) {
                 $data['output_description'] = strip_tags($data['output_description']);
+            }
         }
         $problem->update($data);
 
@@ -217,6 +249,7 @@ class ProblemController extends Controller
     public function destroy(Request $request, Problem $problem)
     {
         $problem->delete();
+
         return $this->index($request);
     }
 }

@@ -18,11 +18,12 @@ class RunsTable extends Component
      */
     public function __construct(
         public bool $global,
-        public Contest|null $contest,
+        public ?Contest $contest,
         protected ContestService $contestService,
     ) {
-        if ($contestService->inContest)
+        if ($contestService->inContest) {
             $this->contest = $contestService->contest;
+        }
     }
 
     protected function getQuery()
@@ -34,8 +35,9 @@ class RunsTable extends Component
                     ->submissions()
                     ->with(['competitor', 'contest']);
 
-                if ($contest->endTime()->addMinutes(5)->gt(now()))
+                if ($contest->endTime()->addMinutes(5)->gt(now())) {
                     $query->where('submit_runs.created_at', '<', $contest->blindTime());
+                }
             } else {
                 $query = SubmitRun::whereHas('problem', function ($query) {
                     // Hide not visible problems to global
@@ -52,18 +54,20 @@ class RunsTable extends Component
                 $query = $user->submissions()->where('contest_id', null);
             }
         }
-        if (!$this->contest)
+        if (! $this->contest) {
             $query->with('user', function ($query) {
                 $query->select('id', 'name');
             });
-        else
+        } else {
             $query->with('competitor', function ($query) {
-                $query->select('id', 'acronym');
+                $query->select('id', 'acronym', 'name');
             });
+        }
         /** @var User */
         $user = Auth::user();
-        if (!$user->isAdmin())
+        if (! $user->isAdmin()) {
             $query->limit(300);
+        }
 
         return $query
             ->with('problem', function ($query) {
@@ -75,11 +79,13 @@ class RunsTable extends Component
     protected function getChannel()
     {
         if ($this->contestService->inContest) {
-            if ($this->global)
-                return 'contest.submissions.' . $this->contest->id;
-            else
-                return 'contest.submissions.' . $this->contest->id . '.' . $this->contestService->competitor->id;
+            if ($this->global) {
+                return 'contest.submissions.'.$this->contest->id;
+            } else {
+                return 'contest.submissions.'.$this->contest->id.'.'.$this->contestService->competitor->id;
+            }
         }
+
         return 'submissions';
     }
 
@@ -89,10 +95,10 @@ class RunsTable extends Component
     public function render(): View|Closure|string
     {
         return view('components.runs-table', [
-            'limit' => \Illuminate\Support\Facades\RateLimiter::remaining('resubmission:' . Auth::user()->id, 5),
+            'limit' => \Illuminate\Support\Facades\RateLimiter::remaining('resubmission:'.Auth::user()->id, 5),
             'submitRuns' => $this->getQuery()->get(),
             'channel' => $this->getChannel(),
-            'contest' => $this->contest
+            'contest' => $this->contest,
         ]);
     }
 }

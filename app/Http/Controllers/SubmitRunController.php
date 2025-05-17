@@ -8,7 +8,6 @@ use App\Enums\SubmitStatus;
 use App\Events\NewSubmissionEvent;
 use App\Http\Requests\StoreSubmitRunRequest;
 use App\Http\Resources\SubmitRunResultResource;
-use App\Jobs\AutoDetectLangSubmitRun;
 use App\Jobs\ExecuteSubmitJob;
 use App\Models\Contest;
 use App\Models\File;
@@ -129,12 +128,12 @@ class SubmitRunController extends Controller
                             $run->language = LanguagesType::CPlusPlus;
                             break;
                         case 'py':
-                            $run->language = LanguagesType::PyPy3_10;
+                            $run->language = LanguagesType::PyPy3_11;
                             break;
                         case 'kt':
                         case 'java':
                         default:
-                            $job = AutoDetectLangSubmitRun::dispatch($run)->afterCommit();
+                            $run->language = LanguagesType::BINARY;
                             break;
 
                     }
@@ -204,10 +203,9 @@ class SubmitRunController extends Controller
             $submitRun->save();
 
             if ($submitRun->language == LanguagesType::name(LanguagesType::Auto_detect)) {
-                AutoDetectLangSubmitRun::dispatch($submitRun)->onQueue('low')->afterCommit();
-            } else {
-                ExecuteSubmitJob::dispatch($submitRun)->onQueue('low')->afterCommit();
+                $submitRun->language = LanguagesType::CPlusPlus;
             }
+            ExecuteSubmitJob::dispatch($submitRun)->onQueue('low')->afterCommit();
         }
 
         return response()->json([

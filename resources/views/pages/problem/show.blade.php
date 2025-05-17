@@ -1,7 +1,7 @@
 @extends('layouts.boca')
 
 @section('head')
-    <script>
+    <script type='module'>
         window.MathJax = {
             processClass: "mathjax",
             ignoreClass: "no-mathjax",
@@ -194,7 +194,7 @@
 @endsection
 
 @section('script')
-    <script>
+    <script type='module'>
         function copyCode(id) {
             var range = document.createRange();
             range.selectNode(document.getElementById(id));

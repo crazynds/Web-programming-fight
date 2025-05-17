@@ -89,7 +89,7 @@
 @endsection
 
 @section('script')
-    <script>
+    <script type='module'>
         window.addEventListener("load", function() {
             var input = document.querySelector('#tags')
             var tagify = new Tagify(input, {

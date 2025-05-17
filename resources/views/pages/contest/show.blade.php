@@ -173,7 +173,7 @@
 
 @section('script')
     @if ($contest->endTime()->gt(now()))
-        <script>
+        <script type='module'>
             // Set the date we're counting down to
             var countDownDate = new Date(
                 "{{ $contest->start_time->lt(now()) ? $contest->endTime() : $contest->start_time }}"

@@ -9,7 +9,6 @@ use App\Models\Contest;
 use App\Models\Problem;
 use App\Models\Team;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +17,6 @@ use Illuminate\Support\Facades\Redirect;
 
 class ContestController extends Controller
 {
-
     public function __construct()
     {
         $this->authorizeResource(Contest::class, 'contest');
@@ -27,8 +25,9 @@ class ContestController extends Controller
     public function admin(Contest $contest)
     {
         $this->authorize('admin', $contest);
+
         return view('pages.contest.admin', [
-            'contest' => $contest
+            'contest' => $contest,
         ]);
     }
 
@@ -39,6 +38,7 @@ class ContestController extends Controller
         foreach ($contest->competitors()->lazy() as $competitor) {
             RecalculateCompetitorScore::dispatch($contest, $competitor);
         }
+
         return redirect()->route('contest.leaderboard', ['contest' => $contest->id]);
     }
 
@@ -49,8 +49,9 @@ class ContestController extends Controller
     {
         $contests = Contest::orderBy('start_time', 'desc')
             ->get();
+
         return view('pages.contest.index', [
-            "contests" => $contests
+            'contests' => $contests,
         ]);
     }
 
@@ -63,36 +64,40 @@ class ContestController extends Controller
         /** @var User $user */
         $user = Auth::user();
         /** @var Competitor $competitor */
-        if (!Gate::allows('enter', $contest))
+        if (! Gate::allows('enter', $contest)) {
             return Redirect::back()->withErrors(['contest' => 'You are\'nt participating this contest.']);
+        }
 
         $competitor = $contest->getCompetitor($user);
         $data = [
             'contest' => $contest->id,
             'competitor' => $competitor->id,
         ];
-        Cache::set('contest:user:' . $user->id, $data, $contest->endTime());
+        Cache::set('contest:user:'.$user->id, $data, $contest->endTime());
+
         return redirect()->route('home');
     }
 
     public function leave(Contest $contest)
     {
-        Cache::forget('contest:user:' . Auth::user()->id);
+        Cache::forget('contest:user:'.Auth::user()->id);
+
         return redirect()->route('contest.index');
     }
 
     public function leaderboard(Contest $contest)
     {
-        $key = 'contest:leaderboard:' . $contest->id;
+        $key = 'contest:leaderboard:'.$contest->id;
         $problems = $contest->problems()->orderBy('id')->pluck('id');
         $blind = $contest->blindTime()->lt(now()) && $contest->endTimeWithExtra()->gt(now());
         // If is blind time, get the blind leaderboard. (The latest leaderboard loaded)
-        if ($blind)
-            $competitors = Cache::get($key . ':blind');
-        else
+        if ($blind) {
+            $competitors = Cache::get($key.':blind');
+        } else {
             $competitors = Cache::get($key);
+        }
         // If any leaderboard could be loaded, retrive it from database.
-        if (!$competitors) {
+        if (! $competitors) {
             $query = $contest->competitors()
                 ->with('scores.submission')
                 ->withSum('scores', 'score')
@@ -100,12 +105,12 @@ class ContestController extends Controller
 
             foreach ($problems as $problem) {
                 $query->withCount([
-                    'submissions as sum_submissions_' . $problem => function ($query) use ($problem, $contest, $blind) {
+                    'submissions as sum_submissions_'.$problem => function ($query) use ($problem, $contest, $blind) {
                         $query->where('submit_runs.problem_id', $problem);
                         if ($blind) {
                             $query->where('submit_runs.created_at', '<', $contest->blindTime());
                         }
-                    }
+                    },
                 ]);
             }
 
@@ -122,27 +127,30 @@ class ContestController extends Controller
             }
             Cache::put($key, $competitors, now()->addMinutes(5));
             // Freeze this leaderboard for blind
-            if ($contest->endTimeWithExtra()->gt(now()))
-                Cache::put($key . ':blind', $competitors, $contest->endTimeWithExtra());
+            if ($contest->endTimeWithExtra()->gt(now())) {
+                Cache::put($key.':blind', $competitors, $contest->endTimeWithExtra());
+            }
         }
+
         return view('pages.contest.competitor.leaderboard', [
             'competitors' => $competitors,
             'contest' => $contest,
             'problems' => $problems,
             'blind' => $blind,
-            'channel' => 'contest.submissions.' . $contest->id,
+            'channel' => 'contest.submissions.'.$contest->id,
         ]);
     }
 
     public function unregister(Contest $contest)
     {
         $competitor = $contest->getCompetitor(Auth::user());
-        if (!$competitor) {
+        if (! $competitor) {
             return back()->withErrors([
-                'unregister' => 'You are not participating in this contest.'
+                'unregister' => 'You are not participating in this contest.',
             ]);
         }
         $competitor->delete();
+
         return back();
     }
 
@@ -168,8 +176,9 @@ class ContestController extends Controller
             $team = $request->input('team', 0);
             /** @var Team */
             $team = $user->myTeams()->where('team_id', $team)->first();
-            if (!$team)
+            if (! $team) {
                 return Redirect::back()->withErrors(['team' => 'Please, select a team that you are the owner of.']);
+            }
             if ($team->members()->count() > 3) {
                 return Redirect::back()->withErrors(['team' => 'Only up to 3 members are allowed in a team to participate in this contest.']);
             }
@@ -177,24 +186,24 @@ class ContestController extends Controller
             $members = $team->members;
 
             /** @var User $user */
-
             $competitor = $contest->competitors()->with('team.members')->whereHas('team.members', function ($query) use ($members) {
                 $query->whereIn('user_id', $members->pluck('id'));
             })->first();
             if ($competitor) {
                 foreach ($competitor->team->members as $user) {
                     if ($members->contains('id', $user->id)) {
-                        return Redirect::back()->withErrors(['team' => 'The user ' . $user->name . ' is already participating in this contest.']);
+                        return Redirect::back()->withErrors(['team' => 'The user '.$user->name.' is already participating in this contest.']);
                     }
                 }
             }
 
             $contest->competitors()->create([
                 'team_id' => $team->id,
-                'name' => '[' . ($team->institution_acronym ? $team->institution_acronym : '????') . '] ' . $team->name,
+                'name' => '['.($team->institution_acronym ?? '????').'] '.$team->name,
                 'acronym' => $team->acronym,
             ]);
         }
+
         return Redirect::back();
     }
 
@@ -210,9 +219,10 @@ class ContestController extends Controller
         } else {
             $problems = Problem::where('visible', true)->orWhere('user_id', $user->id)->get();
         }
+
         return view('pages.contest.create', [
             'problems' => $problems,
-        ])->with('contest', new Contest());
+        ])->with('contest', new Contest);
     }
 
     /**
@@ -261,9 +271,10 @@ class ContestController extends Controller
         } else {
             $problems = Problem::where('visible', true)->orWhere('user_id', $user->id)->get();
         }
+
         return view('pages.contest.create', [
             'problems' => $problems,
-            'contest' => $contest
+            'contest' => $contest,
         ]);
     }
 
@@ -276,8 +287,9 @@ class ContestController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        if (isset($data['description']))
+        if (isset($data['description'])) {
             $data['description'] = strip_tags($data['description']);
+        }
 
         DB::beginTransaction();
         /** @var Contest */
@@ -287,6 +299,7 @@ class ContestController extends Controller
             $contest->problems()->attach($id, ['position' => $key]);
         }
         DB::commit();
+
         return redirect()->route('contest.index');
     }
 
@@ -296,6 +309,7 @@ class ContestController extends Controller
     public function destroy(Contest $contest)
     {
         $contest->delete();
+
         return $this->index();
     }
 }

@@ -15,6 +15,7 @@ class RestoreBackupJob implements ShouldQueue
     use Queueable;
 
     public $timeout = 60 * 60 * 2;
+
     public $tries = 1;
 
     /**
@@ -32,17 +33,19 @@ class RestoreBackupJob implements ShouldQueue
     {
         try {
             // Ativar modo de manutenção
-            //Artisan::call('down');
+            Artisan::call('down');
 
-            //BackupJob::dispatchSync();
+            // BackupJob::dispatchSync();
             dump('Iniciou a restauração');
 
             $backupPath = storage_path('backup');
-            if (file_exists($backupPath))
-                system('rm -rf -- ' . escapeshellarg($backupPath), $retval);
-            if (!file_exists($backupPath)) 
+            if (file_exists($backupPath)) {
+                system('rm -rf -- '.escapeshellarg($backupPath), $retval);
+            }
+            if (! file_exists($backupPath)) {
                 mkdir($backupPath, 0777, true);
-            
+            }
+
             file_put_contents($backupPath.'/restore_backup.zip', Storage::readStream('restore_backup.zip'));
             dump('Copiou o backup pro storage');
             $zip = new ZipArchive;
@@ -51,13 +54,13 @@ class RestoreBackupJob implements ShouldQueue
             }
 
             $extractPath = storage_path('backup/extract');
-            if (!file_exists($extractPath)) {
+            if (! file_exists($extractPath)) {
                 mkdir($extractPath, 0777, true);
             }
             $zip->extractTo($extractPath);
             $zip->close();
             dump('Extraiu zip');
-            
+
             // unlink($backupPath.'/restore_backup.zip');
 
             // Restaurar o banco de dados
@@ -65,39 +68,38 @@ class RestoreBackupJob implements ShouldQueue
 
             // Restaurar os arquivos para o S3
             $this->restoreS3Files("$extractPath/s3");
-            system('rm -rf -- ' . escapeshellarg($backupPath), $retval);
+            system('rm -rf -- '.escapeshellarg($backupPath), $retval);
 
             Storage::delete('restore_backup.zip');
-        } catch(Exception $ex){
+        } catch (Exception $ex) {
             dump($ex);
             throw $ex;
         } finally {
             // Desativar modo de manutenção
-            //Artisan::call('up');   
-        }   
-        
+            Artisan::call('up');
+        }
+
     }
 
-    
     private function restoreDatabase($sqlFile)
     {
-        if (!file_exists($sqlFile)) {
+        if (! file_exists($sqlFile)) {
             return;
         }
 
         // Apaga todas as tabelas antes de restaurar
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        $tables = DB::select("SHOW TABLES");
+        $tables = DB::select('SHOW TABLES');
         foreach ($tables as $tableObj) {
             $table = array_values((array) $tableObj)[0];
             DB::statement("DROP TABLE IF EXISTS `$table`;");
             dump("DROP TABLE IF EXISTS `$table`;");
         }
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-        dump("DROPOU TODAS AS TABELAS;");
+        dump('DROPOU TODAS AS TABELAS;');
 
         // Ler e executar cada comando do SQL
-        
+
         $command = sprintf(
             'mysql --host=%s --user=%s --password=%s --port=%s %s < %s',
             escapeshellarg(config('database.connections.mysql.host')),
@@ -112,29 +114,33 @@ class RestoreBackupJob implements ShouldQueue
         dump('Restaurou o banco de dados');
     }
 
-
     private function restoreS3Files($s3Path)
     {
-        if (!file_exists($s3Path)) {
+        if (! file_exists($s3Path)) {
             return;
         }
 
-        foreach(Storage::allFiles() as $file) {
-            if($file == 'restore_backup.zip') continue;
-            if($file == 'backup.zip') continue;
+        foreach (Storage::allFiles() as $file) {
+            if ($file == 'restore_backup.zip') {
+                continue;
+            }
+            if ($file == 'backup.zip') {
+                continue;
+            }
             Storage::delete($file);
         }
         dump('Removeu os arquivos do storage');
 
         $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($s3Path));
         foreach ($files as $file) {
-            if (!$file->isFile()) continue;
+            if (! $file->isFile()) {
+                continue;
+            }
 
             $relativePath = str_replace("$s3Path/", '', $file->getPathname());
             Storage::put($relativePath, file_get_contents($file->getPathname()));
-            
-            dump('Adicionou arquivo: ' . $relativePath);
+
+            dump('Adicionou arquivo: '.$relativePath);
         }
     }
-
 }

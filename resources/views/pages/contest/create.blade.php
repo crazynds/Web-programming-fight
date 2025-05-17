@@ -145,7 +145,7 @@
             <div class="col-6">
                 <h4 class="text-center">Languages</h4>
                 <select multiple="multiple" id="languages" name="languages[]">
-                    @foreach (App\Enums\LanguagesType::list() as $name => $code)
+                    @foreach (App\Enums\LanguagesType::enabled() as $name => $code)
                         <option value="{{ $code }}" @if (in_array($code, old('languages', $contest->langs ?? []))) selected @endif>
                             {{ $name }}</option>
                     @endforeach
@@ -177,7 +177,7 @@
 
 
 @section('script')
-    <script>
+    <script type='module'>
         window.addEventListener("load", function() {
             $('#problems').multiSelect({
                 selectableHeader: "<label>Avaliable</label><input type='text' class='search-input' autocomplete='off' placeholder='Search'>",

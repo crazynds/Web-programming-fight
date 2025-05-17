@@ -11,9 +11,11 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt-get update \
     && mkdir -p /etc/apt/keyrings \
-    && apt-get install -y gnupg gosu curl ca-certificates git zip unzip libcap2-bin librsvg2-bin fswatch libcap-dev \
+    && apt-get install -y gnupg gosu curl ca-certificates git zip unzip libcap2-bin librsvg2-bin fswatch software-properties-common libcap-dev \
     && curl -sS 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x14aa40ec0831756756d7f66c4f4ea0aae5267a6c' | gpg --dearmor | tee /etc/apt/keyrings/ppa_ondrej_php.gpg > /dev/null \
     && echo "deb [signed-by=/etc/apt/keyrings/ppa_ondrej_php.gpg] https://ppa.launchpadcontent.net/ondrej/php/ubuntu jammy main" > /etc/apt/sources.list.d/ppa_ondrej_php.list
+
+RUN add-apt-repository ppa:deadsnakes/ppa 
 
 RUN apt-get update \
     && apt-get install -y php8.2-cli php8.2-dev \
@@ -27,9 +29,10 @@ RUN apt-get update \
     php8.2-redis php8.2-swoole \
     && curl -sLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
 
+
 RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.2
 
-RUN apt-get install -y dos2unix mariadb-client
+RUN apt-get install -y dos2unix mariadb-client python3.11 python3-pip
 
 RUN groupadd --force -g $WWWGROUP sail
 RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
@@ -43,9 +46,16 @@ RUN apt-get install -y supervisor \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+RUN pip install cloudscraper
+
 COPY docker/start-container /usr/local/bin/start-container
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/php.ini /etc/php/8.2/cli/conf.d/99-sail.ini
+RUN mkdir /var/scripts
+RUN chmod 0777 /var/scripts
+COPY docker/scripts /var/scripts
+
+
 RUN dos2unix /usr/local/bin/start-container
 RUN chmod +x /usr/local/bin/start-container
 
@@ -78,32 +88,38 @@ RUN apt-get install -y \
     make \
     pkg-config \
     protobuf-compiler \
-    python3.11 python3-pip \
     poppler-utils \
+    python3.13 \
     && apt-get -y autoremove \
     && apt-get clean 
 
 RUN mkdir /langs
 
-# Prepare AI environment
-RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-RUN pip install transformers optimum[onnxruntime] optimum
+# Copy Scripts
 RUN mkdir /var/scripts
 RUN chmod 0777 /var/scripts
 COPY ./docker/scripts /var/scripts
-## Run one time to load the model
-RUN python3 /var/scripts/autolang.py < /var/scripts/autolang.py
 
 
 # Download and install pypy
-RUN wget https://buildbot.pypy.org/nightly/py3.10/pypy-c-jit-184945-79a57c5ea141-linux64.tar.bz2 -P /langs
-RUN tar -xf /langs/pypy-c-jit-184945-79a57c5ea141-linux64.tar.bz2 -C /langs
-RUN mv /langs/pypy-c-jit-184945-79a57c5ea141-linux64 /langs/pypy3.10
-RUN rm /langs/pypy-c-jit-184945-79a57c5ea141-linux64.tar.bz2
+RUN wget https://buildbot.pypy.org/nightly/py3.10/pypy-c-jit-186045-8708da3ee078-linux64.tar.bz2 -P /langs
+RUN tar -xf /langs/pypy-c-jit-186045-8708da3ee078-linux64.tar.bz2 -C /langs
+RUN mv /langs/pypy-c-jit-186045-8708da3ee078-linux64 /langs/pypy3.10
+RUN rm /langs/pypy-c-jit-186045-8708da3ee078-linux64.tar.bz2
 RUN rm /langs/pypy3.10/bin/python* && \
     cp /langs/pypy3.10/bin/* /usr/bin -r && \
     cp /langs/pypy3.10/lib/* /usr/lib -r && \
     cp /langs/pypy3.10/include/* /usr/include -r
+
+# Download and install pypy 3.11
+RUN wget https://buildbot.pypy.org/nightly/py3.11/pypy-c-jit-186687-ff94ca720f36-linux64.tar.bz2 -P /langs
+RUN tar -xf /langs/pypy-c-jit-186687-ff94ca720f36-linux64.tar.bz2 -C /langs && \
+    mv /langs/pypy-c-jit-186687-ff94ca720f36-linux64 /langs/pypy3.11 && \
+    rm /langs/pypy-c-jit-186687-ff94ca720f36-linux64.tar.bz2 && \
+    rm /langs/pypy3.11/bin/python* && \
+    cp /langs/pypy3.11/bin/* /usr/bin -r && \
+    cp /langs/pypy3.11/lib/* /usr/lib -r && \
+    cp /langs/pypy3.11/include/* /usr/include -r
 
 
 # Download and install NSJail

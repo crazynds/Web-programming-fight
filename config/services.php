@@ -34,7 +34,12 @@ return [
     'github' => [
         'client_id' => env('GITHUB_CLIENT_ID'),
         'client_secret' => env('GITHUB_CLIENT_SECRET'),
-        'redirect' => env('APP_URL','localhost').'/auth/github/callback',
+        'redirect' => env('APP_URL', 'localhost').'/auth/github/callback',
+    ],
+
+    'vjudge' => [
+        'username' => env('VJUDGE_USERNAME'),
+        'password' => env('VJUDGE_PASSWORD'),
     ],
 
 ];

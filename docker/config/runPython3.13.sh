@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python3.11 -u /var/config/exec "$@"
+python3.13 -u /var/config/exec "$@"

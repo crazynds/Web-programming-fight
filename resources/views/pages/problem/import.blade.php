@@ -50,5 +50,5 @@
 @endsection
 
 @section('script')
-    <script></script>
+    <script type='module'></script>
 @endsection

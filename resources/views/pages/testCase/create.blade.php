@@ -69,7 +69,7 @@
 @endsection
 
 @section('script')
-    <script>
+    <script type='module'>
         window.addEventListener("load", function() {
             const preview = function(input, append) {
 

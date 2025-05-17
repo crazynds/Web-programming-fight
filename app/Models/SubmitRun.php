@@ -7,12 +7,12 @@ use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
 use App\Models\Pivot\CompetitorSubmitRun;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SubmitRun extends Model
 {
     public $timestamps = true;
+
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -24,35 +24,41 @@ class SubmitRun extends Model
             get: fn (string $value) => LanguagesType::name(intval($value)),
         );
     }
+
     protected function languageRaw(): Attribute
     {
         return Attribute::make(
             get: fn ($vl, $attributes) => intval($attributes['language']),
         );
     }
+
     protected function status(): Attribute
     {
         return Attribute::make(
             get: fn (string $value) => SubmitStatus::fromValue(intval($value))->description,
         );
     }
+
     protected function output(): Attribute
     {
         return Attribute::make(
             set: function (?string $value) {
                 $limit = 1024;
-                $value = (isset($value) && strlen($value) > $limit) ? substr($value, 0, $limit) . '\n\n(...)' : $value;
+                $value = (isset($value) && strlen($value) > $limit) ? substr($value, 0, $limit).'\n\n(...)' : $value;
                 if (is_string($value)) {
-                    $value = mb_convert_encoding($value, "UTF-8");
+                    $value = mb_convert_encoding($value, 'UTF-8');
                 }
                 $value = trim($value);
-                if (strlen($value) == 0)
+                if (strlen($value) == 0) {
                     return null;
+                }
+
                 return $value;
             },
             get: fn (?string $value) => $value,
         );
     }
+
     protected function result(): Attribute
     {
         return Attribute::make(

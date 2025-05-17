@@ -1,41 +1,5 @@
 @extends('layouts.boca')
 
-@section('head')
-    <style>
-        .blink {
-            -webkit-animation: blink 2s infinite both;
-            animation: blink 2s infinite both;
-        }
-
-        @-webkit-keyframes blink {
-
-            0%,
-            50%,
-            100% {
-                opacity: 1;
-            }
-
-            25%,
-            75% {
-                opacity: 0.4;
-            }
-        }
-
-        @keyframes blink {
-
-            0%,
-            50%,
-            100% {
-                opacity: 1;
-            }
-
-            25%,
-            75% {
-                opacity: 0.4;
-            }
-        }
-    </style>
-@endsection
 @section('content')
     <div class="row mb-4">
         <div class="col">
@@ -61,6 +25,6 @@
             </div>
         </div>
     @endif
-    <x-runs-table :global="$global" :contest="$contest ?? ($contestService->contest ?? null)"/>
+    <x-runs-table :global="$global" :contest="$contest ?? ($contestService->contest ?? null)" />
 
 @endsection

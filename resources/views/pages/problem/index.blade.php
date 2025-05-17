@@ -6,13 +6,32 @@
 
 @section('content')
     <div class="row mb-4">
-        <div class="col">
+        <div class="col-8">
             <x-ballon />
             <b>
                 Problems:
             </b>
+            @if($vjudgeService->isEnabled() && !$contestService->inContest)
+                <form style="display: inline-block;" col="row">
+                    <div style="display: inline-block;">
+                        <select class="form-select select2" name="onlineJudge">
+                            <option value="" @if(!($onlineJudge ?? false)) selected @endif>Local</option>
+                            @foreach($vjudgeService->avaliableJudges() as $judge)
+                                <option value="{{$judge}}" @if(($onlineJudge ?? False)==$judge) selected @endif>{{$judge}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div style="display: inline-block;">
+                        <input class="form-control" name="search" value="{{ $search ?? ''}}"/>
+                    </div>
+                    <div style="display: inline-block;">
+                        <button type="submit">Search</button>
+                    </div>
+                </form>
+            @endif
+
         </div>
-        <div class="col">
+        <div class="col-4">
             @if (!$contestService->inContest)
                 <a style="float:right" href="{{ route('problem.create') }}">
                     <button>New +</button>
@@ -176,10 +195,13 @@
             @endforeach
         </tbody>
     </table>
+    <div class="pt-3">
+        {{ method_exists($problems,'links') ? $problems->links() : '' }} 
+    </div>
 @endsection
 
 @section('script')
-    <script>
+    <script type='module'>
         $(document).ready(function() {
 
             MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
