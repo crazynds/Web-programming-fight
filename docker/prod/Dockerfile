@@ -13,7 +13,6 @@ ENV NODE_VERSION=18
 RUN curl -fsSL https://deb.nodesource.com/setup_21.x | tap | bash
 RUN apt-get update && \
     apt-get install -y tzdata dos2unix npm bash supervisor mariadb-client \
-    build-essential libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev \
     nano time wget \
     autoconf \
     bison \
@@ -58,11 +57,13 @@ RUN tar -xf /langs/pypy-c-jit-latest-linux64.tar.bz2 -C /langs && \
 # Download and install python 
 RUN wget https://www.python.org/ftp/python/3.13.3/Python-3.13.3.tar.xz -P /langs
 RUN tar -xf /langs/Python-3.13.3.tar.xz -C /langs && \
+    apt-get install -y build-essential libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev && \
     mv /langs/Python-3.13.3 /langs/python3.13 && \
     rm /langs/Python-3.13.3.tar.xz && \
     cd /langs/Python-3.13.3 && \
     ./configure --enable-optimizations && \
-    make altinstall
+    make altinstall && \
+    apt-get purge -y build-essential libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev
 
 # Download and install NSJail
 RUN git clone https://github.com/google/nsjail.git  /nsjail
