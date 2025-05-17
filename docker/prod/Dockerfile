@@ -11,7 +11,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_21.x | tap | bash && \
     apt-get update && \
     apt-get install -y tzdata dos2unix npm bash supervisor mariadb-client \
     nano time wget \
-    gcc g++ build-essential \
+    build-essential gcc g++ \
     python3.11 python3-pip && \ 
     install-php-extensions redis pdo_mysql pdo_pgsql mbstring exif pcntl curl zip intl sockets xml gd && \
     php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer && \
@@ -53,9 +53,9 @@ RUN wget https://buildbot.pypy.org/nightly/py3.11/pypy-c-jit-186687-ff94ca720f36
 
 # Download and install NSJail
 RUN git clone https://github.com/google/nsjail.git  /nsjail && \
-    apt-get install -y libprotobuf-dev protobuf-compiler libnl-3-dev libnl-genl-3-dev libcap-dev libseccomp-dev pkg-config && \
+    apt-get install -y libprotobuf-dev bison flex protobuf-compiler libnl-3-dev libnl-genl-3-dev libcap-dev libseccomp-dev pkg-config && \
     cd /nsjail && make && mv /nsjail/nsjail /bin && rm -rf -- /nsjail && \
-    apt-get purge -y libprotobuf-dev protobuf-compiler libnl-3-dev libnl-genl-3-dev libcap-dev libseccomp-dev pkg-config
+    apt-get purge -y libprotobuf-dev bison flex protobuf-compiler libnl-3-dev libnl-genl-3-dev libcap-dev libseccomp-dev pkg-config
 
 # Copy nsjail config
 RUN mkdir /var/config && chmod 0777 /var/config
