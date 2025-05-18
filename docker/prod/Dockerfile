@@ -27,8 +27,7 @@ RUN wget https://www.python.org/ftp/python/3.13.3/Python-3.13.3.tar.xz -P /langs
     rm /langs/Python-3.13.3.tar.xz && \
     cd /langs/python3.13 && \
     ./configure --with-lto --enable-optimizations --without-ensurepip --disable-ipv6 && \
-    make altinstall && \
-    apt-get purge -y libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev build-essential gcc g++
+    make altinstall
 
 # Download and install pypy 3.10
 RUN wget https://buildbot.pypy.org/nightly/py3.10/pypy-c-jit-186045-8708da3ee078-linux64.tar.bz2 -P /langs && \
@@ -53,11 +52,7 @@ RUN wget https://buildbot.pypy.org/nightly/py3.11/pypy-c-jit-186687-ff94ca720f36
 # Download and install NSJail
 RUN apt-get install -y libprotobuf-dev bison flex protobuf-compiler libnl-3-dev libnl-genl-3-dev libcap-dev libseccomp-dev pkg-config libnl-route-3-dev build-essential gcc g++ git && \
     git clone https://github.com/google/nsjail.git  /nsjail && \
-    cd /nsjail && make && mv /nsjail/nsjail /bin && rm -rf -- /nsjail && \
-    apt-get purge -y libprotobuf-dev bison flex protobuf-compiler libnl-3-dev libnl-genl-3-dev libcap-dev libseccomp-dev pkg-config libnl-route-3-dev build-essential gcc g++ git
-
-# Install gcc and g++ compiler
-RUN apt-get install -y build-essential gcc g++
+    cd /nsjail && make && mv /nsjail/nsjail /bin && rm -rf -- /nsjail
 
 # Copy nsjail config
 RUN mkdir /var/config && chmod 0777 /var/config
@@ -82,7 +77,7 @@ COPY package-lock.json /app/
 
 # Setup the libraries
 RUN composer install --no-interaction --no-dev --optimize-autoloader --no-scripts
-RUN apt-get install -y npm && npm install
+RUN npm install
 
 # Copy php config
 COPY ./docker/prod/php.ini /usr/local/etc/php/conf.d/local.ini

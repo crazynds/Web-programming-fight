@@ -15,8 +15,6 @@ import Echo from "laravel-echo";
 import Pusher from "pusher-js";
 window.Pusher = Pusher;
 
-console.log("passando por aq");
-
 if (!window.env.LIVEWIRE) {
     console.log("declara livewire");
     window.Echo = new Echo({
