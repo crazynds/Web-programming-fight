@@ -84,11 +84,12 @@
                         Fixes 🐛
                     <ul>
                         <li>Compilation time and compilation memory is now limited.</li>
-                        <li></li>
+                        <li>Home screen.</li>
                     </ul>
                     </p>
                 </div>
             </div>
+            <hr style="margin-top: 120px" />
             <div class="row">
                 <div class="col-8">
                     <h3>
