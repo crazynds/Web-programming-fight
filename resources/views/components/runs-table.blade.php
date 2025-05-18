@@ -469,7 +469,7 @@
         else
             row.removeClass('notJudged blink');
     }
-    const updateSubmission = function(data) {
+    const window.updateSubmission = function(data) {
         var row = $('#row' + data.id);
         if (row.length == 0) {
             if (userId != null && userId != data.user_id) return
@@ -544,17 +544,17 @@
         window.addEventListener("load", function() {
             window.Echo.private(channel)
                 .listen('NewSubmissionEvent', (data) => {
-                    updateSubmission(data.data)
+                    window.updateSubmission(data.data)
                 })
 
             window.Echo.private(channel)
                 .listen('UpdateSubmissionTestCaseEvent', (data) => {
-                    updateSubmission(data.data)
+                    window.updateSubmission(data.data)
                 })
 
             window.Echo.private(channel)
                 .listen('UpdateSubmissionEvent', (data) => {
-                    updateSubmission(data.data)
+                    window.updateSubmission(data.data)
                 });
         })
     @endif

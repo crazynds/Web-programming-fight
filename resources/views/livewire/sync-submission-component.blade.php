@@ -5,7 +5,7 @@
 @script
     <script type='module'>
         $wire.on('updateSubmissionEvent', (data) => {
-            data.forEach(updateSubmission)
+            data.forEach(window.updateSubmission)
         });
     </script>
 @endscript

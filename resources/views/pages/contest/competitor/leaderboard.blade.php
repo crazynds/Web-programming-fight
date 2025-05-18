@@ -388,7 +388,7 @@
             @endif
             setTimeout(orderRanking, 100);
         }
-        const updateSubmission = function(data) {
+        window.updateSubmission = function(data) {
             if (!data.contest) return;
             var row = $('#score-' + data.contest.competitor_id + '-' + data.problem.id);
             if (row.length == 0 || row.hasClass('scored2')) return;
@@ -437,12 +437,12 @@
             window.addEventListener("load", function() {
                 window.Echo.private(channel)
                     .listen('NewSubmissionEvent', (data) => {
-                        updateSubmission(data.data)
+                        window.updateSubmission(data.data)
                     })
 
                 window.Echo.private(channel)
                     .listen('UpdateSubmissionEvent', (data) => {
-                        updateSubmission(data.data)
+                        window.updateSubmission(data.data)
                     });
             })
         @endif
