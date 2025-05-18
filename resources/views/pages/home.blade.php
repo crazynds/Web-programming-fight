@@ -62,6 +62,7 @@
                         <li>Livewire can be used instead of WebSockets.</li>
                         <li>Added pagination in problem list.</li>
                         <li>Added title search in problem list.</li>
+                        <li>Added the star button on header.</li>
                     </ul>
                     </p>
                     <p>

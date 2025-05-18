@@ -8,6 +8,8 @@ use App\Models\File;
 use App\Models\Problem;
 use App\Models\Scorer;
 use App\Models\TestCase;
+use App\Services\Languages\LanguageServiceFactory;
+use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
@@ -45,26 +47,6 @@ class ExecutorService
         return $time;
     }
 
-    private function getConfig($language)
-    {
-        switch ($language) {
-            case 'PyPy3.10':
-                return '--conf /var/config/python.conf -R /var/config/runPypy3.10.sh --exec_file /var/config/runPypy3.10.sh';
-            case 'PyPy3.11':
-                return '--conf /var/config/python.conf -R /var/config/runPypy3.11.sh --exec_file /var/config/runPypy3.11.sh';
-            case 'Python3.11':
-                return '--conf /var/config/python.conf -R /var/config/runPython3.11.sh --exec_file /var/config/runPython3.11.sh';
-            case 'Python3.13':
-                return '--conf /var/config/python.conf -R /var/config/runPython3.13.sh --exec_file /var/config/runPython3.13.sh';
-            case 'C++':
-            case 'C':
-            case 'BINARY':
-            default:
-                // USE C++
-                return '--conf /var/config/basic.conf -R /var/config/runBinary.sh --exec_file /var/config/runBinary.sh';
-        }
-    }
-
     private function loadFile($fileId, $path)
     {
         // Carrega o arquivo input para a pasta tmpfs
@@ -80,11 +62,13 @@ class ExecutorService
     public function setup(Problem $problem, File $code, string $language)
     {
         if ($problem->diff_program_language) {
+            // Compile diff program
             $result = $this->buildProgram($problem->diffProgram, $problem->diff_program_language, 'diff_exec');
+            // Get diff config from current config
+            $this->diffConfig = $this->currentConfig;
             if ($result != SubmitResult::NoResult) {
                 return SubmitResult::InternalCompilationError;
             }
-            $this->diffConfig = $this->getConfig($problem->diff_program_language);
         }
 
         return $this->buildProgram($code, $language);
@@ -264,64 +248,20 @@ class ExecutorService
 
     private function buildProgram(File $code, $language, $outputName = 'program')
     {
-        $this->currentConfig = $this->getConfig($language);
-        $timeoutCompilation = '30s';   // Segundos
-        switch ($language) {
-            case 'C++':
-                $program = 'prog.cpp';
-                Storage::disk('work')->writeStream($program, $code->readStream());
-                exec("timeout $timeoutCompilation bash /var/config/compile.sh c++ /var/work/'$program' /var/work/'$outputName'", $this->output, $this->retval);
-                // exec("g++ -std=c++20 -mtune=native -Wreturn-type -static -march=native -w -O2 /var/work/'$program' -o /var/work/'$outputName' 2>&1", $this->output, $this->retval);  // Old method
-                if ($this->retval == 124) {
-                    $this->output .= PHP_EOL.'Compilation timed out';
-                }
-                if ($this->retval != 0) {
-                    return SubmitResult::CompilationError;
-                }
-                break;
-            case 'C (-std=c17)':
-                $program = 'prog.c';
-                Storage::disk('work')->writeStream($program, $code->readStream());
-                exec("timeout $timeoutCompilation bash /var/config/compile.sh c /var/work/'$program' /var/work/'$outputName'", $this->output, $this->retval);
-                // exec("gcc -std=c17 -mtune=native -lm -static -march=native -w -O2 /var/work/'$program' -o /var/work/'$outputName' 2>&1", $this->output, $this->retval);
-                if ($this->retval == 124) {
-                    $this->output .= PHP_EOL.'Compilation timed out';
-                }
-                if ($this->retval != 0) {
-                    return SubmitResult::CompilationError;
-                }
-                break;
-            case 'Python3.11':
-                Storage::disk('work')->deleteDirectory('__pycache__');
-                Storage::disk('work')->writeStream($outputName, $code->readStream());
-                // exec("sed -i '1s/^/from sys import exit\\n\\n/' /var/work/".$outputName); // Add import to exit
-                exec('python3 -m py_compile /var/work/'.$outputName); // Compile pypy
-                break;
-            case 'Python3.13':
-                Storage::disk('work')->deleteDirectory('__pycache__');
-                Storage::disk('work')->writeStream($outputName, $code->readStream());
-                // exec("sed -i '1s/^/from sys import exit\\n\\n/' /var/work/".$outputName); // Add import to exit
-                exec('python3.13 -m py_compile /var/work/'.$outputName); // Compile pypy
-                break;
-            case 'PyPy3.10':
-                Storage::disk('work')->deleteDirectory('__pycache__');
-                Storage::disk('work')->writeStream($outputName, $code->readStream());
-                // exec("sed -i '1s/^/from sys import exit\\n\\n/' /var/work/".$outputName); // Add import to exit
-                exec('pypy3.10 -m py_compile /var/work/'.$outputName);  // Compile pypy
-                break;
-            case 'PyPy3.11':
-                Storage::disk('work')->deleteDirectory('__pycache__');
-                Storage::disk('work')->writeStream($outputName, $code->readStream());
-                // exec("sed -i '1s/^/from sys import exit\\n\\n/' /var/work/".$outputName); // Add import to exit
-                exec('pypy3.11 -m py_compile /var/work/'.$outputName);  // Compile pypy
-                break;
-            case 'BINARY':
-                Storage::disk('work')->writeStream($outputName, $code->readStream());
-                break;
-            default:
-                return SubmitResult::LanguageNotSupported;
-        }
+        $timeoutCompilation = '30s';   // Segundos padrão
 
-        return SubmitResult::NoResult;
+        try {
+            $service = app(LanguageServiceFactory::class)->make($language);
+        } catch (Exception $e) {
+            dump($e);
+
+            return SubmitResult::LanguageNotSupported;
+        }
+        $ret = $service->compile($code, $outputName, $timeoutCompilation);
+        $this->currentConfig = $service->config();
+        $this->retval = $service->retval;
+        $this->output = $service->output;
+
+        return $ret;
     }
 }

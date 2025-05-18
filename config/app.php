@@ -141,7 +141,7 @@ return [
 
     'maintenance' => [
         'driver' => 'cache',
-        'store'  => 'redis',
+        'store' => 'redis',
     ],
 
     /*
@@ -168,6 +168,7 @@ return [
         App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\LanguageServiceProvider::class,
     ])->toArray(),
 
     /*
@@ -186,8 +187,6 @@ return [
         'ReCaptcha' => Biscolab\ReCaptcha\Facades\ReCaptcha::class,
     ])->toArray(),
 
-
-
-    'livewire' => env('LIVEWIRE',false),
+    'livewire' => env('LIVEWIRE', false),
 
 ];

@@ -18,6 +18,7 @@
             LIVEWIRE: {{ config('app.livewire') ? 'true' : 'false' }},
         }
     </script>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
 
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     @vite(['resources/css/boca.css'])
@@ -88,7 +89,7 @@
                     <a href="{{ route('home') }}"
                         style="font-size: 1em; text-decoration: none;height: 100%;display: block;width: 100%;">
                         <x-ballon />
-                        <font color="#000000">
+                        <font color="#000000" class="d-none d-md-inline">
                             @if ($contestService->inContest)
                                 <b>
                                     Contest Mode!
@@ -99,8 +100,22 @@
                         </font>
                     </a>
                 </td>
+                @if (!$contestService->inContest)
+                    <td nowrap="" align="center" class="px-1 d-none d-lg-table-cell">
+                        <span style="float:right; height: 20px; min-width: 100px; margin-top: -2px;">
+                            <span style="float:left">
+                                {{ now()->year }} |
+                            </span>
+                            <!-- Place this tag where you want the button to render. -->
+                            <!-- Place this tag where you want the button to render. -->
+                            <a class="github-button" href="https://github.com/crazynds/Web-programming-fight"
+                                data-color-scheme="no-preference: light; light: light; dark: dark;"
+                                data-icon="octicon-star"
+                                aria-label="Star crazynds/Web-programming-fight on GitHub">Star</a>
+                        </span>
+                    </td>
+                @endif
                 <td width="99%" style="padding-left:6px;overflow: unset;">
-                    {{ now()->year }} |
                     @auth
                         @if (!$contestService->inContest || $contestService->started)
                             <a href="{{ route('problem.index') }}">Problems</a> |
@@ -162,9 +177,11 @@
                         <b>{{ $contestService->competitor->fullName() }}</b>
                     @else
                         @auth
-                            <a href="{{ route('user.me') }}">{{ Auth()->user()->name }}</a>
-                            <img src="{{ Auth()->user()->avatar }}" class="rounded-circle" style="width: 33px;height:33px;"
-                                alt="Avatar" />
+                            <a class="d-none d-lg-inline" href="{{ route('user.me') }}">{{ Auth()->user()->name }}</a>
+
+
+                            <a href="{{ route('user.me') }}"><img src="{{ Auth()->user()->avatar }}"
+                                    class="rounded-circle" style="width: 33px;height:33px;" alt="Avatar" /></a>
                         @else
                             <span class="social-media-menu">
                                 <a href="{{ route('auth.login', ['provider' => 'github']) }}" class="sm-github"></a>
