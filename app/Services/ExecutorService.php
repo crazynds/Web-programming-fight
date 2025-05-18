@@ -297,6 +297,12 @@ class ExecutorService
                 // exec("sed -i '1s/^/from sys import exit\\n\\n/' /var/work/".$outputName); // Add import to exit
                 exec('python3 -m py_compile /var/work/'.$outputName); // Compile pypy
                 break;
+            case 'Python3.13':
+                Storage::disk('work')->deleteDirectory('__pycache__');
+                Storage::disk('work')->writeStream($outputName, $code->readStream());
+                // exec("sed -i '1s/^/from sys import exit\\n\\n/' /var/work/".$outputName); // Add import to exit
+                exec('python3.13 -m py_compile /var/work/'.$outputName); // Compile pypy
+                break;
             case 'PyPy3.10':
                 Storage::disk('work')->deleteDirectory('__pycache__');
                 Storage::disk('work')->writeStream($outputName, $code->readStream());
