@@ -16,7 +16,6 @@ import Pusher from "pusher-js";
 window.Pusher = Pusher;
 
 if (!window.env.LIVEWIRE) {
-    console.log("declara livewire");
     window.Echo = new Echo({
         broadcaster: "reverb",
         key: window.env.REVERB_APP_KEY,

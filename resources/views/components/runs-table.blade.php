@@ -383,7 +383,6 @@
     }
     window.openModal = function(id) {
         var url = '{{ route('api.submitRun.code', ['submitRun' => -1]) }}'.replace('-1', id)
-        console.log($('#codeModal'))
         $('#codeModal').modal("show")
         $('#codeModal').find('#code').html(`
                 <div class="d-flex justify-content-center">
