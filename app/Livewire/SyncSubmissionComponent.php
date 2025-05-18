@@ -90,7 +90,7 @@ class SyncSubmissionComponent extends Component
 
     public function render()
     {
-        return view('livewire.runs-table-component', [
+        return view('livewire.sync-submission-component', [
             'text' => $this->getQuery()->whereDate('submit_runs.updated_at', '>=', $this->lastCheck)->toSql(),
         ]);
     }
