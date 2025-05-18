@@ -54,7 +54,7 @@ RUN wget https://buildbot.pypy.org/nightly/py3.11/pypy-c-jit-186687-ff94ca720f36
 RUN git clone https://github.com/google/nsjail.git  /nsjail && \
     apt-get install -y libprotobuf-dev bison flex protobuf-compiler libnl-3-dev libnl-genl-3-dev libcap-dev libseccomp-dev pkg-config libnl-route-3-dev build-essential gcc g++ && \
     cd /nsjail && make && mv /nsjail/nsjail /bin && rm -rf -- /nsjail && \
-    apt-get purge -y libprotobuf-dev bison flex protobuf-compiler libnl-3-dev libnl-genl-3-dev libcap-dev libseccomp-dev pkg-configlibnl-route-3-dev build-essential gcc g++
+    apt-get purge -y libprotobuf-dev bison flex protobuf-compiler libnl-3-dev libnl-genl-3-dev libcap-dev libseccomp-dev pkg-config libnl-route-3-dev build-essential gcc g++
 
 # Install gcc and g++ compiler
 RUN apt-get install -y build-essential gcc g++
