@@ -469,7 +469,7 @@
         else
             row.removeClass('notJudged blink');
     }
-    const window.updateSubmission = function(data) {
+    window.updateSubmission = function(data) {
         var row = $('#row' + data.id);
         if (row.length == 0) {
             if (userId != null && userId != data.user_id) return
