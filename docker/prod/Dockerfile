@@ -77,7 +77,7 @@ COPY package-lock.json /app/
 
 # Setup the libraries
 RUN composer install --no-interaction --no-dev --optimize-autoloader --no-scripts
-RUN npm install
+RUN apt-get install -y npm && npm install
 
 # Copy php config
 COPY ./docker/prod/php.ini /usr/local/etc/php/conf.d/local.ini
