@@ -27,7 +27,7 @@ RUN wget https://www.python.org/ftp/python/3.13.3/Python-3.13.3.tar.xz -P /langs
     mv /langs/Python-3.13.3 /langs/python3.13 && \
     rm /langs/Python-3.13.3.tar.xz && \
     cd /langs/python3.13 && \
-    ./configure --enable-optimizations --without-ensurepip --disable-ipv6 && \
+    ./configure --with-lto --enable-optimizations --without-ensurepip --disable-ipv6 && \
     make altinstall && \
     apt-get purge -y libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev
 
