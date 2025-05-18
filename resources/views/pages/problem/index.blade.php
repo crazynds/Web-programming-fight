@@ -11,25 +11,25 @@
             <b>
                 Problems:
             </b>
-            @if($vjudgeService->isEnabled() && !$contestService->inContest)
-                <form style="display: inline-block;" col="row">
+            <form style="display: inline-block;" col="row">
+                @if ($vjudgeService->isEnabled() && !$contestService->inContest)
                     <div style="display: inline-block;">
                         <select class="form-select select2" name="onlineJudge">
-                            <option value="" @if(!($onlineJudge ?? false)) selected @endif>Local</option>
-                            @foreach($vjudgeService->avaliableJudges() as $judge)
-                                <option value="{{$judge}}" @if(($onlineJudge ?? False)==$judge) selected @endif>{{$judge}}</option>
+                            <option value="" @if (!($onlineJudge ?? false)) selected @endif>Local</option>
+                            @foreach ($vjudgeService->avaliableJudges() as $judge)
+                                <option value="{{ $judge }}" @if (($onlineJudge ?? false) == $judge) selected @endif>
+                                    {{ $judge }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div style="display: inline-block;">
-                        <input class="form-control" name="search" value="{{ $search ?? ''}}"/>
-                    </div>
-                    <div style="display: inline-block;">
-                        <button type="submit">Search</button>
-                    </div>
-                </form>
-            @endif
-
+                @endif
+                <div style="display: inline-block;">
+                    <input class="form-control" name="search" value="{{ $search ?? '' }}" />
+                </div>
+                <div style="display: inline-block;">
+                    <button type="submit">Search</button>
+                </div>
+            </form>
         </div>
         <div class="col-4">
             @if (!$contestService->inContest)
@@ -196,7 +196,7 @@
         </tbody>
     </table>
     <div class="pt-3">
-        {{ method_exists($problems,'links') ? $problems->links() : '' }} 
+        {{ method_exists($problems, 'links') ? $problems->links() : '' }}
     </div>
 @endsection
 

@@ -9,12 +9,14 @@
             </b>
 
             @can('update', $problem)
-                <a style="margin-right: 5px;text-decoration:none !important;" href="{{ route('problem.diff.create', ['problem' => $problem->id]) }}">
+                <a style="margin-right: 5px;text-decoration:none !important;"
+                    href="{{ route('problem.diff.create', ['problem' => $problem->id]) }}">
                     <button>New Diff Program +</button>
                 </a>
-                @if($problem->diffProgram()->exists())
-                    <a href="#">  
-                        <form action="{{ route('problem.diff.destroy', ['problem' => $problem->id, 'diff'=> 0]) }}" method="POST" style="display: inline;">
+                @if ($problem->diffProgram()->exists())
+                    <a href="#">
+                        <form action="{{ route('problem.diff.destroy', ['problem' => $problem->id, 'diff' => 0]) }}" method="POST"
+                            style="display: inline;">
                             @method('DELETE')
                             @csrf
                             <button type="submit">❌</button>
@@ -26,7 +28,9 @@
         </div>
         <div class="col" style="text-align:center;">
             <h1>
-                {{ $problem->title }}
+                <a href="{{ route('problem.show', ['problem' => $problem->id]) }}">
+                    {{ $problem->title }}
+                </a>
             </h1>
         </div>
         <div class="col">

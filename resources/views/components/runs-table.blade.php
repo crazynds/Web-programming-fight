@@ -95,11 +95,11 @@
                                 $nickName = $submitRun->user->name;
                             @endphp
                         @endif
-                        {{ strlen($nickName) > 20 ? substr($nickName, 0, 20) . '...' : $nickName }}
+                        {{ Str::limit($nickName, 20) }}
                     </td>
                     <td class="px-2">
                         <a href="{{ route('problem.show', ['problem' => $submitRun->problem->id], false) }}">
-                            {{ $submitRun->problem->title }}
+                            {{ Str::limit($submitRun->problem->title, 30) }}
                         </a>
                     </td>
                     <td class="px-2" id="lang">
@@ -420,7 +420,7 @@
         datetimetag.text(data.datetime);
         const userName = {{ $contestService->inContest || $contest ? 'data.contest.competitor' : 'data.user' }};
         usertag.text(userName.length > 20 ? userName.substring(0, 20) + '...' : userName);
-        titletag.text(data.problem.title);
+        titletag.text(data.problem.title.length > 30 ? data.problem.title.substring(0, 30) + '...' : data.problem);
         langtag.text(data.language);
         statustag.text(data.status);
         resulttag.text(data.result);
