@@ -9,7 +9,7 @@ ENV NODE_VERSION=18
 # Install node UBUNTU
 RUN curl -fsSL https://deb.nodesource.com/setup_21.x | tap | bash && \
     apt-get update && \
-    apt-get install -y tzdata dos2unix npm bash supervisor mariadb-client \
+    apt-get install -y tzdata dos2unix bash supervisor mariadb-client \
     nano time wget \
     python3.11 python3-pip && \ 
     install-php-extensions redis pdo_mysql pdo_pgsql mbstring exif pcntl curl zip intl sockets xml gd && \
