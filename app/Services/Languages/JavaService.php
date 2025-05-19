@@ -21,8 +21,8 @@ class JavaService extends LanguageService
 
     public function compile(File $code, string $outputName, string $timeoutCompilation): int
     {
-        $code = $code->get();
-        $className = $this->extractMainPublicClass($code);
+        $content = $code->get();
+        $className = $this->extractMainPublicClass($content);
         if (! $className) {
             $this->output .= PHP_EOL.'No main class found';
 

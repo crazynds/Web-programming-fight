@@ -253,7 +253,6 @@ class ExecutorService
         try {
             $service = app(LanguageServiceFactory::class)->make($language);
         } catch (Exception $e) {
-            dump($e);
 
             return SubmitResult::LanguageNotSupported;
         }
