@@ -22,6 +22,10 @@ class LanguageServiceFactory
                 return $this->container->make(PythonService::class, [
                     'language' => $language,
                 ]);
+            case 'Java OpenJDK 24':
+                return $this->container->make(JavaService::class, [
+                    'language' => $language,
+                ]);
             case 'BINARY':
                 return $this->container->make(BinaryService::class);
             default:

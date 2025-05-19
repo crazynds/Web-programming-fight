@@ -42,6 +42,14 @@ RUN wget https://buildbot.pypy.org/nightly/py3.11/pypy-c-jit-186687-ff94ca720f36
     mv /langs/pypy-c-jit-186687-ff94ca720f36-linux64 /langs/pypy3.11 && \
     rm /langs/pypy-c-jit-186687-ff94ca720f36-linux64.tar.bz2
 
+
+# Download and install Java JDK 24
+RUN wget https://download.java.net/java/GA/jdk24.0.1/24a58e0e276943138bf3e963e6291ac2/9/GPL/openjdk-24.0.1_linux-x64_bin.tar.gz -P /langs && \
+    tar -xf /langs/openjdk-24.0.1_linux-x64_bin.tar.gz -C /langs && \
+    mv /langs/jdk-24.0.1 /langs/javaOpenJDK24 && \
+    rm /langs/openjdk-24.0.1_linux-x64_bin.tar.gz
+
+
 # Download and install NSJail
 RUN apt-get install -y libprotobuf-dev bison flex protobuf-compiler libnl-3-dev libnl-genl-3-dev libcap-dev libseccomp-dev pkg-config libnl-route-3-dev build-essential gcc g++ git && \
     git clone https://github.com/google/nsjail.git  /nsjail && \

@@ -23,6 +23,8 @@ final class LanguagesType extends Enum
 
     const PyPy3_11 = 7;
 
+    const Java_OpenJDK24 = 8;
+
     const BINARY = 99;
 
     public static function enabled()
@@ -33,6 +35,7 @@ final class LanguagesType extends Enum
             LanguagesType::C,
             LanguagesType::PyPy3_11,
             LanguagesType::Python3_13,
+            LanguagesType::Java_OpenJDK24,
         ];
         $resp = [];
         foreach ($valids as $valid) {
@@ -52,6 +55,7 @@ final class LanguagesType extends Enum
             'PyPy3.10' => LanguagesType::PyPy3_10,
             'Python3.11' => LanguagesType::Python3_11,
             'Python3.13' => LanguagesType::Python3_13,    // Not installed yet
+            'Java OpenJDK 24' => LanguagesType::Java_OpenJDK24,
         ];
     }
 
@@ -67,6 +71,7 @@ final class LanguagesType extends Enum
             'PyPy3.11' => [1.8, 2], // 1.8x more time for pypy and 2x more memory
             'Python3.11' => [2, 2], // 2x more time for python and 2x more memory
             'Python3.13' => [1.8, 2], // 1.8x more time for python and 2x more memory
+            'Java OpenJDK 24' => [1, 1.2],
         ];
     }
 
@@ -90,6 +95,7 @@ final class LanguagesType extends Enum
             case self::Python3_11:
             case self::Python3_13:
             case self::C:
+            case self::Java_OpenJDK24:
             case self::Auto_detect:
                 return [
                     File::defaults()

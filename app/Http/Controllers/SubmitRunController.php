@@ -130,8 +130,10 @@ class SubmitRunController extends Controller
                         case 'py':
                             $run->language = LanguagesType::PyPy3_11;
                             break;
-                        case 'kt':
                         case 'java':
+                            $run->language = LanguagesType::Java_OpenJDK24;
+                            break;
+                        case 'kt':
                         default:
                             $run->language = LanguagesType::BINARY;
                             break;
