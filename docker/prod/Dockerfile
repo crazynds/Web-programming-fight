@@ -55,6 +55,8 @@ RUN apt-get install -y libprotobuf-dev bison flex protobuf-compiler libnl-3-dev 
     git clone https://github.com/google/nsjail.git  /nsjail && \
     cd /nsjail && make && mv /nsjail/nsjail /bin && rm -rf -- /nsjail
 
+RUN apt-get install -y npm
+
 # Copy nsjail config
 RUN mkdir /var/config && chmod 0777 /var/config
 COPY ./docker/config/ /var/config/
@@ -78,7 +80,7 @@ COPY package-lock.json /app/
 
 # Setup the libraries
 RUN composer install --no-interaction --no-dev --optimize-autoloader --no-scripts
-RUN apt-get install -y npm && npm install
+RUN npm install
 
 # Copy php config
 COPY ./docker/prod/php.ini /usr/local/etc/php/conf.d/local.ini
