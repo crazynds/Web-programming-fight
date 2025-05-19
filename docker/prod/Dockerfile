@@ -23,31 +23,24 @@ RUN wget https://www.python.org/ftp/python/3.13.3/Python-3.13.3.tar.xz -P /langs
     tar -xf /langs/Python-3.13.3.tar.xz -C /langs && \
     apt-get update && \
     apt-get install -y libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev build-essential gcc g++ && \
-    mv /langs/Python-3.13.3 /langs/python3.13 && \
+    mv /langs/Python-3.13.3 /langs/sc-python3.13 && \
     rm /langs/Python-3.13.3.tar.xz && \
-    cd /langs/python3.13 && \
-    ./configure --with-lto --enable-optimizations --without-ensurepip --disable-ipv6 && \
-    make altinstall
+    cd /langs/sc-python3.13 && \
+    ./configure --with-lto --enable-optimizations --without-ensurepip --prefix=/langs/python3.13 && \
+    make -j$(nproc) && \
+    make install && rm -rf /langs/sc-python3.13
 
 # Download and install pypy 3.10
 RUN wget https://buildbot.pypy.org/nightly/py3.10/pypy-c-jit-186045-8708da3ee078-linux64.tar.bz2 -P /langs && \
     tar -xf /langs/pypy-c-jit-186045-8708da3ee078-linux64.tar.bz2 -C /langs && \
     mv /langs/pypy-c-jit-186045-8708da3ee078-linux64 /langs/pypy3.10 && \
-    rm /langs/pypy-c-jit-186045-8708da3ee078-linux64.tar.bz2 && \
-    rm /langs/pypy3.10/bin/python* && \
-    cp /langs/pypy3.10/bin/* /usr/bin -r && \
-    cp /langs/pypy3.10/lib/* /usr/lib -r && \
-    cp /langs/pypy3.10/include/* /usr/include -r
+    rm /langs/pypy-c-jit-186045-8708da3ee078-linux64.tar.bz2
 
 # Download and install pypy 3.11
 RUN wget https://buildbot.pypy.org/nightly/py3.11/pypy-c-jit-186687-ff94ca720f36-linux64.tar.bz2 -P /langs && \
     tar -xf /langs/pypy-c-jit-186687-ff94ca720f36-linux64.tar.bz2 -C /langs && \
     mv /langs/pypy-c-jit-186687-ff94ca720f36-linux64 /langs/pypy3.11 && \
-    rm /langs/pypy-c-jit-186687-ff94ca720f36-linux64.tar.bz2 && \
-    rm /langs/pypy3.11/bin/python* && \
-    cp /langs/pypy3.11/bin/* /usr/bin -r && \
-    cp /langs/pypy3.11/lib/* /usr/lib -r && \
-    cp /langs/pypy3.11/include/* /usr/include -r
+    rm /langs/pypy-c-jit-186687-ff94ca720f36-linux64.tar.bz2
 
 # Download and install NSJail
 RUN apt-get install -y libprotobuf-dev bison flex protobuf-compiler libnl-3-dev libnl-genl-3-dev libcap-dev libseccomp-dev pkg-config libnl-route-3-dev build-essential gcc g++ git && \
