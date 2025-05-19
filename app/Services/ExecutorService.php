@@ -208,6 +208,7 @@ class ExecutorService
         exec("cp /var/work/'$programName' /var/config/exec 2>&1 > /dev/null");   // Copy program to correct place
         exec('chmod +x /var/config/exec 2>&1 > /dev/null');
         exec($command, $this->output, $this->retval);
+        dump($command);
 
         // dump($this->output);
         $exectime = 0;
