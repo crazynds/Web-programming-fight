@@ -12,7 +12,7 @@ fi
 limit_mb=$((limit_kb / 1024))
 
 # Reserve 10% for JVM overhead (stack, metaspace, code cache, etc)
-heap_mb=$(((limit_mb-512)/2))
+heap_mb=$(((limit_mb-900)/2))
 
 
 /langs/javaOpenJDK24/bin/java \
