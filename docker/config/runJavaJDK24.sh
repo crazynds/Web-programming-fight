@@ -25,4 +25,4 @@ heap_mb=$((limit_mb * 90 / 100))
     -XX:+UseCompressedOops \
     -Dfile.encoding=UTF-8 \
     -Djava.awt.headless=true \
-    -jar /var/work/exec "$@"
+    -jar /var/config/exec "$@"
