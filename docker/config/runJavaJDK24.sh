@@ -12,17 +12,18 @@ fi
 limit_mb=$((limit_kb / 1024))
 
 # Reserve 10% for JVM overhead (stack, metaspace, code cache, etc)
-heap_mb=$((limit_mb * 90 / 100))
+heap_mb=$(((limit_mb-512)/2))
 
 
 /langs/javaOpenJDK24/bin/java \
     -Xms${heap_mb}m \
     -Xmx${heap_mb}m \
-    -Xss64m \
     -XX:+UseSerialGC \
     -XX:+TieredCompilation \
     -XX:+ExitOnOutOfMemoryError \
+    -Xlog:cds=off \
     -XX:+UseCompressedOops \
+    -XX:-UseCompressedClassPointers \
     -Dfile.encoding=UTF-8 \
     -Djava.awt.headless=true \
     -jar /var/config/exec "$@"

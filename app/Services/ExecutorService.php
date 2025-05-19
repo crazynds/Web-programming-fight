@@ -159,7 +159,7 @@ class ExecutorService
 
         $modifiers = LanguagesType::modifiers()[$scorer->language];
         $timeLimit = $scorer->time_limit * $modifiers[0];
-        $memoryLimit = $scorer->memory_limit * $modifiers[1];
+        $memoryLimit = $scorer->memory_limit * $modifiers[1] + $modifiers[2];
         $this->execute($timeLimit, $memoryLimit, 'scorer');
 
         $output = Storage::disk('work')->get('output');

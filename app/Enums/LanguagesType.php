@@ -65,13 +65,13 @@ final class LanguagesType extends Enum
         // 0 => time
         // 1 => memory
         return [
-            'C++' => [1, 1],
-            'C (-std=c17)' => [1, 1],
-            'PyPy3.10' => [1.8, 2], // 1.8x more time for pypy and 2x more memory
-            'PyPy3.11' => [1.8, 2], // 1.8x more time for pypy and 2x more memory
-            'Python3.11' => [2, 2], // 2x more time for python and 2x more memory
-            'Python3.13' => [1.8, 2], // 1.8x more time for python and 2x more memory
-            'Java OpenJDK 24' => [1, 1.2],
+            'C++' => [1, 1, 0],
+            'C (-std=c17)' => [1, 1, 0],
+            'PyPy3.10' => [1.8, 2, 0], // 1.8x more time for pypy and 2x more memory
+            'PyPy3.11' => [1.8, 2, 0], // 1.8x more time for pypy and 2x more memory
+            'Python3.11' => [2, 2, 0], // 2x more time for python and 2x more memory
+            'Python3.13' => [1.8, 2, 0], // 1.8x more time for python and 2x more memory
+            'Java OpenJDK 24' => [1, 1.2, 1024], // The last value is the extra memory to initialize the JVM
         ];
     }
 

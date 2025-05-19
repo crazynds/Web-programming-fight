@@ -44,12 +44,16 @@ class ExecuteSubmitJob implements ShouldBeUnique, ShouldQueue
     private function executeTestCase(ExecutorService $executor, TestCase $testCase, $modifiers, bool $failOnTimelimt = false)
     {
         $timeLimit = $this->submit->problem->time_limit * $modifiers[0];
-        $memoryLimit = $this->submit->problem->memory_limit * $modifiers[1];
-        $executor->executeTestCase($testCase, $timeLimit, $memoryLimit);
-        // Execute 2 times the test case when time limit
-        if ($executor->execution_time > $timeLimit && ! $failOnTimelimt && $testCase->validated) {
-            return $this->executeTestCase($executor, $testCase, $modifiers, true);
-        }
+        $memoryLimit = $this->submit->problem->memory_limit * $modifiers[1] + $modifiers[2];
+        // Execute $n times the test case when time limit
+        $n = 3;
+        do {
+            $executor->executeTestCase($testCase, $timeLimit, $memoryLimit);
+            $n--;
+        } while ($executor->execution_time > $timeLimit &&
+            ! $failOnTimelimt &&
+            $testCase->validated &&
+            $n > 0);
 
         if ($testCase->validated) {
             $this->submit->execution_time = max($this->submit->execution_time ?? 0, $executor->execution_time);
