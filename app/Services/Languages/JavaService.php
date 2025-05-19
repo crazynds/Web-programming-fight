@@ -29,7 +29,7 @@ class JavaService extends LanguageService
             return SubmitResult::CompilationError;
         }
         Storage::disk('work')->writeStream($className.'.java', $code->readStream());
-        Storage::disk('work')->writeStream('manifest.txt', 'Main-Class: '.$className.PHP_EOL);
+        Storage::disk('work')->put('manifest.txt', 'Main-Class: '.$className.PHP_EOL);
         switch ($this->language) {
             case 'Java OpenJDK 24':
             default:
