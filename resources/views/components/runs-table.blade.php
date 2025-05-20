@@ -254,7 +254,7 @@
 <script type='module'>
     const userId = {{ $global ? 'null' : \Auth::user()->id }}
 
-    function copyCode() {
+    window.copyCode = function() {
         var range = document.createRange();
         range.selectNode(document.getElementById("code"));
         window.getSelection().removeAllRanges(); // clear current selection
