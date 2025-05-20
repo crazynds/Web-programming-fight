@@ -43,7 +43,7 @@
                             data-problem-id="{{ $problem->id }}" data-show-caption="false" data-size="sm"
                             @if (!$accepted) value="{{ $problem->rating / 2.0 }}" data-readonly="true" 
                         @else
-                        value="{{ (\App\Models\Rating::where('problem_id', $problem->id)->where('user_id', Auth::id())->first()?->value ??$problem->rating) /2.0 }}" @endif>
+                        value="{{ (\App\Models\Rating::where('problem_id', $problem->id)->where('user_id', Auth::id())->first()?->value ?? $problem->rating) / 2.0 }}" @endif>
                     @endif
                     <div class="vr"></div>
                     <small>
@@ -195,7 +195,7 @@
 
 @section('script')
     <script type='module'>
-        function copyCode(id) {
+        window.copyCode = function(id) {
             var range = document.createRange();
             range.selectNode(document.getElementById(id));
             window.getSelection().removeAllRanges(); // clear current selection

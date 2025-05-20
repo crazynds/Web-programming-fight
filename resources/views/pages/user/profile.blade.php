@@ -158,7 +158,7 @@
 
 @section('script')
     <script type='module'>
-        const copyCode = function() {
+        window.copyCode = function() {
             var range = document.createRange();
             range.selectNode(document.getElementById("code"));
             window.getSelection().removeAllRanges(); // clear current selection
