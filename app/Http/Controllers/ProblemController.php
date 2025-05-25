@@ -37,7 +37,7 @@ class ProblemController extends Controller
         $problem->visible = ! $problem->visible;
         $problem->save();
 
-        return redirect()->route('problem.index');
+        return redirect()->back();
     }
 
     /**
