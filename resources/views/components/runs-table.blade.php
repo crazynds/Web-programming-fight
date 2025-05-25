@@ -420,7 +420,8 @@
         datetimetag.text(data.datetime);
         const userName = {{ $contestService->inContest || $contest ? 'data.contest.competitor' : 'data.user' }};
         usertag.text(userName.length > 20 ? userName.substring(0, 20) + '...' : userName);
-        titletag.text(data.problem.title.length > 30 ? data.problem.title.substring(0, 30) + '...' : data.problem);
+        titletag.text(data.problem.title.length > 30 ? data.problem.title.substring(0, 30) + '...' : data.problem
+            .title);
         langtag.text(data.language);
         statustag.text(data.status);
         resulttag.text(data.result);
