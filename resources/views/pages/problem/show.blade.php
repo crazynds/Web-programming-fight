@@ -1,7 +1,7 @@
 @extends('layouts.boca')
 
 @section('head')
-    <script type='module'>
+    <script>
         window.MathJax = {
             processClass: "mathjax",
             ignoreClass: "no-mathjax",

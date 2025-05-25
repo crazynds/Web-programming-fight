@@ -42,7 +42,7 @@ class PrepareSBCProblemsJob implements ShouldQueue
         $problemInfo = explode("\n", $problemInfo);
         $problemInfo = array_column(array_map(fn ($x) => explode('=', $x), $problemInfo), 1, 0);
         // Pegar informações de titulo/descrição/input/output
-        $title = substr($problemInfo['fullname'], 1, strlen($problemInfo['fullname']) - 2);
+        $title = trim(str_replace('"', '', $problemInfo['fullname']));
         $letter = $problemInfo['basename'];
         $data = $zp->getFromName('description/'.$problemInfo['descfile']);
         if (str_ends_with($problemInfo['descfile'], '.pdf')) {
