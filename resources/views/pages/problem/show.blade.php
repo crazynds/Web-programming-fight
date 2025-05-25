@@ -10,12 +10,10 @@
                     ['$', '$']
                 ]
             }
-            options: {
-                skipHtmlTags: [ //  HTML tags that won't be searched for math
-                    'script', 'noscript', 'style', 'textarea',
-                    'annotation', 'annotation-xml'
-                ],
-            }
+            skipHtmlTags: [ //  HTML tags that won't be searched for math
+                'script', 'noscript', 'style', 'textarea',
+                'annotation', 'annotation-xml'
+            ],
         }
     </script>
     <style>
@@ -130,8 +128,8 @@
                                     Explanation {{ $loop->index + 1 }}:
                                 </b>
                                 <br>
-                                <i class="mathjax">
-                                    <pre>{{ $testCase->explanation }}</pre>
+                                <i>
+                                    <pre class="mathjax" style="white-space:pre-wrap; word-wrap:break-word;">{{ $testCase->explanation }}</pre>
                                 </i>
                             </p>
                         </div>
