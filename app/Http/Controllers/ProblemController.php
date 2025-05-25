@@ -47,6 +47,7 @@ class ProblemController extends Controller
     {
         $onlineJudge = $request->input('onlineJudge', '');
         $search = $request->input('search', '');
+        $tag = $request->input('tag', '');
         $page = $request->input('page', 0);
 
         if ($this->contestService->inContest) {
@@ -104,10 +105,13 @@ class ProblemController extends Controller
                         ->where('contest_id', $request->input('contest'));
                 }
             }
+            if ($tag) {
+                $problems->join('problem_tag', 'problems.id', 'problem_tag.problem_id')
+                    ->where('tag_id', $tag);
+            }
             $problems = $problems->paginate(40);
-            $vjudge = new VJudgeService;
         } else {
-            $vjudge = new VJudgeService;
+            // $vjudge = new VJudgeService;
             // $vjudgeProblems = $vjudge->searchProblems($onlineJudge, $search, $page);
             // $problems = Problem::whereIn('vjudge_id', $vjudgeProblems->pluck('id')->toArray())->get();
             // $diffs = array_diff($vjudgeProblems->pluck('id')->toArray(), $problems->pluck('vjudge_id')->toArray());

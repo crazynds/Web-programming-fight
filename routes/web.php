@@ -9,10 +9,10 @@ use App\Http\Controllers\ProblemController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ScorerController;
 use App\Http\Controllers\SubmitRunController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TestCaseController;
 use App\Http\Controllers\UserController;
-use App\Http\Middleware\AccessOnlyDuringContest;
 use App\Http\Middleware\PreventAccessDuringContest;
 use Illuminate\Support\Facades\Route;
 
@@ -27,11 +27,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
 Route::get('/home', function () {
     return view('pages.home');
 })->name('home');
-
 
 // auth routes
 Route::get('/auth/{provider}/redirect', [AuthController::class, 'redirect'])->name('auth.login');
@@ -50,6 +48,10 @@ Route::middleware(['auth'])->group(function () {
 // Rotas do sistema normal
 Route::middleware(['auth', PreventAccessDuringContest::class])->group(function () {
     Route::resource('problem', ProblemController::class);
+
+    Route::resource('tag', TagController::class)
+        ->only(['index', 'show']);
+
     Route::resource('problem.testCase', TestCaseController::class)
         ->except(['update']);
     Route::get('/problem/{problem}/testcase/create/manual', [TestCaseController::class, 'createManual'])
@@ -60,9 +62,8 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
     Route::resource('problem.rating', RatingController::class)
         ->only('store');
 
-
     Route::resource('problem.diff', DiffController::class)
-        ->only(['create','store','destroy']);
+        ->only(['create', 'store', 'destroy']);
 
     Route::resource('problem.scorer', ScorerController::class)
         ->except(['edit', 'update']);
@@ -88,7 +89,6 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
             Route::get('download', [IOProblemController::class, 'download'])
                 ->name('download');
 
-
             Route::get('testCase/{testCase}/input', 'downloadInput')
                 ->name('testCase.input');
             Route::get('testCase/{testCase}/output', 'downloadOutput')
@@ -99,7 +99,6 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
                 ->name('testCase.down');
             Route::get('testCase/{testCase}/public', 'publicChange')
                 ->name('testCase.edit.public');
-
 
             Route::get('scorer/all/reavaliate', [ScorerController::class, 'reavaliate'])
                 ->name('scorer.reavaliate');
@@ -121,8 +120,6 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
     Route::get('/user/profile/{user}', [UserController::class, 'profileUser'])
         ->name('user.profile');
 
-
-
     Route::resource('team', TeamController::class)
         ->only(['index', 'store', 'create', 'edit', 'update', 'destroy']);
     Route::get('/team/{team}/accept', [TeamController::class, 'accept'])
@@ -131,7 +128,6 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
         ->name('team.deny');
     Route::get('/team/{team}/leave', [TeamController::class, 'leave'])
         ->name('team.leave');
-
 
     Route::resource('contest', ContestController::class)
         ->only(['index', 'show', 'store', 'create', 'edit', 'update', 'destroy']);
@@ -153,7 +149,6 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
     Route::resource('contest.clarification', ClarificationController::class)
         ->only(['update', 'destroy']);
 });
-
 
 Route::get('/', function () {
     return redirect()->route('home');
