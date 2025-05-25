@@ -125,7 +125,7 @@
                                 </b>
                                 <br>
                                 <i class="mathjax">
-                                    {{ $testCase->explanation }}
+                                    <pre>{{ $testCase->explanation }}</pre>
                                 </i>
                             </p>
                         </div>
