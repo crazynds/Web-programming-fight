@@ -55,7 +55,8 @@ RUN apt-get install -y libprotobuf-dev bison flex protobuf-compiler libnl-3-dev 
     git clone https://github.com/google/nsjail.git  /nsjail && \
     cd /nsjail && make && mv /nsjail/nsjail /bin && rm -rf -- /nsjail
 
-RUN apt-get install -y npm
+# Needed to pdfextract
+RUN apt-get install -y npm poppler-utils
 
 # Copy nsjail config
 RUN mkdir /var/config && chmod 0777 /var/config

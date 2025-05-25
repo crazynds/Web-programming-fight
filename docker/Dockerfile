@@ -90,6 +90,7 @@ RUN apt-get install -y \
     protobuf-compiler \
     poppler-utils \
     python3.13 \
+    poppler-utils \
     && apt-get -y autoremove \
     && apt-get clean 
 
