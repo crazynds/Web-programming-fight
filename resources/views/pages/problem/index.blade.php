@@ -20,6 +20,7 @@
                                 <option value="{{ $judge }}" @if (($onlineJudge ?? false) == $judge) selected @endif>
                                     {{ $judge }}</option>
                             @endforeach
+                            <input type="hidden" name="tag" value="{{ $tag ?? '' }}">
                         </select>
                     </div>
                 @endif
@@ -179,7 +180,8 @@
                                 @endcan
                                 @can('delete', $problem)
                                     <div class="vr"></div>
-                                    <form action="{{ route('problem.destroy', ['problem' => $problem->id]) }}" method="POST">
+                                    <form action="{{ route('problem.destroy', ['problem' => $problem->id]) }}"
+                                        method="POST">
                                         @method('DELETE')
                                         @csrf
                                         <button type="submit" class="d-flex bg-transparent" style="border:0; padding:0;"
