@@ -128,8 +128,9 @@
                                     Explanation {{ $loop->index + 1 }}:
                                 </b>
                                 <br>
-                                <i>
-                                    <pre class="mathjax" style="white-space:pre-wrap; word-wrap:break-word;">{{ $testCase->explanation }}</pre>
+                                <i class="mathjax"
+                                    style="white-space: pre-wrap; font-family: monospace; word-wrap:break-word;">
+                                    {{ $testCase->explanation }}
                                 </i>
                             </p>
                         </div>
