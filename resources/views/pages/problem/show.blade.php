@@ -129,9 +129,7 @@
                                 </b>
                                 <br>
                                 <i class="mathjax"
-                                    style="white-space: pre-wrap; font-family: monospace; word-wrap:break-word;">
-                                    {{ $testCase->explanation }}
-                                </i>
+                                    style="white-space: pre-wrap; font-family: monospace; word-wrap:break-word;">{{ $testCase->explanation }}</i>
                             </p>
                         </div>
                     @endif
