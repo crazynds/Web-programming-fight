@@ -64,6 +64,7 @@
                         <li>Added title search in problem list.</li>
                         <li>Added the star button on header.</li>
                         <li>Added support to Java OpenJDK 24.</li>
+                        <li>Added tag pages.</li>
                     </ul>
                     </p>
                     <p>
