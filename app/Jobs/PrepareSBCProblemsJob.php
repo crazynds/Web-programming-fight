@@ -74,7 +74,7 @@ class PrepareSBCProblemsJob implements ShouldQueue
         $limit = $zp->getFromName('limits/cpp');
         preg_match_all('/echo (\d+)/', $limit, $matches);
         $matches = $matches[1];
-        $timelimit = $matches[0] * 1000;
+        $timelimit = (int) ((intval($matches[0]) * 1000) / intval($matches[1]));
         $memorylimit = $matches[2];
         /** @var Problem */
         $problem = Problem::create([
