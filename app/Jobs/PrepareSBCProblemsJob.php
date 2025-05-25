@@ -56,7 +56,13 @@ class PrepareSBCProblemsJob implements ShouldQueue
             $text = explode(PHP_EOL, $text, 4)[3];
             $text = explode('Entrada'.PHP_EOL, $text, 2);
             $descricao = $text[0];
-            $text = explode('Saı́da'.PHP_EOL, $text[1], 2);
+
+            $tmp = explode('Saı́da'.PHP_EOL, $text[1], 2);
+            if (count($tmp) == 1) {
+                $tmp = explode('Saída'.PHP_EOL, $text[1], 2);
+            }
+            $text = $tmp;
+
             $input = $text[0];
             $text = explode('Exemplo de entrada 1'.PHP_EOL, $text[1], 2);
             $output = $text[0];
