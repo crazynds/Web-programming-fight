@@ -73,6 +73,7 @@
                         <li>Python and PyPy is now compiled before execution.</li>
                         <li>Python is now version 3.13</li>
                         <li>Pypy is now version 3.11</li>
+                        <li>Rating system works in index problem page now.</li>
                     </ul>
                     </p>
                     <p>

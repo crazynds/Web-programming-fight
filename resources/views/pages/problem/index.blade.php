@@ -71,8 +71,8 @@
             @php($number = 'A')
             @foreach ($problems as $problem)
                 <tr
-                    @if ($problem->visible == false && !$contestService->inContest) class="bg-black" style="--bs-bg-opacity: 0.125;"
-                @elseif($problem->my_accepted_submissions > 0) class="bg-success" style="--bs-bg-opacity: 0.125;" @endif>
+                    @if ($problem->visible == false && !$contestService->inContest) class="star-row bg-black" style="--bs-bg-opacity: 0.125;"
+                @elseif($problem->my_accepted_submissions > 0) class="star-row bg-success" style="--bs-bg-opacity: 0.125;" @endif>
                     <td class="pr-2">
                         @if ($contestService->inContest)
                             <b class="px-2" style="font-size: 1.6em">
@@ -87,11 +87,11 @@
                     @if (!$contestService->inContest)
                         <td>
                             <input type="hidden" class="star-rating rating" data-show-clear="false"
-                                data-problem-id="{{ $problem->id }}" data-show-caption="false" data-size="xs"
-                                value="{{ $problem->rating / 2.0 }}" data-readonly="true">
-                            {{-- @if ($problem->my_accepted_submissions == 0) value="{{ $problem->rating / 2.0 }}" data-readonly="true" 
-                            @else
-                            value="{{ (\App\Models\Rating::where('problem_id', $problem->id)->where('user_id', Auth::id())->first()?->value ??$problem->rating) /2.0 }}" @endif> --}}
+                                id="rating-{{ $problem->id }}" data-problem-id="{{ $problem->id }}"
+                                data-show-caption="false" data-size="xs" value="{{ $problem->rating / 2.0 }}"
+                                data-original-value="{{ $problem->rating / 2.0 }}"
+                                @if ($problem->my_accepted_submissions == 0) data-readonly="true" data-my-ratting=""
+                                @else data-my-ratting="{{ (\App\Models\Rating::where('problem_id', $problem->id)->where('user_id', Auth::id())->first()?->value ?? $problem->rating) / 2.0 }}" @endif>
                         </td>
                     @endif
                     <td class="px-2 text-center">
@@ -205,6 +205,22 @@
 @section('script')
     <script type='module'>
         $(document).ready(function() {
+            var edit = false;
+
+            $('.star-row').on('mouseenter', function() {
+                const $this = $(this).find('.star-rating');
+                const myRating = $this.data('my-ratting');
+                if (!myRating) return
+                $($this).rating('update', myRating);
+                edit = true
+            });
+
+            $('.star-row').on('mouseleave', function() {
+                const $this = $(this).find('.star-rating');
+                const originalRating = $this.data('original-value');
+                edit = false
+                $($this).rating('update', originalRating);
+            });
 
             MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
 
@@ -222,7 +238,15 @@
             // Hidden input does not trigger change events, so this is needed to trigger it.
             $(".star-rating").each((idx, el) => trackChange(el));
 
+
             $('.star-rating').change(function() {
+                if (!edit) return;
+                const myRating = $(this).data('my-ratting');
+                if (parseInt(myRating) == parseInt(this.value)) {
+                    return
+                }
+                $(this).data('my-ratting', this.value);
+                console.log('update', this.value)
                 $.ajax({
                     type: "POST",
                     url: "{{ route('problem.rating.store', ['problem' => -1]) }}".replace('-1',
