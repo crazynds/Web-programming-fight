@@ -28,7 +28,7 @@ case "$LINGUAGEM" in
     c++)
         echo "Compilando código C++..."
         #OUTPUT="/var/config/exec"  # Remove a extensão do arquivo
-        g++ -std=c++20 -mtune=native -Wreturn-type -static -march=native -w -O2 "$ARQUIVO" -o "$OUTPUT" 2>&1
+        g++ -include /var/config/fast_io.h -std=c++20 -mtune=native -Wreturn-type -static -march=native -w -O2 "$ARQUIVO" -o "$OUTPUT" 2>&1
         if [ $? -eq 0 ]; then
             echo "Compilado com sucesso"
         else

@@ -448,7 +448,7 @@
         @endif
         @if ($blind && $contest->endTime()->lt(now()))
             // Set the date we're counting down to
-            var countDownDate = new Date("{{ $contest->endTimeWithExtra() }}").getTime();
+            var countDownDate = new Date("{{ $contest->endTimeWithExtra()->toIso8601String() }}").getTime();
 
             const clock = function() {
 

@@ -78,7 +78,7 @@
         <script type='module'>
             // Set the date we're counting down to
             var countDownDate = new Date(
-                "{{ $contest->start_time->lt(now()) ? $contest->endTime() : $contest->start_time }}"
+                "{{ $contest->start_time->lt(now()) ? $contest->endTime()->toIso8601String() : $contest->start_time->toIso8601String() }}"
             ).getTime();
 
             const clock = function() {

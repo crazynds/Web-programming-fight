@@ -74,6 +74,7 @@
                         <li>Python is now version 3.13</li>
                         <li>Pypy is now version 3.11</li>
                         <li>Rating system works in index problem page now.</li>
+                        <li>All C++ ploblens include fast IO by default.</li>
                     </ul>
                     </p>
                     <p>
@@ -89,6 +90,7 @@
                     <ul>
                         <li>Compilation time and compilation memory is now limited.</li>
                         <li>Home screen.</li>
+                        <li>Fixed a bug when enter in a contest with different timezone.</li>
                     </ul>
                     </p>
                 </div>

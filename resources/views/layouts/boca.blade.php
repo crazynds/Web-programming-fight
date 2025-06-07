@@ -217,7 +217,7 @@
         <script type='module'>
             // Set the date we're counting down to
             var countDownDate = new Date(
-                "{{ $contestService->started ? $contestService->contest->start_time->addMinutes($contestService->contest->duration) : $contestService->contest->start_time }}"
+                "{{ $contestService->started ? $contestService->contest->start_time->addMinutes($contestService->contest->duration)->toIso8601String() : $contestService->contest->start_time->toIso8601String() }}"
             ).getTime();
 
             const clock = function() {
