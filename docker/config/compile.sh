@@ -28,7 +28,14 @@ case "$LINGUAGEM" in
     c++)
         echo "Compilando código C++..."
         #OUTPUT="/var/config/exec"  # Remove a extensão do arquivo
-        g++ -include /var/config/fast_io.h -std=c++20 -mtune=native -Wreturn-type -static -march=native -w -O2 "$ARQUIVO" -o "$OUTPUT" 2>&1
+
+        if grep -qE '\b(printf|scanf)\b' "$FILE"; then
+            echo "➡️  printf ou scanf detectado. Compilando SEM fast_io.h..."
+            g++ -flto -std=c++20 -mtune=native -Wreturn-type -static -march=native -w -O2 "$ARQUIVO" -o "$OUTPUT" 2>&1
+        else
+            echo "✅ Nenhum uso de printf/scanf detectado. Compilando COM fast_io.h..."
+            g++ -include /var/config/fast_io.h -flto -std=c++20 -mtune=native -Wreturn-type -static -march=native -w -O2 "$ARQUIVO" -o "$OUTPUT" 2>&1
+        fi
         if [ $? -eq 0 ]; then
             echo "Compilado com sucesso"
         else

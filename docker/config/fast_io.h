@@ -13,7 +13,6 @@ struct FastIO
     }
 };
 
-// Este objeto global será criado antes do main
-static FastIO fast_io_instance;
+static FastIO _____fast_io_instance;
 
 #endif // FAST_IO_H
