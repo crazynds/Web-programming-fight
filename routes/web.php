@@ -49,8 +49,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', PreventAccessDuringContest::class])->group(function () {
     Route::resource('problem', ProblemController::class);
 
-    Route::resource('tag', TagController::class)
-        ->only(['index', 'show']);
+    Route::resource('tag', TagController::class);
 
     Route::resource('problem.testCase', TestCaseController::class)
         ->except(['update']);

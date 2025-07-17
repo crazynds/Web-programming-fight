@@ -42,12 +42,12 @@ class StoreContestRequest extends FormRequest
             'languages' => 'required|array|min:1|max:20',
             'languages.*' => [
                 'required',
-                new EnumValue(LanguagesType::class, false)
+                new EnumValue(LanguagesType::class, false),
             ],
 
             'problems' => 'required|array|min:1|max:32',
             'problems.*' => 'required|integer|exists:problems,id',
-            recaptchaFieldName() => recaptchaRuleName()
+            recaptchaFieldName() => recaptchaRuleName(),
         ];
     }
 }

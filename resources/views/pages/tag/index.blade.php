@@ -11,11 +11,11 @@
             </b>
         </div>
         <div class="col">
-            {{-- @can('create', \App\Models\Tag::class)
+            @can('create', \App\Models\Tag::class)
                 <a style="float:right" href="{{ route('tag.create') }}">
                     <button>New +</button>
                 </a>
-            @endcan --}}
+            @endcan
         </div>
     </div>
 
@@ -43,6 +43,24 @@
                         {{ $tag->problems()->count() }}
                     </td>
                     <td class="px-2">
+                        <div class="hstack gap-1">
+                            @can('update', $tag)
+                                <a href="{{ route('tag.edit', ['tag' => $tag->id]) }}" class="d-flex action-btn">
+                                    <i class="las la-edit"></i>
+                                </a>
+                            @endcan
+
+                            @can('delete', $tag)
+                                <div class="vr"></div>
+                                <form action="{{ route('tag.destroy', ['tag' => $tag->id]) }}" method="POST">
+                                    @method('DELETE')
+                                    @csrf
+                                    <button type="submit" class="d-flex bg-transparent" style="border:0; padding:0;">
+                                        <i class="las la-trash"></i>
+                                    </button>
+                                </form>
+                            @endcan
+                        </div>
                     </td>
                 </tr>
             @endforeach
