@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreTagRequest;
 use App\Models\Problem;
 use App\Models\Tag;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -43,11 +42,11 @@ class TagController extends Controller
     {
         $data = $request->safe()->except(['problems', 'g-recaptcha-response']);
         DB::beginTransaction();
-        /** @var Contest */
-        $contest = Tag::create($data);
-        $contest->problems()->detach();
+        /** @var Tag */
+        $tag = Tag::create($data);
+        $tag->problems()->detach();
         foreach ($request->input('problems') as $key => $id) {
-            $contest->problems()->attach($id);
+            $tag->problems()->attach($id);
         }
         DB::commit();
 
@@ -86,9 +85,16 @@ class TagController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(StoreTagRequest $request, Tag $tag)
     {
-        //
+        $data = $request->safe()->except(['problems', 'g-recaptcha-response']);
+        DB::beginTransaction();
+        $tag->update($data);
+        $tag->problems()->detach();
+        foreach ($request->input('problems') as $key => $id) {
+            $tag->problems()->attach($id);
+        }
+        DB::commit();
     }
 
     /**
