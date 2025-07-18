@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 #[ObservedBy(ContestObserver::class)]
 class Contest extends Model
@@ -14,8 +15,13 @@ class Contest extends Model
     public $guarded = [];
 
     public $casts = [
-        'start_time' => 'datetime'
+        'start_time' => 'datetime',
     ];
+
+    public function clearCache()
+    {
+        Cache::delete('contest:leaderboard:'.$this->id);
+    }
 
     protected function languages(): Attribute
     {
@@ -29,18 +35,22 @@ class Contest extends Model
     {
         return $this->belongsTo(User::class);
     }
+
     public function problems()
     {
         return $this->belongsToMany(Problem::class, 'contest_problem');
     }
+
     public function clarifications()
     {
         return $this->hasMany(ContestClatification::class);
     }
+
     public function competitors()
     {
         return $this->hasMany(Competitor::class);
     }
+
     public function submissions()
     {
         return $this->hasMany(SubmitRun::class);

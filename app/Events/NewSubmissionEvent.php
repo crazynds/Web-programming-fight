@@ -26,6 +26,11 @@ class NewSubmissionEvent implements ShouldBroadcast
                 'contest_id' => $submitRun->contest_id,
                 'competitor_id' => $submitRun->competitor?->id,
                 'competitor' => $submitRun->competitor->fullName(),
+                // 'team' => [
+                //     'country' => $submitRun->competitor->team->country,
+                //     'state' => $submitRun->competitor->team->state,
+                //     'institution_acronym' => $submitRun->competitor->team->institution_acronym,
+                // ],
                 'blind' => $submitRun->contest->blindTime()->lt(now()) && $submitRun->contest->endTimeWithExtra()->gt(now()),
             ];
         }

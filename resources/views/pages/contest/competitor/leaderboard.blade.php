@@ -157,10 +157,10 @@
             </b>
         </div>
         <div class="col">
-            @if (!$blind)
-            <span style="display: inline-block;">
-                <h3>Blind Time!! <span id="clock"></span></h3>
-            </span>
+            @if ($blind)
+                <span style="display: inline-block;">
+                    <h3>Blind Time!! <span id="clock"></span></h3>
+                </span>
             @endif
 
             <button style="float:right" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
@@ -218,13 +218,13 @@
         <tbody>
             @foreach ($competitors as $competitor)
                 @if (!$contest->individual)
-                    @if(request()->input('institution_acronym') && request()->input('institution_acronym')!=$competitor->team->institution_acronym)
+                    @if(request()->has('institution_acronym') && request()->input('institution_acronym')!=$competitor->team->institution_acronym)
                         @continue
                     @endif
-                    @if(request()->input('country') && request()->input('country')!=$competitor->team->institution_acronym)
+                    @if(request()->has('country') && request()->input('country')!=$competitor->team->institution_acronym)
                         @continue
                     @endif
-                    @if(request()->input('state') && request()->input('state')!=$competitor->team->institution_acronym)
+                    @if(request()->has('state') && request()->input('state')!=$competitor->team->institution_acronym)
                         @continue
                     @endif
                 @endif
@@ -292,6 +292,17 @@
 @section('script')
     <script type='module'>
         const channel = '{{ $channel }}'
+        const filter = {
+            @if(request()->has('institution_acronym'))
+            institution_acronym: '{{ request()->input('institution_acronym') }}',
+            @endif
+            @if(request()->has('country'))
+            country: '{{ request()->input('country') }}',
+            @endif
+            @if(request()->has('state'))
+            state: '{{ request()->input('state') }}',
+            @endif
+        }
 
         function confeti(el = null) {
 
@@ -412,13 +423,17 @@
                     const penB = parseInt($b.find('#penality').text(), 10);
                 @endif
 
-                if (scoreB !== scoreA) return scoreB - scoreA;
+                if (scoreB != scoreA) return scoreB - scoreA;
                 return penA - penB;
             });
+
             // Aplica a nova ordem com animação
             const $tbody = $('#ranking tbody');
             $tbody.empty();
-            sorted.forEach(row => $tbody.append(row));
+            sorted.forEach(function(el,index) {
+                $(el).find('td:first-child').text((index + 1) + '⁰');
+                $tbody.append(el);
+            });
         }
         const updateLeaderboard = function(competitor_id) {
             const count = $('#row' + competitor_id + ' .scored').length;
@@ -439,7 +454,7 @@
         window.updateSubmission = function(data) {
             if (!data.contest) return;
             var row = $('#score-' + data.contest.competitor_id + '-' + data.problem.id);
-            if (row.length == 0 || row.hasClass('scored2')) return;
+            if (row.length == 0 || row.hasClass('scored2')) return; // Ignore competidors not here
             if (data.status != 'Judged' && data.status != 'Error') {
                 updateRow(row, data);
             } else {

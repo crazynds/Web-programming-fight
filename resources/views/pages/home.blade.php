@@ -54,7 +54,7 @@
                         'date' => '18-07-2025',
                         'author' => 'Crazynds',
                         'features' => [
-                            'Added Tag crud for adms.'
+                            'Added Tag crud for adms.',
                             'Added leaderboard filters.'
                         ],
                         'changes' => [
@@ -62,7 +62,8 @@
                         ],
                         'styles' => [],
                         'fixes' => [
-                            'When sending a binary as auto detect result in an internal error.'
+                            'When sending a binary as auto detect result in an internal error.',
+                            'When a new team enters the contest, the leaderboard does not update.'
                         ]
                     ],
                     [

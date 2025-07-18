@@ -38,6 +38,7 @@ class ContestController extends Controller
         foreach ($contest->competitors()->lazy() as $competitor) {
             RecalculateCompetitorScore::dispatch($contest, $competitor);
         }
+        $contest->clearCache();
 
         return redirect()->route('contest.leaderboard', ['contest' => $contest->id]);
     }
@@ -150,6 +151,7 @@ class ContestController extends Controller
             ]);
         }
         $competitor->delete();
+        $contest->clearCache();
 
         return back();
     }
@@ -196,13 +198,13 @@ class ContestController extends Controller
                     }
                 }
             }
-
             $contest->competitors()->create([
                 'team_id' => $team->id,
                 'name' => '['.($team->institution_acronym ?? '????').'] '.$team->name,
                 'acronym' => $team->acronym,
             ]);
         }
+        $contest->clearCache();
 
         return Redirect::back();
     }
@@ -299,6 +301,7 @@ class ContestController extends Controller
             $contest->problems()->attach($id, ['position' => $key]);
         }
         DB::commit();
+        $contest->clearCache();
 
         return redirect()->route('contest.index');
     }
