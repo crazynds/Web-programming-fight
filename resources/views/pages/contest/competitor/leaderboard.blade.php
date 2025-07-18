@@ -157,12 +157,49 @@
             </b>
         </div>
         <div class="col">
-            @if ($blind)
+            @if (!$blind)
+            <span style="display: inline-block;">
                 <h3>Blind Time!! <span id="clock"></span></h3>
+            </span>
+            @endif
+
+            <button style="float:right" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
+                <i class="fas fa-filter"></i> Show Filters
+            </button>
+
+            @if(request()->has('contry') || request()->has('state') || request()->has('institution_acronym'))
+                <a style="float:right; margin-right:10px" href="?">
+                    <button>Clear Filters</button>
+                </a>
             @endif
         </div>
     </div>
-
+    @if(!$contest->individual)
+    <div class="mb-3">
+        
+        <div class="collapse mt-2 @if(request()->has('contry') || request()->has('state') || request()->has('institution_acronym'))show @endif" id="filterCollapse">
+            <div class="card-body">
+                <div style="max-width:800px">
+                    @foreach ($competitors->pluck('team.country')->unique()->sort() as $country)
+                    
+                        <a @if(request()->input('country')==$country)style="color:blue"@endif href="?country={{ $country }}">{{$country}}</a>
+                    @endforeach
+                </div>
+                <div style="max-width:800px">
+                    @foreach ($competitors->pluck('team.state')->unique()->sort() as $state)
+                        <a @if(request()->input('state')==$state)style="color:blue"@endif href="?state={{ $state }}">{{$state}}</a>
+                    @endforeach
+                </div>
+                <div style="max-width:800px">
+                    @foreach ($competitors->pluck('team.institution_acronym')->unique()->sort() as $institution)
+                        <a @if(request()->input('institution_acronym')==$institution)style="color:blue"@endif href="?institution_acronym={{ $institution }}">{{$institution}}</a>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+            
+    @endif
     <table border="1"@if ($blind) style="background-color: #0002" @endif id="ranking">
         <thead>
             <tr>
@@ -180,6 +217,17 @@
         </thead>
         <tbody>
             @foreach ($competitors as $competitor)
+                @if (!$contest->individual)
+                    @if(request()->input('institution_acronym') && request()->input('institution_acronym')!=$competitor->team->institution_acronym)
+                        @continue
+                    @endif
+                    @if(request()->input('country') && request()->input('country')!=$competitor->team->institution_acronym)
+                        @continue
+                    @endif
+                    @if(request()->input('state') && request()->input('state')!=$competitor->team->institution_acronym)
+                        @continue
+                    @endif
+                @endif
                 <tr id="row{{ $competitor->id }}" data-id="{{ $competitor->id }}">
                     <td class="px-1">
                         {{ $loop->iteration }}⁰
@@ -195,7 +243,7 @@
                     @php($letter = 'A')
                     @php($questions = 0)
                     @foreach ($problems as $problem)
-                        <td class="px-2">
+                        <td class="px-1">
                             @php($questions++)
                             @php($score = $competitor->scores[$problem] ?? null)
 

@@ -46,198 +46,195 @@
                 </div>
             </div>
         @else
-            <div class="row">
-                <div class="col-8">
-                    <h3>
-                        v1.1.0 - Fancy Update!
-                    </h3>
-                    <p>
-                        Date: 17-05-2025
-                        By: Crazynds
-                    </p>
-                    <p>
-                        Features ✨
-                    <ul>
-                        <li>Integration with VJudge. (Not available yet)</li>
-                        <li>Livewire can be used instead of WebSockets.</li>
-                        <li>Added pagination in problem list.</li>
-                        <li>Added title search in problem list.</li>
-                        <li>Added the star button on header.</li>
-                        <li>Added support to Java OpenJDK 24.</li>
-                        <li>Added tag pages.</li>
-                    </ul>
-                    </p>
-                    <p>
-                        Changes ⚙️
-                    <ul>
-                        <li>Python and PyPy is now compiled before execution.</li>
-                        <li>Python is now version 3.13</li>
-                        <li>Pypy is now version 3.11</li>
-                        <li>Rating system works in index problem page now.</li>
-                        <li>All C++ ploblens include fast IO by default.</li>
-                    </ul>
-                    </p>
-                    <p>
-                        Styles 🎨
-                    <ul>
-                        <li>JQuery is not imported manually anymore.</li>
-                        <li>Select2 plugin is now used.</li>
-                        <li>Contest leaderboad now auto updates itself and has some fancy animations.</li>
-                    </ul>
-                    </p>
-                    <p>
-                        Fixes 🐛
-                    <ul>
-                        <li>Compilation time and compilation memory is now limited.</li>
-                        <li>Home screen.</li>
-                        <li>Fixed a bug when enter in a contest with different timezone.</li>
-                    </ul>
-                    </p>
-                </div>
-            </div>
-            <hr style="margin-top: 120px" />
-            <div class="row">
-                <div class="col-8">
-                    <h3>
-                        v1.0.2 - Default Update!
-                    </h3>
-                    <p>
-                        Date: 20-01-2025
-                        By: Crazynds
-                    </p>
-                    <p>
-                        Features ✨
-                    <ul>
-                        <li>Added difficulty in all problems.</li>
-                        <li>If you get AC on a problem, you can rate how difficult it is.</li>
-                        <li>Added option to import SBC maraton problems.</li>
-                        <li>Added diff program to test differents outcomes.</li>
-                        <li>Added tags to problems, even if you don't see them.</li>
-                        <li>Added ability to add an explanation for each test case.</li>
-                    </ul>
-                    </p>
-                    <p>
-                        Changes ⚙️
-                    <ul>
-                        <li>Now when you edit a test case you cannot change its name unless you know our tricks... 👀</li>
-                        <li>Standardized execution within NSJail.</li>
-                    </ul>
-                    </p>
-                    <p>
-                        Styles 🎨
-                    <ul>
-                        <li>Now we have stars in each problem ✨</li>
-                        <li>Images in problems description are now horizontally centered</li>
-                        <li></li>
-                    </ul>
-                    </p>
-                    <p>
-                        Fixes 🐛
-                    <ul>
-                        <li>Fixed a bug when you try to add a new test case you get a error 500 page.</li>
-                        <li>Fixed a bug to show preview of image in file manager.</li>
-                        <li>Fixed a bug when a submission get stuck in some loop resulting in a 'runtime error' instead of 'time
-                            limit'.</li>
-                        <li>Fixed a bug that stuck any submission in 'C', resulting in a 'runtime error'.</li>
-                        <li></li>
-                    </ul>
-                    </p>
-                </div>
-            </div>
-            <hr style="margin-top: 120px" />
-            <div class="row">
-                <div class="col-8">
-                    <h3>
-                        v1.0.1 - The Big Challenge! ⚔️💥🗡️🏆
-                    </h3>
-                    <p>
-                        Date: 09-07-2024
-                        By: Crazynds
-                    </p>
-                    <p>
-                        Features ✨
-                    <ul>
-                        <li>Created fast problem import using ZIP files.</li>
-                        <li>Created contest page!</li>
-                        <li>Created contest mode and all contest related features! 🎉</li>
-                        <li>Added C to the available languages!</li>
-                    </ul>
-                    </p>
-                    <p>
-                        Changes ⚙️
-                    <ul>
-                        <li>FAQ and About options are no longer displayed while the pages do not exist.</li>
-                        <li>The multipliers in python and pypy are now less strict.</li>
-                        <li>Now we have a lot more result status to understand what happen with the submission.</li>
-                        <li>Refactored all permissions levels.</li>
-                    </ul>
-                    </p>
-                    <p>
-                        Styles 🎨
-                    <ul>
-                        <li>Added a custom style to scroll bar.</li>
-                        <li>Added 'Go Back' buttons in some forgotten areas.</li>
-                        <li>Increased area size of Home button.</li>
-                        <li>Create a custom style para contest mode!</li>
-                        <li>Problem layout improved.</li>
-                        <li>Leaderboard layout improved.</li>
-                        <li>Navbar layout improved.</li>
-                        <li>Language multiplier table added to the submission form.</li>
-                    </ul>
-                    </p>
+            @php
+                $changelogs = [
+                    [
+                        'version' => 'v1.1.1',
+                        'title' => '!',
+                        'date' => '18-07-2025',
+                        'author' => 'Crazynds',
+                        'features' => [
+                            'Added Tag crud for adms.'
+                            'Added leaderboard filters.'
+                        ],
+                        'changes' => [
+                            'Add location information required in teams creation.'
+                        ],
+                        'styles' => [],
+                        'fixes' => [
+                            'When sending a binary as auto detect result in an internal error.'
+                        ]
+                    ],
+                    [
+                        'version' => 'v1.1.0',
+                        'title' => 'Fancy Update!',
+                        'date' => '17-05-2025',
+                        'author' => 'Crazynds',
+                        'features' => [
+                            'Integration with VJudge. (Not available yet)',
+                            'Livewire can be used instead of WebSockets.',
+                            'Added pagination in problem list.',
+                            'Added title search in problem list.',
+                            'Added the star button on header.',
+                            'Added support to Java OpenJDK 24.',
+                            'Added tag pages.'
+                        ],
+                        'changes' => [
+                            'Python and PyPy is now compiled before execution.',
+                            'Python is now version 3.13',
+                            'Pypy is now version 3.11',
+                            'Rating system works in index problem page now.',
+                            'All C++ ploblens include fast IO by default.'
+                        ],
+                        'styles' => [
+                            'JQuery is not imported manually anymore.',
+                            'Select2 plugin is now used.',
+                            'Contest leaderboad now auto updates itself and has some fancy animations.'
+                        ],
+                        'fixes' => [
+                            'Compilation time and compilation memory is now limited.',
+                            'Home screen.',
+                            'Fixed a bug when enter in a contest with different timezone.'
+                        ]
+                    ],
+                    [
+                        'version' => 'v1.0.2',
+                        'title' => 'Default Update!',
+                        'date' => '20-01-2025',
+                        'author' => 'Crazynds',
+                        'features' => [
+                            'Added difficulty in all problems.',
+                            'If you get AC on a problem, you can rate how difficult it is.',
+                            'Added option to import SBC maraton problems.',
+                            'Added diff program to test differents outcomes.',
+                            'Added tags to problems, even if you don\'t see them.',
+                            'Added ability to add an explanation for each test case.'
+                        ],
+                        'changes' => [
+                            'Now when you edit a test case you cannot change its name unless you know our tricks... 👀',
+                            'Standardized execution within NSJail.'
+                        ],
+                        'styles' => [
+                            'Now we have stars in each problem ✨',
+                            'Images in problems description are now horizontally centered'
+                        ],
+                        'fixes' => [
+                            'Fixed a bug when you try to add a new test case you get a error 500 page.',
+                            'Fixed a bug to show preview of image in file manager.',
+                            'Fixed a bug when a submission get stuck in some loop resulting in a \'runtime error\' instead of \'time limit\'.',
+                            'Fixed a bug that stuck any submission in \'C\', resulting in a \'runtime error\'.'
+                        ]
+                    ],
+                    [
+                        'version' => 'v1.0.1',
+                        'title' => 'The Big Challenge! ⚔️💥🗡️🏆',
+                        'date' => '09-07-2024',
+                        'author' => 'Crazynds',
+                        'features' => [
+                            'Created fast problem import using ZIP files.',
+                            'Created contest page!',
+                            'Created contest mode and all contest related features! 🎉',
+                            'Added C to the available languages!'
+                        ],
+                        'changes' => [
+                            'FAQ and About options are no longer displayed while the pages do not exist.',
+                            'The multipliers in python and pypy are now less strict.',
+                            'Now we have a lot more result status to understand what happen with the submission.',
+                            'Refactored all permissions levels.'
+                        ],
+                        'styles' => [
+                            'Added a custom style to scroll bar.',
+                            'Added \'Go Back\' buttons in some forgotten areas.',
+                            'Increased area size of Home button.',
+                            'Create a custom style para contest mode!',
+                            'Problem layout improved.',
+                            'Leaderboard layout improved.',
+                            'Navbar layout improved.',
+                            'Language multiplier table added to the submission form.'
+                        ],
+                        'fixes' => [
+                            'Fixed crashes when downloading a problem with big inputs.',
+                            'Fixed bugs when using teams with contest.',
+                            'Now the server won\'t save the file if it\'s not a valid text file.',
+                            'Fixed a bug when you couldn\'t download or see a old code.',
+                            'Fixed a bug when you couldn\'t see why compilation error happens.'
+                        ]
+                    ],
+                    [
+                        'version' => 'v1.0.0',
+                        'title' => 'Lets the party begin! 🎉🎉🎉',
+                        'date' => '29-04-2024',
+                        'author' => 'Crazynds',
+                        'features' => [
+                            'Added support for Python 3.11 and Pypy 3.10',
+                            'Added party comemoration for accepted submissions',
+                            'Added sadface rain for non accepted submissions',
+                            'Created \'scorer\' to rank the submissions',
+                            'Created a global rank',
+                            'Created this update list 🥳'
+                        ],
+                        'changes' => [
+                            'Enchanced Profile page and added a list of all solved problems by the user',
+                            'Change submissions page to automatically update using sockets and broadcast messages'
+                        ],
+                        'styles' => [],
+                        'fixes' => [
+                            'Small bugs that I dont remember'
+                        ]
+                    ]
+                ];
+            @endphp
 
-                    <p>
-                        Fixes 🐛
-                    <ul>
-                        <li>Fixed crashes when downloading a problem with big inputs.</li>
-                        <li>Fixed bugs when using teams with contest.</li>
-                        <li>Now the server won't save the file if it's not a valid text file.</li>
-                        <li>Fixed a bug when you couldn't download or see a old code.</li>
-                        <li>Fixed a bug when you couldn't see why compilation error happens.</li>
-                    </ul>
-                    </p>
-                </div>
-            </div>
-            <hr style="margin-top: 120px" />
+            @foreach($changelogs as $changelog)
+                <div class="row">
+                    <div class="col-8">
+                        <h3>{{ $changelog['version'] }} - {{ $changelog['title'] }}</h3>
+                        <p>
+                            Date: {{ $changelog['date'] }}<br>
+                            By: {{ $changelog['author'] }}
+                        </p>
+                        
+                        @if(!empty($changelog['features']))
+                            <p>Features ✨</p>
+                            <ul>
+                                @foreach($changelog['features'] as $feature)
+                                    <li>{{ $feature }}</li>
+                                @endforeach
+                            </ul>
+                        @endif
 
-            <div class="row">
-                <div class="col-8">
-                    <h3>
-                        v1.0.0 - Lets the party begin! 🎉🎉🎉
-                    </h3>
-                    <p>
-                        Date: 29-04-2024
-                        By: Crazynds
-                    </p>
-                    <p>
-                        Features ✨
-                    <ul>
-                        <li>Added support for Python 3.11 and Pypy 3.10</li>
-                        <li>Added party comemoration for accepted submissions</li>
-                        <li>Added sadface rain for non accepted submissions</li>
-                        <li>Created 'scorer' to rank the submissions</li>
-                        <li>Created a global rank </li>
-                        <li>Created this update list 🥳</li>
-                    </ul>
-                    </p>
-                    <p>
-                        Changes ⚙️
-                    <ul>
-                        <li>Enchanced Profile page and added a list of all solved problems by the user</li>
-                        <li>Change submissions page to automatically update using sockets and broadcast messages</li>
-                    </ul>
-                    </p>
-                    <p>
-                        Fixes 🐛
-                    <ul>
-                        <li>Small bugs that I dont remember</li>
-                    </ul>
-                    </p>
-                </div>
-                <div class="col-6">
+                        @if(!empty($changelog['changes']))
+                            <p>Changes ⚙️</p>
+                            <ul>
+                                @foreach($changelog['changes'] as $change)
+                                    <li>{{ $change }}</li>
+                                @endforeach
+                            </ul>
+                        @endif
 
+                        @if(!empty($changelog['styles']))
+                            <p>Styles 🎨</p>
+                            <ul>
+                                @foreach($changelog['styles'] as $style)
+                                    <li>{{ $style }}</li>
+                                @endforeach
+                            </ul>
+                        @endif
+
+                        @if(!empty($changelog['fixes']))
+                            <p>Fixes 🐛</p>
+                            <ul>
+                                @foreach($changelog['fixes'] as $fix)
+                                    <li>{{ $fix }}</li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </div>
                 </div>
-            </div>
+                @if(!$loop->last)
+                    <hr style="margin-top: 120px" />
+                @endif
+            @endforeach
         @endif
     @endauth
 @endsection

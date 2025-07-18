@@ -34,14 +34,55 @@
                 <input type="text" maxlength="5" name="acronym" class="form-control"
                     value="{{ old('acronym', $team->acronym) }}" />
             </div>
-        </div>
+        </div>        
+
         <div class="row mt-3">
-            <div class="col" style="padding-top: 30px;">
+            <div class="col">
+                <label for="country" class="form-label">Country: </label><br />
+                @php
+                    $countries = [
+                        'Brazil', 'Argentina', 'United States', 'Canada', 'Mexico',
+                        'Colombia', 'Peru', 'Chile', 'Venezuela', 'Ecuador'
+                    ];
+                    sort($countries);
+                @endphp
+                <select name="country" id="country" class="form-select" required>
+                    <option value="">Select a country</option>
+                    @foreach($countries as $country)
+                        <option value="{{ $country }}" {{ old('country', $team->country ?? '') == $country ? 'selected' : '' }}>{{ $country }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col" id="state-field" style="display: none;">
+                <label for="state" class="form-label">State: </label><br />
+                <select name="state" id="state" class="form-select">
+                    <option value="">Select a state</option>
+                    @php
+                        $states = [
+                            'AC' => 'Acre', 'AL' => 'Alagoas', 'AP' => 'Amapá', 'AM' => 'Amazonas',
+                            'BA' => 'Bahia', 'CE' => 'Ceará', 'DF' => 'Distrito Federal', 'ES' => 'Espírito Santo',
+                            'GO' => 'Goiás', 'MA' => 'Maranhão', 'MT' => 'Mato Grosso', 'MS' => 'Mato Grosso do Sul',
+                            'MG' => 'Minas Gerais', 'PA' => 'Pará', 'PB' => 'Paraíba', 'PR' => 'Paraná',
+                            'PE' => 'Pernambuco', 'PI' => 'Piauí', 'RJ' => 'Rio de Janeiro',
+                            'RN' => 'Rio Grande do Norte', 'RS' => 'Rio Grande do Sul', 'RO' => 'Rondônia',
+                            'RR' => 'Roraima', 'SC' => 'Santa Catarina', 'SP' => 'São Paulo',
+                            'SE' => 'Sergipe', 'TO' => 'Tocantins'
+                        ];
+                    @endphp
+                    @foreach($states as $code => $name)
+                        <option value="{{ $code }}" {{ old('state', $team->state ?? '') == $code ? 'selected' : '' }}>{{ $name }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col">
+                <label for="membersjson" class="form-label">Membros: </label><br />
                 <input id="tags" name="membersjson" placeholder="Members nickname"
                     value="{{ old('membersjson', $team->membersjson()) }}">
                 <small>
-                    Write the member's github nickname and press enter. It is not necessary to add your own
-                    nickname.</small>
+                    Write the member's github nickname and press enter.</small>
             </div>
             <div class="col-3">
                 <label for="institution_acronym" class="form-label">Institution acronym: </label><br />
@@ -61,6 +102,15 @@
             </div>
         @endif
 
+        <div class="alert alert-info mt-3">
+            <strong>Note about team members:</strong>
+            <ul class="mb-0 mt-2">
+                <li>Members need to have logged into the system at least once to receive an invitation.</li>
+                <li>Invited members will need to accept the invitation in their team management section.</li>
+                <li>You can invite multiple members by entering their usernames and pressing Enter.</li>
+                <li>You don't need to add youself.</li>
+            </ul>
+        </div>
 
         <p class="mt-3">
             {!! htmlFormButton('Submit', [
@@ -71,25 +121,33 @@
 
 @endsection
 
-@section('head')
-    {{-- <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
-<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" /> --}}
-
-    {{-- <style>
-    .tagify+input{
-      display: block !important;
-      position: static !important;
-      transform: none !important;
-      width: 90%;
-      margin-top: 1em;
-      padding: .5em;
-    }
-</style> --}}
-@endsection
 
 @section('script')
     <script type='module'>
+        document.addEventListener('DOMContentLoaded', function() {
+            const countrySelect = document.getElementById('country');
+            const stateField = document.getElementById('state-field');
+            const stateSelect = document.getElementById('state');
+
+            // Toggle state field based on country selection
+            function toggleStateField() {
+                if (countrySelect.value === 'Brazil') {
+                    stateField.style.display = 'block';
+                    stateSelect.required = true;
+                } else {
+                    stateField.style.display = 'none';
+                    stateSelect.required = false;
+                    stateSelect.value = ''; // Clear state when country changes
+                }
+            }
+
+            // Initial check
+            toggleStateField();
+
+            // Add event listener for country change
+            countrySelect.addEventListener('change', toggleStateField);
+        });
+
         window.addEventListener("load", function() {
             var input = document.querySelector('#tags')
             var tagify = new Tagify(input, {

@@ -17,6 +17,7 @@ class StoreTeamRequest extends FormRequest
             $data['acronym'] = Str::upper($data['acronym']);
         }
         $this->replace($data);
+
         return true;
     }
 
@@ -28,15 +29,18 @@ class StoreTeamRequest extends FormRequest
     public function rules(): array
     {
         $teamId = $this->route('team')?->id;
-        if (!$teamId) {
+        if (! $teamId) {
             $teamId = -1;
         }
+
         return [
-            'name' => "required|string|min:2|max:40",
-            'acronym' => "required|string|min:3|max:5|alpha_dash:ascii|unique:teams,acronym," . $teamId,
-            'membersjson' => "nullable|json",
-            'institution_acronym' => 'nullable|string|max:10',
-            recaptchaFieldName() => recaptchaRuleName()
+            'name' => 'required|string|min:2|max:40',
+            'acronym' => 'required|string|min:3|max:5|alpha_dash:ascii|unique:teams,acronym,'.$teamId,
+            'membersjson' => 'nullable|json',
+            'institution_acronym' => 'required|string|max:10',
+            'country' => 'required|string|max:100',
+            'state' => 'nullable|string|max:100',
+            recaptchaFieldName() => recaptchaRuleName(),
         ];
     }
 }

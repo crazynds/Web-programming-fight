@@ -48,7 +48,7 @@
                             (<u class="text-info" title="Invited members">{{ $team->invited_count }}</u>)
                         @endif
                     </td>
-                    <td>
+                    <td class="px-2 text-center">
                         @if ($team->pivot->owner)
                             <span title="You are the owner of this team" style="cursor:help">
                                 👑
