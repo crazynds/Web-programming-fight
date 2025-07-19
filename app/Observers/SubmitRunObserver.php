@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Enums\SubmitStatus;
 use App\Events\UpdateSubmissionEvent;
 use App\Models\SubmitRun;
 
@@ -10,17 +11,18 @@ class SubmitRunObserver
     /**
      * Handle the SubmitRun "created" event.
      */
-    public function created(SubmitRun $submitRun): void
-    {
-    }
+    public function created(SubmitRun $submitRun): void {}
 
     /**
      * Handle the SubmitRun "updated" event.
      */
     public function updated(SubmitRun $submitRun): void
     {
-        //Broadcast event to all connected clients
-        UpdateSubmissionEvent::dispatch($submitRun);
+        // Only if the status is not ContestPendingAdminAvaliation
+        if ($submitRun->status != SubmitStatus::fromValue(SubmitStatus::AwaitingAdminJudge)->description) {
+            // Broadcast event to all connected clients
+            UpdateSubmissionEvent::dispatch($submitRun);
+        }
     }
 
     /**
@@ -28,8 +30,9 @@ class SubmitRunObserver
      */
     public function deleted(SubmitRun $submitRun): void
     {
-        if (!!$submitRun->file_id)
+        if ((bool) $submitRun->file_id) {
             $submitRun->file->delete();
+        }
     }
 
     /**

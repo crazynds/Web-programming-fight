@@ -2,11 +2,9 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\TagTypeEnum;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class StoreTagRequest extends FormRequest
+class UpdateContestSettingsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,16 +22,8 @@ class StoreTagRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'alias' => 'required|string|max:255',
-            'type' => [
-                'required',
-                Rule::enum(TagTypeEnum::class),
-            ],
-
-            'problems' => 'required|array|min:1',
-            'problems.*' => 'required|integer|exists:problems,id',
-            recaptchaFieldName() => recaptchaRuleName(),
+            'auto_judge' => 'array',
+            'auto_judge.*' => 'boolean',
         ];
     }
 }

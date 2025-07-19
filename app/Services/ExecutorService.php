@@ -113,6 +113,8 @@ class ExecutorService
             exec('cp /var/work/diff_exec /var/config/exec 2>&1 > /dev/null');   // Copy program to correct place
             exec('chmod +x /var/config/exec 2>&1 > /dev/null');
             $this->output = [];
+            dump('Comparring the custom diff');
+            dump($command);
             exec($command, $this->output, $this->retval); // Execute
             foreach (explode(PHP_EOL, Storage::disk('work')->get('time')) as $line) {
                 $arr = explode(': ', trim($line));

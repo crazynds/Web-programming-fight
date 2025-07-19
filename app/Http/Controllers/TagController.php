@@ -20,7 +20,8 @@ class TagController extends Controller
      */
     public function index()
     {
-        $tags = Tag::all();
+        $tags = Tag::withCount('problems')
+            ->get();
 
         return view('pages.tag.index', [
             'tags' => $tags,
@@ -90,11 +91,14 @@ class TagController extends Controller
         $data = $request->safe()->except(['problems', 'g-recaptcha-response']);
         DB::beginTransaction();
         $tag->update($data);
+        $tag->save();
         $tag->problems()->detach();
         foreach ($request->input('problems') as $key => $id) {
             $tag->problems()->attach($id);
         }
         DB::commit();
+
+        return redirect()->route('tag.index');
     }
 
     /**

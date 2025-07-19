@@ -5,6 +5,7 @@
 @endsection
 
 @section('content')
+    @php($user = Auth::user())
     <div class="row mb-4">
         <div class="col-8">
             <x-ballon />
@@ -37,7 +38,7 @@
                 <a style="float:right" href="{{ route('problem.create') }}">
                     <button>New +</button>
                 </a>
-                @if (Auth::user()->isAdmin())
+                @if ($user->isAdmin())
                     <a style="float:right; margin-right: 5px;" href="{{ route('problem.import') }}">
                         <button>Import +</button>
                     </a>
@@ -91,7 +92,7 @@
                                 data-show-caption="false" data-size="xs" value="{{ $problem->rating / 2.0 }}"
                                 data-original-value="{{ $problem->rating / 2.0 }}"
                                 @if ($problem->my_accepted_submissions == 0) data-readonly="true" data-my-ratting=""
-                                @else data-my-ratting="{{ (\App\Models\Rating::where('problem_id', $problem->id)->where('user_id', Auth::id())->first()?->value ?? $problem->rating) / 2.0 }}" @endif>
+                                @else data-my-ratting="{{ ($rating[$problem->id]?->value ?? $problem->rating) / 2.0 }}" @endif>
                         </td>
                     @endif
                     <td class="px-2 text-center">
@@ -148,7 +149,7 @@
                                     </a>
                                 @endcan
                                 @can('update', $problem)
-                                    @if (Auth::user()->isAdmin())
+                                    @if ($user->isAdmin())
                                         <div class="vr"></div>
                                         <a href="{{ route('problem.scorer.index', ['problem' => $problem->id]) }}"
                                             title="Edit scores" class="d-flex action-btn">

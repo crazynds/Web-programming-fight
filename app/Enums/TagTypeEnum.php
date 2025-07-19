@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-use BenSampo\Enum\Enum;
-
-/**
- */
-final class TagTypeEnum extends Enum
+enum TagTypeEnum: int
 {
-    const Event = 0;
-    const AlgorithmType = 1;
-    const Language = 2;
-    const Algorithm = 3;
-    const Local = 4;
+    use EnumHelpers;
+    case Event = 0;
+    case AlgorithmType = 1;
+    case Language = 2;
+    case Algorithm = 3;
+    case Local = 4;
 
-    const Others = 99;
+    case Others = 99;
 }

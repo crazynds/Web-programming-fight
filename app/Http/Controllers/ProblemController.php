@@ -49,6 +49,7 @@ class ProblemController extends Controller
         $search = $request->input('search', '');
         $tag = $request->input('tag', '');
         $page = $request->input('page', 0);
+        $ratings = [];
 
         if ($this->contestService->inContest) {
             $problems = $this->contestService->contest->problems()
@@ -67,6 +68,7 @@ class ProblemController extends Controller
                             ->limit(1);
                     },
                 ])
+                ->with('user')
                 ->orderBy('id')->get();
         } elseif (! isset($onlineJudge) || empty($onlineJudge) || strtolower($onlineJudge) == 'local') {
             $problems = Problem::withCount([
@@ -80,7 +82,8 @@ class ProblemController extends Controller
                         ->limit(1);
                 },
                 'ranks',
-            ])->whereNull('problems.online_judge')
+            ])->with('user')
+                ->whereNull('problems.online_judge')
                 ->where(function ($query) {
                     /** @var User */
                     $user = Auth::user();
@@ -110,6 +113,13 @@ class ProblemController extends Controller
                     ->where('tag_id', $tag);
             }
             $problems = $problems->paginate(40);
+            $ids = [];
+            foreach ($problems as $problem) {
+                $ids[] = $problem->id;
+            }
+            foreach (Rating::where('user_id', Auth::id())->whereIn('id', $ids)->get() as $rating) {
+                $ratings[$rating->problem_id] = $rating;
+            }
         } else {
             // $vjudge = new VJudgeService;
             // $vjudgeProblems = $vjudge->searchProblems($onlineJudge, $search, $page);
@@ -127,6 +137,7 @@ class ProblemController extends Controller
             'problems' => $problems,
             'onlineJudge' => $onlineJudge ?? null,
             'search' => $search ?? null,
+            'ratings' => $ratings,
         ]);
     }
 

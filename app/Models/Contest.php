@@ -38,7 +38,8 @@ class Contest extends Model
 
     public function problems()
     {
-        return $this->belongsToMany(Problem::class, 'contest_problem');
+        return $this->belongsToMany(Problem::class, 'contest_problem')
+            ->withPivot('auto_judge');
     }
 
     public function clarifications()

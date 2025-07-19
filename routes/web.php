@@ -145,6 +145,8 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
         ->name('contest.admin');
     Route::post('/contest/{contest}/recomputateScores', [ContestController::class, 'recomputateScores'])
         ->name('contest.recomputateScores');
+    Route::put('/contest/{contest}/settings', [ContestController::class, 'settings'])
+        ->name('contest.settings');
     Route::resource('contest.clarification', ClarificationController::class)
         ->only(['update', 'destroy']);
 });

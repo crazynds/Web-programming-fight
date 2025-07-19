@@ -86,7 +86,7 @@
                         </small>
                     </td>
                     <td class="px-2">
-                        @if ($submitRun->competitor)
+                        @if ($submitRun->contest_id && $submitRun->competitor)
                             @php
                                 $nickName = $submitRun->competitor->fullName();
                             @endphp

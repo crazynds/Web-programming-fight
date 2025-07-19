@@ -24,4 +24,6 @@ final class SubmitResult extends Enum
     const LanguageNotSupported = 10;
     const NoTestCase = 11;
     const InternalCompilationError = 12;
+
+    const AIDetected = 14;
 }

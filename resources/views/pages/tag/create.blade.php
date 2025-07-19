@@ -46,8 +46,8 @@
                 </select>
                 <label for="type" class="form-label mt-2">Type: </label><br />
                 <select name="type" class="form-select select2" required>
-                    @foreach (App\Enums\TagTypeEnum::asArray() as $name => $code)
-                        <option value="{{ $code }}">{{ $name }}</option>
+                    @foreach (App\Enums\TagTypeEnum::cases() as $type)
+                        <option value="{{ $type->value }}" @if($type->value == old('type',$tag->type?->value)) selected @endif>{{ $type->name }}</option>
                     @endforeach
                 </select>
             </div>

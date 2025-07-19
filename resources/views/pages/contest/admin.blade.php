@@ -17,15 +17,44 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-6">
-            painel de leaderboard
-
+        <div class="col-4" style="border-right: black dashed 1px; min-height: 70vh">
             <form action="{{ route('contest.recomputateScores', ['contest' => $contest->id]) }}" method="post">
                 @csrf
                 <button type="submit" style="float:right"> Re-computate Scores </button>
             </form>
+            <form action="{{ route('contest.settings', ['contest' => $contest->id]) }}" method="POST">
+                <button type="submit">
+                    <i class="fas fa-save me-1"></i> Save Settings
+                </button>
+                <div class="mt-2">
+                    <h5>Problem Auto-Judge Settings</h5>
+                </div>
+                @csrf
+                @method('PUT')
+                <div>
+                    @foreach($contest->problems as $index => $problem)
+                        @php
+                            $letter = chr(65 + $index); // Convert index to letter (0=A, 1=B, etc.)
+                        @endphp
+                            <label class="form-check-label fw-bold" for="problem-{{ $problem->id }}">
+                                <div style="border: gray solid 1px; display:inline-block; padding: 5px; margin: 2px;">
+                                    {{ $letter }}
+                                    <br>
+                                    <input type="hidden" name="auto_judge[{{ $problem->id }}]" value="0">
+                                    <input class="form-check-input me-2" 
+                                            type="checkbox" 
+                                            id="problem-{{ $problem->id }}" 
+                                            name="auto_judge[{{ $problem->id }}]" 
+                                            value="1"
+                                            @if($problem->pivot->auto_judge) checked @endif
+                                            onclick="this.previousSibling.value = this.checked ? '1' : '0'">
+                                </div>
+                            </label>
+                    @endforeach
+                </div>
+            </form>
         </div>
-        <div class="col-6">
+        <div class="col-4" style="border-right: black dashed 1px; min-height: 70vh">
             <h4>Clarifications</h4>
             @if ($errors->any())
                 <div class="row mt-3">
@@ -69,6 +98,28 @@
                 </form>
                 <hr />
             @endforeach
+        </div>
+        <div class="col-4">
+            <table border="1" id="ranking">
+                <thead>
+                    <tr>
+                        <th class="px-1">#</th>
+                        <th class="text-center px-2"><b>Actions</b></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($contest->competitors as $competitor)
+                    <tr>
+                        <td class="px-2">
+                            {{ $competitor->fullName() }}
+                        </td>
+                        <td>
+
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 @endsection

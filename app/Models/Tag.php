@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TagTypeEnum;
 use App\Observers\TagObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
@@ -10,8 +11,12 @@ use Illuminate\Database\Eloquent\Model;
 class Tag extends Model
 {
     public $timestamps = false;
+
     public $guarded = [];
 
+    public $casts = [
+        'type' => TagTypeEnum::class,
+    ];
 
     public function problems()
     {

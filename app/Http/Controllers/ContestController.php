@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCompetitorRequest;
 use App\Http\Requests\StoreContestRequest;
+use App\Http\Requests\UpdateContestSettingsRequest;
 use App\Jobs\RecalculateCompetitorScore;
 use App\Models\Contest;
 use App\Models\Problem;
@@ -41,6 +42,21 @@ class ContestController extends Controller
         $contest->clearCache();
 
         return redirect()->route('contest.leaderboard', ['contest' => $contest->id]);
+    }
+
+    public function settings(UpdateContestSettingsRequest $request, Contest $contest)
+    {
+        $this->authorize('admin', $contest);
+        $autoJudge = $request->safe()->input('auto_judge');
+        $problemsUpdate = [];
+        foreach ($autoJudge as $id => $value) {
+            $problemsUpdate[$id] = [
+                'auto_judge' => $value,
+            ];
+        }
+        $contest->problems()->sync($problemsUpdate, false);
+
+        return redirect()->back();
     }
 
     /**
@@ -200,7 +216,7 @@ class ContestController extends Controller
             }
             $contest->competitors()->create([
                 'team_id' => $team->id,
-                'name' => '['.($team->institution_acronym ?? '????').'] '.$team->name,
+                'name' => $team->name,
                 'acronym' => $team->acronym,
             ]);
         }

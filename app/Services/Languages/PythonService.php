@@ -31,10 +31,10 @@ class PythonService extends LanguageService
         Storage::disk('work')->writeStream($outputName, $code->readStream());
         switch ($this->language) {
             case 'PyPy3.10':
-                $command = 'pypy3.10 -m py_compile /var/work/'.$outputName;
+                $command = '/langs/pypy3.10/bin/pypy -m py_compile /var/work/'.$outputName;
                 break;
             case 'PyPy3.11':
-                $command = 'pypy3.11 -m py_compile /var/work/'.$outputName;
+                $command = '/langs/pypy3.11/bin/pypy -m py_compile /var/work/'.$outputName;
                 break;
             case 'Python3.11':
                 $command = 'python3 -m py_compile /var/work/'.$outputName;

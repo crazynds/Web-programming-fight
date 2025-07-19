@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Contest;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class ContestPolicy
 {
@@ -55,7 +54,7 @@ class ContestPolicy
      */
     public function update(User $user, Contest $contest): bool
     {
-        return ($this->admin($user, $contest) && $contest->start_time->gt(now()));
+        return $this->admin($user, $contest) && $contest->start_time->gt(now());
     }
 
     /**

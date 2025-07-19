@@ -40,7 +40,7 @@
                         </a>
                     </td>
                     <td class="px-2 text-center">
-                        {{ $tag->problems()->count() }}
+                        {{ $tag->problems_count }}
                     </td>
                     <td class="px-2">
                         <div class="hstack gap-1">

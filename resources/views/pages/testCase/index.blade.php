@@ -138,18 +138,17 @@
                         @else
                             @if ($testCase->public)
                                 Yes
+                            @else
+                                No
+                            @endif
+                            @can('update', $problem)
                                 <a href="{{ route('problem.testCase.edit.public', ['problem' => $problem->id, 'testCase' => $testCase->id]) }}"
                                     style="text-decoration:none !important;">
                                     <i class="las la-lock"></i>
                                 </a>
-                            @else
-                                No
-                                <a href="{{ route('problem.testCase.edit.public', ['problem' => $problem->id, 'testCase' => $testCase->id]) }}"
-                                    style="text-decoration:none !important;">
-                                    <i class="las la-unlock"></i>
-                                </a>
-                            @endif
+                            @endcan
                         @endif
+
                     </td>
                     <td class="text-center">
                         @if ($testCase->validated)
@@ -160,11 +159,14 @@
                     </td>
                     <td class="px-2">
                         <div class="hstack gap-1">
-                            @can('update', $problem)
+                            @can('view', $testCase)
                                 <a href="{{ route('problem.testCase.show', ['problem' => $problem->id, 'testCase' => $testCase->id]) }}"
                                     class="d-flex action-btn">
                                     <i class="las la-eye"></i>
                                 </a>
+                            @endcan
+
+                            @can('update', $problem)
                                 <div class="vr"></div>
                                 <a href="{{ route('problem.testCase.edit', ['problem' => $problem->id, 'testCase' => $testCase->id]) }}"
                                     title="Edit this test case" class="d-flex action-btn">

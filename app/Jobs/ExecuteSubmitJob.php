@@ -182,7 +182,25 @@ class ExecuteSubmitJob implements ShouldBeUnique, ShouldQueue
         } elseif ($result == SubmitResult::CompilationError) {
             $this->submit->output = implode(PHP_EOL, $executor->output);
         }
-        $this->submit->status = SubmitStatus::Judged;
+
+        // If this submit is in a contest, do the things
+        if ($this->submit->contest) {
+            $contest = $this->submit->contest;
+
+            $problem = $contest->problems()->where('id', $this->submit->problem_id)->first();
+            if ($problem && ! $problem->pivot->auto_judge) {
+                $competidor = Competitor::whereHas('submissions', function ($query) {
+                    $query->where('submit_run_id', $this->submit->id);
+                })->first();
+                // Synchronously
+                ContestComputeScore::dispatchSync($this->submit, $this->submit->contest, $competidor);
+            } else {
+                $this->submit->status = SubmitStatus::AwaitingAdminJudge;
+            }
+
+        } else {
+            $this->submit->status = SubmitStatus::Judged;
+        }
         $this->submit->save();
 
         if (
@@ -190,14 +208,6 @@ class ExecuteSubmitJob implements ShouldBeUnique, ShouldQueue
             $this->submit->problem->scores()->exists()
         ) {
             ScoreSubmitJob::dispatch($this->submit);
-        }
-        // If this submit is in a contest, do the things
-        if ($this->submit->contest) {
-            $competidor = Competitor::whereHas('submissions', function ($query) {
-                $query->where('submit_run_id', $this->submit->id);
-            })->first();
-            // Synchronously
-            ContestComputeScore::dispatchSync($this->submit, $this->submit->contest, $competidor);
         }
 
         // Log::channel('events')->info('Ending submit ' . $this->submit->id. ' with result ' . $this->submit->result);
