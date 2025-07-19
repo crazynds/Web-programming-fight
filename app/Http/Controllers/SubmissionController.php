@@ -6,13 +6,13 @@ use App\Enums\LanguagesType;
 use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
 use App\Events\NewSubmissionEvent;
-use App\Http\Requests\StoreSubmitRunRequest;
-use App\Http\Resources\SubmitRunResultResource;
+use App\Http\Requests\StoreSubmissionRequest;
+use App\Http\Resources\SubmissionResultResource;
 use App\Jobs\ExecuteSubmitJob;
 use App\Models\Contest;
 use App\Models\File;
 use App\Models\Problem;
-use App\Models\SubmitRun;
+use App\Models\Submission;
 use App\Models\User;
 use App\Services\ContestService;
 use Illuminate\Http\Request;
@@ -22,11 +22,11 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 
-class SubmitRunController extends Controller
+class SubmissionController extends Controller
 {
     public function __construct(protected ContestService $contestService)
     {
-        $this->authorizeResource(SubmitRun::class, 'submitRun');
+        $this->authorizeResource(Submission::class, 'submission');
     }
 
     public function global(?Contest $contest = null)
@@ -72,7 +72,7 @@ class SubmitRunController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreSubmitRunRequest $request)
+    public function store(StoreSubmissionRequest $request)
     {
         $user = Auth::user();
         if (RateLimiter::tooManyAttempts('submission:'.$user->id, 30)) {
@@ -89,7 +89,7 @@ class SubmitRunController extends Controller
         $run = DB::transaction(function () use ($request, $user, $problem) {
 
             $originalFile = $request->file('code');
-            $run = new SubmitRun;
+            $run = new Submission;
             $run->language = $request->input('lang');
             $run->problem()->associate($problem);
             $run->user()->associate($user);
@@ -155,42 +155,52 @@ class SubmitRunController extends Controller
             return $run;
         });
 
-        return redirect()->route('submitRun.index');
+        return redirect()->route('submission.index');
     }
 
-    public function download(SubmitRun $submitRun)
+    public function download(Submission $submission)
     {
-        $this->authorize('view', $submitRun);
-        if ($this->contestService->inContest && ! $this->contestService->contest->problems()->where('problems.id', $submitRun->problem_id)->exists()) {
+        $this->authorize('view', $submission);
+        if ($this->contestService->inContest && ! $this->contestService->contest->problems()->where('problems.id', $submission->problem_id)->exists()) {
             abort(404);
         }
 
-        return $submitRun->file->download('#'.$submitRun->id.'_'.Str::slug($submitRun->problem->title).'.'.$submitRun->file->type);
+        return $submission->file->download('#'.$submission->id.'_'.Str::slug($submission->problem->title).'.'.$submission->file->type);
     }
 
-    public function getCode(SubmitRun $submitRun)
+    public function getCode(Submission $submission)
     {
-        $this->authorize('view', $submitRun);
-        $code = $submitRun->file?->get() ?? 'Invalid Code!';
+        $this->authorize('view', $submission);
+        $code = $submission->file?->get() ?? 'Invalid Code!';
         if (! mb_check_encoding($code, 'UTF-8')) {
             $code = 'Malformed UTF-8 file!';
         }
 
         return response()->json([
             'code' => $code,
+            'language' => match ($submission->language) {
+                LanguagesType::name(LanguagesType::C) => 'c',
+                LanguagesType::name(LanguagesType::CPlusPlus) => 'cpp',
+                LanguagesType::name(LanguagesType::Java_OpenJDK24) => 'java',
+                LanguagesType::name(LanguagesType::Python3_11) => 'python',
+                LanguagesType::name(LanguagesType::Python3_13) => 'python',
+                LanguagesType::name(LanguagesType::PyPy3_10) => 'python',
+                LanguagesType::name(LanguagesType::PyPy3_11) => 'python',
+                default => 'plaintext',
+            },
         ]);
     }
 
-    public function result(SubmitRun $submitRun)
+    public function result(Submission $submission)
     {
-        $this->authorize('view', $submitRun);
+        $this->authorize('view', $submission);
 
-        return new SubmitRunResultResource($submitRun);
+        return new SubmissionResultResource($submission);
     }
 
-    public function rejudge(SubmitRun $submitRun)
+    public function rejudge(Submission $submission)
     {
-        $this->authorize('update', $submitRun);
+        $this->authorize('update', $submission);
         /** @var User */
         $user = Auth::user();
         if (RateLimiter::tooManyAttempts('resubmission:'.$user->id, 5)) {
@@ -204,15 +214,15 @@ class SubmitRunController extends Controller
             RateLimiter::hit('resubmission:'.$user->id, 60 * 10);
         }
 
-        if (SubmitStatus::fromValue(SubmitStatus::Judged)->description == $submitRun->status || SubmitStatus::fromValue(SubmitStatus::Error)->description == $submitRun->status) {
-            $submitRun->status = SubmitStatus::WaitingInLine;
-            $submitRun->result = SubmitResult::NoResult;
-            $submitRun->save();
+        if (SubmitStatus::fromValue(SubmitStatus::Judged)->description == $submission->status || SubmitStatus::fromValue(SubmitStatus::Error)->description == $submission->status) {
+            $submission->status = SubmitStatus::WaitingInLine;
+            $submission->result = SubmitResult::NoResult;
+            $submission->save();
 
-            if ($submitRun->language == LanguagesType::name(LanguagesType::Auto_detect)) {
-                $submitRun->language = LanguagesType::CPlusPlus;
+            if ($submission->language == LanguagesType::name(LanguagesType::Auto_detect)) {
+                $submission->language = LanguagesType::CPlusPlus;
             }
-            ExecuteSubmitJob::dispatch($submitRun)->onQueue('low')->afterCommit();
+            ExecuteSubmitJob::dispatch($submission)->onQueue('low')->afterCommit();
         }
 
         return response()->json([
@@ -220,13 +230,13 @@ class SubmitRunController extends Controller
         ]);
     }
 
-    public function show(SubmitRun $submitRun)
+    public function show(Submission $submission)
     {
-        $this->authorize('viewOutput', $submitRun);
+        $this->authorize('viewOutput', $submission);
 
         return view('pages.run.show', [
-            'submitRun' => $submitRun,
-            'output' => $submitRun->output,
+            'submission' => $submission,
+            'output' => $submission->output,
         ]);
     }
 }

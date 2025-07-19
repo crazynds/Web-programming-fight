@@ -3,10 +3,10 @@
 namespace App\Http\Requests;
 
 use App\Enums\LanguagesType;
-use Illuminate\Foundation\Http\FormRequest;
 use BenSampo\Enum\Rules\EnumValue;
+use Illuminate\Foundation\Http\FormRequest;
 
-class StoreSubmitRunRequest extends FormRequest
+class StoreSubmissionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,13 +27,13 @@ class StoreSubmitRunRequest extends FormRequest
             'problem' => 'required|integer|exists:problems,id',
             'lang' => [
                 'required',
-                new EnumValue(LanguagesType::class,false)
+                new EnumValue(LanguagesType::class, false),
             ],
             'code' => [
                 'required',
-                ...LanguagesType::validation($this->input('lang',0)),
+                ...LanguagesType::validation($this->input('lang', 0)),
             ],
-            recaptchaFieldName() => recaptchaRuleName()
+            recaptchaFieldName() => recaptchaRuleName(),
         ];
     }
 }

@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class SubmitRunResultResource extends JsonResource
+class SubmissionResultResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -21,7 +21,7 @@ class SubmitRunResultResource extends JsonResource
             'suspense' => $this->when($this->status == 'Judged', ($this->num_test_cases + 1) / ($this->problem->testCases()->count() + 1)),
             'execution' => [
                 'time' => $this->execution_time,
-                'memory' => $this->execution_memory
+                'memory' => $this->execution_memory,
             ],
         ];
     }

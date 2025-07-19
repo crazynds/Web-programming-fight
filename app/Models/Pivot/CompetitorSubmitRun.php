@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class CompetitorSubmitRun extends Pivot
 {
-    public $table = 'competitor_submit_run';
+    public $table = 'competitor_submission';
 }

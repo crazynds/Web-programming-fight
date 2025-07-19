@@ -4,16 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Enums\SubmitResult;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     public function index()
     {
-        $users = User::with('lastRun:submit_runs.user_id,created_at')->get();
+        $users = User::with('lastRun:submissions.user_id,created_at')->get();
+
         return view('pages.user.index', [
-            'users' => $users
+            'users' => $users,
         ]);
     }
 
@@ -21,6 +21,7 @@ class UserController extends Controller
     {
         /** @var User */
         $user = Auth::user();
+
         return $this->profileUser($user);
     }
 

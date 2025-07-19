@@ -3,6 +3,7 @@ import "./bootstrap";
 import "./axios";
 import "./jqueryLibs";
 import "./easymde";
+import "./highlight";
 import Tagify from "@yaireo/tagify";
 import confetti from "canvas-confetti";
 import "bootstrap-star-rating";

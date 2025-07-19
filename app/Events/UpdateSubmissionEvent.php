@@ -2,16 +2,15 @@
 
 namespace App\Events;
 
-use App\Models\SubmitRun;
+use App\Models\Submission;
 
 class UpdateSubmissionEvent extends NewSubmissionEvent
 {
     /**
      * Create a new event instance.
      */
-    public function __construct(SubmitRun $submitRun)
+    public function __construct(Submission $submission)
     {
-        parent::__construct($submitRun);
+        parent::__construct($submission);
     }
-
 }

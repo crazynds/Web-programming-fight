@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\SubmitRun;
+use App\Models\Submission;
 use App\Models\TestCase;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -14,14 +14,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('submit_run_test_case', function (Blueprint $table) {
-            $table->foreignIdFor(SubmitRun::class)->constrained()->onDelete('cascade');
+            $table->foreignIdFor(Submission::class, 'submit_run_id')->constrained('submit_runs')->onDelete('cascade');
             $table->foreignIdFor(TestCase::class)->constrained()->onDelete('cascade');
             $table->tinyInteger('result');
-            $table->primary(['test_case_id','submit_run_id']);
+            $table->primary(['test_case_id', 'submit_run_id']);
             // Estatisticas do test case
-            $table->index(['test_case_id','result']);
+            $table->index(['test_case_id', 'result']);
             // Job para buscar as runs com results especificos
-            $table->index(['submit_run_id','result']);
+            $table->index(['submit_run_id', 'result']);
         });
     }
 

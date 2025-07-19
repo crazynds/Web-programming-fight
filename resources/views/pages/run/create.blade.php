@@ -15,7 +15,7 @@
     </div>
 
     <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data"
-        action="{{ route(($contestService->inContest ? 'contest.' : '') . 'submitRun.store') }}">
+        action="{{ route(($contestService->inContest ? 'contest.' : '') . 'submission.store') }}">
         @csrf
         <div class="row">
             <div class="col">

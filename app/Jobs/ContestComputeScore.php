@@ -5,7 +5,7 @@ namespace App\Jobs;
 use App\Enums\SubmitResult;
 use App\Models\Competitor;
 use App\Models\Contest;
-use App\Models\SubmitRun;
+use App\Models\Submission;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -21,7 +21,7 @@ class ContestComputeScore extends RecalculateCompetitorScore implements ShouldQu
      * Create a new job instance.
      */
     public function __construct(
-        protected SubmitRun $submitRun,
+        protected Submission $submission,
         protected Contest $contest,
         protected Competitor $competitor
     ) {
@@ -30,15 +30,15 @@ class ContestComputeScore extends RecalculateCompetitorScore implements ShouldQu
 
     protected function compute(): void
     {
-        switch ($this->submitRun->result) {
+        switch ($this->submission->result) {
             case SubmitResult::fromValue(SubmitResult::Accepted)->description:
-                $computedPontuation = $this->calculateScore($this->contest, $this->submitRun);
+                $computedPontuation = $this->calculateScore($this->contest, $this->submission);
                 $problemsCount = $this->competitor->submissions()
-                    ->where('problem_id', $this->submitRun->problem_id)
+                    ->where('problem_id', $this->submission->problem_id)
                     ->whereNotIn('result', $this->ignoreResults)->count();
-                $penality = $this->calculatePenality($this->submitRun, $problemsCount - 1);
+                $penality = $this->calculatePenality($this->submission, $problemsCount - 1);
 
-                $this->updateCompetitorScore($this->submitRun, $computedPontuation, $penality);
+                $this->updateCompetitorScore($this->submission, $computedPontuation, $penality);
 
                 // Clear leaderboard cache
                 Cache::forget('contest:leaderboard:'.$this->contest->id);

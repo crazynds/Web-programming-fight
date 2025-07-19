@@ -32,7 +32,7 @@ class Problem extends Model
 
     public function submissions()
     {
-        return $this->hasMany(SubmitRun::class);
+        return $this->hasMany(Submission::class);
     }
 
     public function scores()

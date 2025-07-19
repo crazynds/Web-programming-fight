@@ -3,9 +3,8 @@
 namespace App\Jobs;
 
 use App\Enums\SubmitResult;
-use App\Models\SubmitRun;
+use App\Models\Submission;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -29,7 +28,7 @@ class DeleteOldSubmissionsErrorFiles implements ShouldQueue
     public function handle(): void
     {
         foreach (
-            SubmitRun::whereIn('result', [
+            Submission::whereIn('result', [
                 SubmitResult::CompilationError,
                 SubmitResult::Error,
                 SubmitResult::LanguageNotSupported,

@@ -36,7 +36,7 @@ class ProblemObserver
     }
 
     /**
-     * Handle the SubmitRun "force deleted" event.
+     * Handle the Submission "force deleted" event.
      */
     public function forceDeleting(Problem $problem): void
     {

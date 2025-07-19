@@ -123,9 +123,9 @@ class ContestController extends Controller
             foreach ($problems as $problem) {
                 $query->withCount([
                     'submissions as sum_submissions_'.$problem => function ($query) use ($problem, $contest, $blind) {
-                        $query->where('submit_runs.problem_id', $problem);
+                        $query->where('submissions.problem_id', $problem);
                         if ($blind) {
-                            $query->where('submit_runs.created_at', '<', $contest->blindTime());
+                            $query->where('submissions.created_at', '<', $contest->blindTime());
                         }
                     },
                 ]);

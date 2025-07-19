@@ -5,7 +5,7 @@ namespace App\Jobs;
 use App\Enums\SubmitResult;
 use App\Models\Competitor;
 use App\Models\Contest;
-use App\Models\SubmitRun;
+use App\Models\Submission;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -57,7 +57,7 @@ class RecalculateCompetitorScore implements ShouldQueue
         $problemsPenality = [];
         DB::beginTransaction();
         $this->competitor->scores()->delete();
-        /** @var SubmitRun */
+        /** @var Submission */
         foreach ($submissions as $submit) {
             if ($submit->result == SubmitResult::fromValue(SubmitResult::Accepted)->description) {
                 $computedPontuation = $this->calculateScore($this->contest, $submit);
@@ -83,13 +83,13 @@ class RecalculateCompetitorScore implements ShouldQueue
         Cache::forget('contest:leaderboard:'.$this->contest->id);
     }
 
-    protected function updateCompetitorScore(SubmitRun $submit, int $computedPontuation, int $penality)
+    protected function updateCompetitorScore(Submission $submit, int $computedPontuation, int $penality)
     {
         $score = $this->competitor->scores()->where('problem_id', $submit->problem_id)->first();
         if (! $score) {
             $this->competitor->scores()->create([
                 'problem_id' => $submit->problem_id,
-                'submit_run_id' => $submit->id,
+                'submission_id' => $submit->id,
                 'penality' => $penality,
                 'score' => $computedPontuation,
             ]);
@@ -97,17 +97,17 @@ class RecalculateCompetitorScore implements ShouldQueue
             $score->update([
                 'score' => $computedPontuation,
                 'penality' => $penality,
-                'submit_run_id' => $submit->id,
+                'submission_id' => $submit->id,
             ]);
         }
     }
 
-    protected function calculatePenality(SubmitRun $submitRun, int $problemsBefore): int
+    protected function calculatePenality(Submission $submission, int $problemsBefore): int
     {
         $penality = 0;
         if (! ($this->contest->time_based_points || $this->contest->parcial_solution)) {
             /** @var Carbon */
-            $created = $submitRun->created_at;
+            $created = $submission->created_at;
             $penality = $created->diffInMinutes($this->contest->start_time);
             $penality = floor(abs($penality));
         }
@@ -116,7 +116,7 @@ class RecalculateCompetitorScore implements ShouldQueue
         return $penality + $penalityTried;
     }
 
-    protected function calculateScore(Contest $contest, SubmitRun $submitRun, $percent = 1): int
+    protected function calculateScore(Contest $contest, Submission $submission, $percent = 1): int
     {
         $score = 1;
 
@@ -128,7 +128,7 @@ class RecalculateCompetitorScore implements ShouldQueue
             /** @var Carbon */
             $startTime = $contest->start_time;
             /** @var Carbon */
-            $sendTime = $submitRun->created_at;
+            $sendTime = $submission->created_at;
             $diff = $startTime->addMinutes($contest->duration)->diffInMinutes($sendTime) * -1;
             $p = $diff / $contest->duration;
             $score *= 0.7 + 0.3 * $p;    // 100%-70%

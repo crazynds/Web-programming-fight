@@ -4,7 +4,7 @@ namespace App\Livewire;
 
 use App\Events\UpdateSubmissionEvent;
 use App\Models\Contest;
-use App\Models\SubmitRun;
+use App\Models\Submission;
 use App\Models\User;
 use App\Services\ContestService;
 use Illuminate\Support\Facades\Auth;
@@ -38,10 +38,10 @@ class SyncSubmissionComponent extends Component
                     ->with(['competitor', 'contest']);
 
                 if ($contest->endTime()->addMinutes(5)->gt(now())) {
-                    $query->where('submit_runs.created_at', '<', $contest->blindTime());
+                    $query->where('submissions.created_at', '<', $contest->blindTime());
                 }
             } else {
-                $query = SubmitRun::whereHas('problem', function ($query) {
+                $query = Submission::whereHas('problem', function ($query) {
                     // Hide not visible problems to global
                     $query->where('problems.visible', true);
                 })->where('contest_id', null);
@@ -80,7 +80,7 @@ class SyncSubmissionComponent extends Component
 
     public function refresh()
     {
-        $newests = $this->getQuery()->where('submit_runs.updated_at', '>', $this->lastCheck)->get();
+        $newests = $this->getQuery()->where('submissions.updated_at', '>', $this->lastCheck)->get();
         foreach ($newests as $run) {
             $event = new UpdateSubmissionEvent($run);
             $this->dispatch('updateSubmissionEvent', $event->data);
@@ -91,7 +91,7 @@ class SyncSubmissionComponent extends Component
     public function render()
     {
         return view('livewire.sync-submission-component', [
-            'text' => $this->getQuery()->whereDate('submit_runs.updated_at', '>=', $this->lastCheck)->toSql(),
+            'text' => $this->getQuery()->whereDate('submissions.updated_at', '>=', $this->lastCheck)->toSql(),
         ]);
     }
 }

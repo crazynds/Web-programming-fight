@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App\Enums\SubmitResult;
 use App\Models\Rank;
-use App\Models\SubmitRun;
+use App\Models\Submission;
 use App\Services\ExecutorService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -13,7 +13,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class ScoreSubmitJob implements ShouldQueue, ShouldBeUnique
+class ScoreSubmitJob implements ShouldBeUnique, ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -21,7 +21,7 @@ class ScoreSubmitJob implements ShouldQueue, ShouldBeUnique
      * Create a new job instance.
      */
     public function __construct(
-        protected SubmitRun $submit
+        protected Submission $submit
     ) {
         $this->onQueue('rank');
     }
@@ -30,7 +30,6 @@ class ScoreSubmitJob implements ShouldQueue, ShouldBeUnique
     {
         return $this->submit->id;
     }
-
 
     /**
      * Execute the job.
@@ -50,12 +49,15 @@ class ScoreSubmitJob implements ShouldQueue, ShouldBeUnique
                 $result = $executor->executeScorer($scorer);
                 if ($result) {
                     $categories = null;
-                    //dump($result);
+                    // dump($result);
                     foreach ($result as $category => $arr) {
                         $value = $arr['value'];
                         $reference = $arr['reference'];
-                        if ($categories == null) $categories = $category;
-                        else $categories .= ", " . $category;
+                        if ($categories == null) {
+                            $categories = $category;
+                        } else {
+                            $categories .= ', '.$category;
+                        }
                         $rank = Rank::firstOrCreate([
                             'problem_id' => $problem->id,
                             'user_id' => $this->submit->user_id,
@@ -63,13 +65,13 @@ class ScoreSubmitJob implements ShouldQueue, ShouldBeUnique
                             'language' => $this->submit->languageRaw,
                             'scorer_id' => $scorer->id,
                         ], [
-                            'submit_run_id' => $this->submit->id,
+                            'submission_id' => $this->submit->id,
                             'value' => $value,
                             'reference' => $reference,
                         ]);
                         if ($rank->value < $value) {
                             $rank->value = $value;
-                            $rank->submit_run_id = $this->submit->id;
+                            $rank->submission_id = $this->submit->id;
                             $rank->reference = $reference;
                             $rank->save();
                         }

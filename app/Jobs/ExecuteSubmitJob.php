@@ -6,8 +6,7 @@ use App\Enums\LanguagesType;
 use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
 use App\Events\UpdateSubmissionTestCaseEvent;
-use App\Models\Competitor;
-use App\Models\SubmitRun;
+use App\Models\Submission;
 use App\Models\TestCase;
 use App\Services\ExecutorService;
 use Illuminate\Bus\Queueable;
@@ -31,7 +30,7 @@ class ExecuteSubmitJob implements ShouldBeUnique, ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        protected SubmitRun $submit
+        protected Submission $submit
     ) {
         $this->onQueue('submit');
     }
@@ -188,26 +187,24 @@ class ExecuteSubmitJob implements ShouldBeUnique, ShouldQueue
             $contest = $this->submit->contest;
 
             $problem = $contest->problems()->where('id', $this->submit->problem_id)->first();
-            if ($problem && ! $problem->pivot->auto_judge) {
-                $competidor = Competitor::whereHas('submissions', function ($query) {
-                    $query->where('submit_run_id', $this->submit->id);
-                })->first();
+            if ($problem && ! $problem->pivot->auto_judge && $this->submit->result == SubmitResult::getDescription(SubmitResult::Accepted)) {
+                $this->submit->status = SubmitStatus::AwaitingAdminJudge;
+            } else {
+                $this->submit->status = SubmitStatus::Judged;
+                $competidor = $this->submit->competitor;
                 // Synchronously
                 ContestComputeScore::dispatchSync($this->submit, $this->submit->contest, $competidor);
-            } else {
-                $this->submit->status = SubmitStatus::AwaitingAdminJudge;
             }
-
+            $this->submit->save();
         } else {
             $this->submit->status = SubmitStatus::Judged;
-        }
-        $this->submit->save();
-
-        if (
-            $this->submit->result == SubmitResult::fromValue(SubmitResult::Accepted)->description &&
-            $this->submit->problem->scores()->exists()
-        ) {
-            ScoreSubmitJob::dispatch($this->submit);
+            $this->submit->save();
+            if (
+                $this->submit->result == SubmitResult::fromValue(SubmitResult::Accepted)->description &&
+                $this->submit->problem->scores()->exists()
+            ) {
+                ScoreSubmitJob::dispatch($this->submit);
+            }
         }
 
         // Log::channel('events')->info('Ending submit ' . $this->submit->id. ' with result ' . $this->submit->result);
@@ -215,6 +212,7 @@ class ExecuteSubmitJob implements ShouldBeUnique, ShouldQueue
 
     public function failed(Throwable $exception): void
     {
+        dump($exception);
         $this->submit->status = SubmitStatus::Error;
         $this->submit->result = SubmitResult::Error;
         $this->submit->output = $exception->getTraceAsString();

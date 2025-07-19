@@ -62,7 +62,7 @@
                         {{ $problem->time_limit / 1000 }}s
                     </div>
                     <div class="vr"></div>
-                    <a href="{{ route('submitRun.create', ['problem' => $problem->id]) }}">
+                    <a href="{{ route('submission.create', ['problem' => $problem->id]) }}">
                         Submit
                     </a>
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminJudgeSubmissionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Contest\ClarificationController;
 use App\Http\Controllers\ContestController;
@@ -8,7 +9,7 @@ use App\Http\Controllers\IOProblemController;
 use App\Http\Controllers\ProblemController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ScorerController;
-use App\Http\Controllers\SubmitRunController;
+use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TestCaseController;
@@ -104,12 +105,12 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
         });
 
     // run routes
-    Route::resource('submitRun', SubmitRunController::class)
+    Route::resource('submission', SubmissionController::class)
         ->only(['index', 'store', 'create', 'show']);
-    Route::get('/submitRun/global/live', [SubmitRunController::class, 'global'])
-        ->name('submitRun.global');
-    Route::get('/submitRun/{submitRun}/download', [SubmitRunController::class, 'download'])
-        ->name('submitRun.download');
+    Route::get('/submission/global/live', [SubmissionController::class, 'global'])
+        ->name('submission.global');
+    Route::get('/submission/{submission}/download', [SubmissionController::class, 'download'])
+        ->name('submission.download');
 
     // user routes
     Route::get('/user/profile', [UserController::class, 'profile'])
@@ -138,7 +139,7 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
         ->name('contest.enter');
     Route::get('/constest/{contest}/leaderboard', [ContestController::class, 'leaderboard'])
         ->name('contest.leaderboard');
-    Route::get('/constest/{contest}/submissions', [SubmitRunController::class, 'global'])
+    Route::get('/constest/{contest}/submissions', [SubmissionController::class, 'global'])
         ->name('contest.submissions')
         ->can('viewSubmissions', 'contest');
     Route::get('/contest/{contest}/admin', [ContestController::class, 'admin'])
@@ -147,6 +148,14 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
         ->name('contest.recomputateScores');
     Route::put('/contest/{contest}/settings', [ContestController::class, 'settings'])
         ->name('contest.settings');
+    Route::post('/contest/{contest}/submission/{submission}/accept', [AdminJudgeSubmissionController::class, 'accept'])
+        ->name('contest.submission.accept');
+    Route::post('/contest/{contest}/submission/{submission}/rejectWA', [AdminJudgeSubmissionController::class, 'rejectWA'])
+        ->name('contest.submission.rejectWA');
+    Route::post('/contest/{contest}/submission/{submission}/rejectTL', [AdminJudgeSubmissionController::class, 'rejectTL'])
+        ->name('contest.submission.rejectTL');
+    Route::post('/contest/{contest}/submission/{submission}/rejectAI', [AdminJudgeSubmissionController::class, 'rejectAI'])
+        ->name('contest.submission.rejectAI');
     Route::resource('contest.clarification', ClarificationController::class)
         ->only(['update', 'destroy']);
 });

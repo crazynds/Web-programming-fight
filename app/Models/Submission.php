@@ -6,11 +6,16 @@ use App\Enums\LanguagesType;
 use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
 use App\Models\Pivot\CompetitorSubmitRun;
+use App\Observers\SubmissionObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
-class SubmitRun extends Model
+#[ObservedBy(SubmissionObserver::class)]
+class Submission extends Model
 {
+    public $guarded = [];
+
     public $timestamps = true;
 
     protected $casts = [
@@ -93,6 +98,6 @@ class SubmitRun extends Model
 
     public function competitor()
     {
-        return $this->hasOneThrough(Competitor::class, CompetitorSubmitRun::class, 'submit_run_id', 'id', 'id', 'competitor_id');
+        return $this->hasOneThrough(Competitor::class, CompetitorSubmitRun::class, 'submission_id', 'id', 'id', 'competitor_id');
     }
 }

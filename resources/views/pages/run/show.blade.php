@@ -5,7 +5,7 @@
         <div class="col">
             <x-ballon />
             <b>
-                Submission: #{{$submitRun->id}}
+                Submission: #{{$submission->id}}
             </b>
         </div>
     </div>

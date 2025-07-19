@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class CompetitorScore extends Model
@@ -11,11 +9,12 @@ class CompetitorScore extends Model
     public $table = 'competitor_problem';
 
     protected $primaryKey = ['problem_id', 'competitor_id'];
+
     public $incrementing = false;
 
     public $timestamps = false;
-    public $guarded = [];
 
+    public $guarded = [];
 
     public function competitor()
     {
@@ -29,8 +28,9 @@ class CompetitorScore extends Model
 
     public function submission()
     {
-        return $this->belongsTo(SubmitRun::class, 'submit_run_id');
+        return $this->belongsTo(Submission::class);
     }
+
     /**
      * Set the keys for a save update query.
      *
@@ -40,7 +40,7 @@ class CompetitorScore extends Model
     protected function setKeysForSaveQuery($query)
     {
         $keys = $this->getKeyName();
-        if (!is_array($keys)) {
+        if (! is_array($keys)) {
             return parent::setKeysForSaveQuery($query);
         }
 
@@ -54,7 +54,7 @@ class CompetitorScore extends Model
     /**
      * Get the primary key value for a save query.
      *
-     * @param mixed $keyName
+     * @param  mixed  $keyName
      * @return mixed
      */
     protected function getKeyForSaveQuery($keyName = null)

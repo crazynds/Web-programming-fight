@@ -1,9 +1,8 @@
 <?php
 
 use App\Models\Competitor;
-use App\Models\Contest;
 use App\Models\Problem;
-use App\Models\SubmitRun;
+use App\Models\Submission;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,7 +18,7 @@ return new class extends Migration
             $table->foreignIdFor(Problem::class)->constrained()->onDelete('cascade');
             $table->foreignIdFor(Competitor::class)->constrained()->onDelete('cascade');
 
-            $table->foreignIdFor(SubmitRun::class)->nullable()->constrained()->onDelete('set null');
+            $table->foreignIdFor(Submission::class, 'submit_run_id')->nullable()->constrained('submit_runs')->onDelete('set null');
 
             $table->integer('penality');
             $table->integer('score'); // Total after the calculations

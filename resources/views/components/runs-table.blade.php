@@ -61,167 +61,187 @@
             @php
                 $lastUpdated = \Illuminate\Support\Carbon::now()->subHour();
             @endphp
-            @foreach ($submitRuns as $submitRun)
+            @foreach ($submissions as $submission)
                 @php
-                    $lastUpdated = max($submitRun->updated_at, $lastUpdated);
+                    $lastUpdated = max($submission->updated_at, $lastUpdated);
                 @endphp
-                <tr id="row{{ $submitRun->id }}" data-id="{{ $submitRun->id }}"
-                    @if ($submitRun->status != 'Judged' && $submitRun->status != 'Error') class="notJudged blink" @endif>
+                <tr id="row{{ $submission->id }}" data-id="{{ $submission->id }}"
+                    @if ($submission->status != 'Judged' && $submission->status != 'Error') class="notJudged blink" @endif>
                     <td>
-                        @can('view', $submitRun)
-                            <a href="#" onclick="openModal({{ $submitRun->id }})">
-                                #{{ $submitRun->id }}
+                        @can('view', $submission)
+                            <a href="#" onclick="openModal({{ $submission->id }})">
+                                #{{ $submission->id }}
                             </a>
                         @else
-                            #{{ $submitRun->id }}
+                            #{{ $submission->id }}
                         @endcan
                     </td>
                     <td class="px-2 text-center">
                         <small>
-                            @if (\Carbon\Carbon::parse($submitRun->created_at)->format('d/m/Y') != (new DateTime())->format('d/m/Y'))
-                                {{ \Carbon\Carbon::parse($submitRun->created_at)->format('d/m/Y') }}
+                            @if (\Carbon\Carbon::parse($submission->created_at)->format('d/m/Y') != (new DateTime())->format('d/m/Y'))
+                                {{ \Carbon\Carbon::parse($submission->created_at)->format('d/m/Y') }}
                             @else
-                                {{ \Carbon\Carbon::parse($submitRun->created_at)->format('H:i:s') }}
+                                {{ \Carbon\Carbon::parse($submission->created_at)->format('H:i:s') }}
                             @endif
                         </small>
                     </td>
                     <td class="px-2">
-                        @if ($submitRun->contest_id && $submitRun->competitor)
+                        @if ($submission->contest_id && $submission->competitor)
                             @php
-                                $nickName = $submitRun->competitor->fullName();
+                                $nickName = $submission->competitor->fullName();
                             @endphp
                         @else
                             @php
-                                $nickName = $submitRun->user->name;
+                                $nickName = $submission->user->name;
                             @endphp
                         @endif
                         {{ Str::limit($nickName, 20) }}
                     </td>
                     <td class="px-2">
-                        <a href="{{ route('problem.show', ['problem' => $submitRun->problem->id], false) }}">
-                            {{ Str::limit($submitRun->problem->title, 30) }}
+                        <a href="{{ route('problem.show', ['problem' => $submission->problem->id], false) }}">
+                            {{ Str::limit($submission->problem->title, 30) }}
                         </a>
                     </td>
                     <td class="px-2" id="lang">
-                        {{ $submitRun->language }}
+                        {{ $submission->language }}
                     </td>
-                    <td class="px-2">
-                        <strong id="status">
-                            {{ $submitRun->status }}
-                        </strong>
-                    </td>
-                    <td class="px-2">
-                        <span id="result"
-                            @switch($submitRun->result)
-                            @case('Accepted')
-                                style="color:#0a0"
-                                @break
-                            @case('Error')
-                            @case('File too large')
-                            @case('Invalid utf8 file')
-                                style="color:#f00"
-                                @break
-                            @case('Wrong answer')
-                                style="color:#a00"
-                                @break
-                            @case('Compilation error')
-                            @case('Runtime error')
-                                style="color:#aa0"
-                                @break
-                            @case('Time limit')
-                            @case('Memory limit')
-                                style="color:#00a"
-                                @break
-                            @default
-                                style="color:grey"
-                        @endswitch>
-                            {{ $submitRun->result }}
-                        </span>
-                    </td>
-                    <td class="px-2 text-center">
-                        <small id="testCases"
-                            @switch($submitRun->result)
-                            @case('Accepted')
-                                style="color:#0a0"
-                                @break
-                            @case('Error')
-                            @case('File too large')
-                            @case('Invalid utf8 file')
-                                style="color:#f00"
-                                @break
-                            @case('Wrong answer')
-                                style="color:#a00"
-                                @break
-                            @case('Compilation error')
-                            @case('Runtime error')
-                                style="color:#aa0"
-                                @break
-                            @case('Time limit')
-                            @case('Memory limit')
-                                style="color:#00a"
-                                @break
-                            @default
-                                style="color:grey"
-                        @endswitch>
-                            @switch($submitRun->result)
+                    @if($submission->status == App\Enums\SubmitStatus::getDescription(App\Enums\SubmitStatus::AwaitingAdminJudge))
+                        <td class="px-2">
+                            <strong id="status">
+                                Judging
+                            </strong>
+                        </td>
+                        <td class="px-2">
+                            <span id="result"
+                                style="color:grey">
+                                No result
+                            </span>
+                        </td>
+                        <td class="px-2 text-center">
+                            <small id="testCases"
+                                style="color:grey">
+                                ---
+                            </small>
+                        </td>
+                    @else
+                        <td class="px-2">
+                            <strong id="status">
+                                {{ $submission->status }}
+                            </strong>
+                        </td>
+                        <td class="px-2">
+                            <span id="result"
+                                @switch($submission->result)
                                 @case('Accepted')
-                                    All
-                                @break
-
+                                    style="color:#0a0"
+                                    @break
+                                @case('Error')
+                                @case('File too large')
+                                @case('Invalid utf8 file')
+                                    style="color:#f00"
+                                    @break
                                 @case('Wrong answer')
-                                    {{ $submitRun->num_test_cases + 1 }}
-                                @break
-
+                                    style="color:#a00"
+                                    @break
+                                @case('Compilation error')
                                 @case('Runtime error')
+                                    style="color:#aa0"
+                                    @break
                                 @case('Time limit')
-
                                 @case('Memory limit')
-                                    {{ $submitRun->num_test_cases + 1 }}
-                                @break
-
+                                    style="color:#00a"
+                                    @break
                                 @default
-                                    ---
-                                @break
-                            @endswitch
-                        </small>
-                    </td>
+                                    style="color:grey"
+                                @endswitch>
+                                {{ $submission->result }}
+                            </span>
+                        </td>
+                        <td class="px-2 text-center">
+                            <small id="testCases"
+                                @switch($submission->result)
+                                @case('Accepted')
+                                    style="color:#0a0"
+                                    @break
+                                @case('Error')
+                                @case('File too large')
+                                @case('Invalid utf8 file')
+                                    style="color:#f00"
+                                    @break
+                                @case('Wrong answer')
+                                    style="color:#a00"
+                                    @break
+                                @case('Compilation error')
+                                @case('Runtime error')
+                                    style="color:#aa0"
+                                    @break
+                                @case('Time limit')
+                                @case('Memory limit')
+                                    style="color:#00a"
+                                    @break
+                                @default
+                                    style="color:grey"
+                            @endswitch>
+                                @switch($submission->result)
+                                    @case('Accepted')
+                                        All
+                                    @break
+
+                                    @case('Wrong answer')
+                                        {{ $submission->num_test_cases + 1 }}
+                                    @break
+
+                                    @case('Runtime error')
+                                    @case('Time limit')
+
+                                    @case('Memory limit')
+                                        {{ $submission->num_test_cases + 1 }}
+                                    @break
+
+                                    @default
+                                        ---
+                                    @break
+                                @endswitch
+                            </small>
+                        </td>
+                    @endif
                     <td class="px-2" style="font-size: 0.9em" id="resources">
-                        @if (isset($submitRun->execution_time) && $submitRun->status == 'Judged')
-                            {{ number_format($submitRun->execution_time / 1000, 2, '.', ',') }}s
+                        @if (isset($submission->execution_time) && $submission->status == 'Judged')
+                            {{ number_format($submission->execution_time / 1000, 2, '.', ',') }}s
                         @else
                             --
                         @endif
                         |
-                        @if (isset($submitRun->execution_memory) && $submitRun->status == 'Judged')
-                            {{ $submitRun->execution_memory }} MB
+                        @if (isset($submission->execution_memory) && $submission->status == 'Judged')
+                            {{ $submission->execution_memory }} MB
                         @else
                             --
                         @endif
                     </td>
                     <td class="px-2">
                         <div class="hstack gap-1">
-                            @if ($submitRun->status == 'Judged' || $submitRun->status == 'Error')
-                                @can('update', $submitRun)
-                                    @if ($limit && $submitRun->status != 'Compilation error')
-                                        <a href="{{ route('api.submitRun.rejudge', ['submitRun' => $submitRun->id], false) }}"
+                            @if ($submission->status == 'Judged' || $submission->status == 'Error')
+                                @can('update', $submission)
+                                    @if ($limit && $submission->status != 'Compilation error')
+                                        <a href="{{ route('api.submission.rejudge', ['submission' => $submission->id], false) }}"
                                             class="d-flex action-btn single-silent-click">
                                             <i class="las la-redo-alt"></i>
                                         </a>
                                     @endif
                                 @endcan
-                                @can('viewOutput', $submitRun)
-                                    @if (isset($submitRun->output))
-                                        <a href="{{ route('submitRun.show', ['submitRun' => $submitRun->id], false) }}"
+                                @can('viewOutput', $submission)
+                                    @if (isset($submission->output))
+                                        <a href="{{ route('submission.show', ['submission' => $submission->id], false) }}"
                                             class="d-flex action-btn">
                                             <i class="las la-poll-h"></i>
                                         </a>
                                     @endif
                                 @endcan
                             @endif
-                            @can('view', $submitRun)
-                                @if ($submitRun->file_id != null && !$contestService->inContest)
+                            @can('view', $submission)
+                                @if ($submission->file_id != null && !$contestService->inContest)
                                     <a target="_blank"
-                                        href="{{ route('submitRun.download', ['submitRun' => $submitRun->id], false) }}"
+                                        href="{{ route('submission.download', ['submission' => $submission->id], false) }}"
                                         class="d-flex action-btn">
                                         <i class="las la-file-download"></i>
                                     </a>
@@ -242,7 +262,7 @@
                         Copy
                     </button>
                 </div>
-                <pre id="code" style="border: 1px black solid">Code...</pre>
+                <pre id="code" style="border: 1px black solid;padding: 4px">Code...</pre>
             </div>
         </div>
     </div>
@@ -260,6 +280,24 @@
         window.getSelection().removeAllRanges(); // clear current selection
         window.getSelection().addRange(range); // to select text
         document.execCommand("copy");
+    }
+    window.openModal = function(id) {
+        var url = '{{ route('api.submission.code', ['submission' => -1]) }}'.replace('-1', id)
+        $('#codeModal').modal("show")
+        $('#codeModal').find('#code').html(`
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-grow" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            `)
+        $.get(url, function(data) {
+            if (data.code)
+                $('#codeModal').find('#code').html(hljs.highlight(
+                    data.code,
+                    { language: data.language }
+                ).value)
+        });
     }
 
     function failed() {
@@ -379,21 +417,6 @@
         fire(0.1, {
             spread: 120,
             startVelocity: 45,
-        });
-    }
-    window.openModal = function(id) {
-        var url = '{{ route('api.submitRun.code', ['submitRun' => -1]) }}'.replace('-1', id)
-        $('#codeModal').modal("show")
-        $('#codeModal').find('#code').html(`
-                <div class="d-flex justify-content-center">
-                    <div class="spinner-grow" role="status">
-                        <span class="sr-only">Loading...</span>
-                    </div>
-                </div>
-            `)
-        $.get(url, function(data) {
-            if (data.code)
-                $('#codeModal').find('#code').text(data.code)
         });
     }
 

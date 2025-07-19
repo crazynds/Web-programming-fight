@@ -119,9 +119,9 @@
                     @auth
                         @if (!$contestService->inContest || $contestService->started)
                             <a href="{{ route('problem.index') }}">Problems</a> |
-                            {{-- <a href="{{ route('submitRun.create') }}">Submit</a> | --}}
+                            {{-- <a href="{{ route('submission.create') }}">Submit</a> | --}}
                             <a href="{{ route('tag.index') }}">Tags</a> |
-                            <a href="{{ route('submitRun.index') }}">Runs</a>
+                            <a href="{{ route('submission.index') }}">Runs</a>
                         @else
                             <span style="font-size: 12pt;">
                                 Wait for the contest to start...
@@ -136,7 +136,7 @@
                                 <a href="{{ route('contest.competitor.leaderboard') }}">Leaderboard</a> |
                                 <a href="{{ route('contest.competitor.index') }}">Competitors</a>
                                 @if ($contestService->started)
-                                    | <a href="{{ route('submitRun.global') }}">Global Runs</a>
+                                    | <a href="{{ route('submission.global') }}">Global Runs</a>
                                 @endif
                             @endif
 
@@ -150,7 +150,7 @@
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
-                                    <li><a class="dropdown-item" href="{{ route('submitRun.global') }}">Global Runs</a>
+                                    <li><a class="dropdown-item" href="{{ route('submission.global') }}">Global Runs</a>
                                     </li>
                                     {{-- <li>
                                     <hr class="dropdown-divider">

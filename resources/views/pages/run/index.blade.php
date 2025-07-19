@@ -9,7 +9,7 @@
             </b>
         </div>
         <div class="col">
-            <a style="float:right" href="{{ route('submitRun.create') }}">
+            <a style="float:right" href="{{ route('submission.create') }}">
                 <button>New Submission +</button>
             </a>
         </div>

@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\BackupController;
-use App\Http\Controllers\SubmitRunController;
+use App\Http\Controllers\SubmissionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,25 +20,22 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-
-
-Route::middleware('auth:web')->group(function(){
-    Route::get('/run/{submitRun}/code',[SubmitRunController::class,'getCode'])
-        ->name('submitRun.code');
-    Route::get('/run/{submitRun}/result',[SubmitRunController::class,'result'])
-        ->name('submitRun.result');
-    Route::get('/submitRun/{submitRun}/rejudge', [SubmitRunController::class, 'rejudge'])
-        ->name('submitRun.rejudge');
-
+Route::middleware('auth:web')->group(function () {
+    Route::get('/run/{submission}/code', [SubmissionController::class, 'getCode'])
+        ->name('submission.code');
+    Route::get('/run/{submission}/result', [SubmissionController::class, 'result'])
+        ->name('submission.result');
+    Route::get('/submission/{submission}/rejudge', [SubmissionController::class, 'rejudge'])
+        ->name('submission.rejudge');
 
     Route::middleware('can:viewPulse')->group(function () {
-        Route::get('/backup',[BackupController::class,'start'])
+        Route::get('/backup', [BackupController::class, 'start'])
             ->name('backup.start');
-        Route::get('/backup/download',[BackupController::class,'download'])
+        Route::get('/backup/download', [BackupController::class, 'download'])
             ->name('backup.download');
-        Route::get('/backup/now',[BackupController::class,'backupNow'])
+        Route::get('/backup/now', [BackupController::class, 'backupNow'])
             ->name('backup.now');
-        Route::post('/backup/upload',[BackupController::class,'upload'])
+        Route::post('/backup/upload', [BackupController::class, 'upload'])
             ->name('backup.upload');
     });
 

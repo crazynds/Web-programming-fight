@@ -42,7 +42,7 @@ class Competitor extends Model
 
     public function submissions()
     {
-        return $this->belongsToMany(SubmitRun::class);
+        return $this->belongsToMany(Submission::class);
     }
 
     public function scores()

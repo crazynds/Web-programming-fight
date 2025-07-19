@@ -67,37 +67,37 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($submissions as $submitRun)
-                <tr data-id="{{ $submitRun->id }}" @if ($submitRun->status != 'Judged' && $submitRun->status != 'Error') class="notJudged blink" @endif>
+            @foreach ($submissions as $submission)
+                <tr data-id="{{ $submission->id }}" @if ($submission->status != 'Judged' && $submission->status != 'Error') class="notJudged blink" @endif>
                     <td>
-                        @can('view', $submitRun)
-                            <a href="#" onclick="openModal({{ $submitRun->id }})">
-                                #{{ $submitRun->id }}
+                        @can('view', $submission)
+                            <a href="#" onclick="openModal({{ $submission->id }})">
+                                #{{ $submission->id }}
                             </a>
                         @else
-                            #{{ $submitRun->id }}
+                            #{{ $submission->id }}
                         @endcan
                     </td>
                     <td class="px-1 text-center">
                         <small>
-                            @if ($submitRun->created_at->format('d/m/Y') != (new DateTime())->format('d/m/Y'))
-                                {{ $submitRun->created_at->format('d/m/Y') }}
+                            @if ($submission->created_at->format('d/m/Y') != (new DateTime())->format('d/m/Y'))
+                                {{ $submission->created_at->format('d/m/Y') }}
                             @else
-                                {{ $submitRun->created_at->format('H:i:s') }}
+                                {{ $submission->created_at->format('H:i:s') }}
                             @endif
                         </small>
                     </td>
                     <td class="px-1">
-                        <a href="{{ route('problem.show', ['problem' => $submitRun->problem->id]) }}">
-                            {{ $submitRun->problem->title }}
+                        <a href="{{ route('problem.show', ['problem' => $submission->problem->id]) }}">
+                            {{ $submission->problem->title }}
                         </a>
                     </td>
                     <td class="px-1">
-                        {{ $submitRun->language }}
+                        {{ $submission->language }}
                     </td>
                     <td class="px-2">
                         <span id="result"
-                            @switch($submitRun->result)
+                            @switch($submission->result)
                             @case('Accepted')
                                 style="color:#0a0"
                                 @break
@@ -118,18 +118,18 @@
                             @default
                                 style="color:grey"
                         @endswitch>
-                            {{ $submitRun->result }}
+                            {{ $submission->result }}
                         </span>
                     </td>
                     <td class="px-2" style="font-size: 0.9em">
-                        @if (isset($submitRun->execution_time) && $submitRun->status == 'Judged')
-                            {{ number_format($submitRun->execution_time / 1000, 2, '.', ',') }}s
+                        @if (isset($submission->execution_time) && $submission->status == 'Judged')
+                            {{ number_format($submission->execution_time / 1000, 2, '.', ',') }}s
                         @else
                             --
                         @endif
                         |
-                        @if (isset($submitRun->execution_memory) && $submitRun->status == 'Judged')
-                            {{ $submitRun->execution_memory }} MB
+                        @if (isset($submission->execution_memory) && $submission->status == 'Judged')
+                            {{ $submission->execution_memory }} MB
                         @else
                             --
                         @endif
@@ -168,7 +168,7 @@
         window.openModal = function() {}
         window.addEventListener("load", function() {
             window.openModal = function(id) {
-                var url = '{{ route('api.submitRun.code', ['submitRun' => -1]) }}'.replace('-1', id)
+                var url = '{{ route('api.submission.code', ['submission' => -1]) }}'.replace('-1', id)
                 $('#codeModal').modal("show")
                 $('#codeModal').find('#code').html(`
                 <div class="d-flex justify-content-center">

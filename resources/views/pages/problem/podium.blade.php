@@ -52,13 +52,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($problem->ranks($category)->orderBy('value', 'desc')->limit(10)->with('submitRun.user')->get() as $ranking)
+                            @foreach ($problem->ranks($category)->orderBy('value', 'desc')->limit(10)->with('submission.user')->get() as $ranking)
                                 <tr>
                                     <td class="pr-2">
                                         #{{ $loop->iteration }}
                                     </td>
                                     <td class="px-2" style="display: flex;align-items: center;">
-                                        {{ $ranking->submitRun->user->name }}
+                                        {{ $ranking->submission->user->name }}
                                         <i
                                             class="las la-trophy {{ $loop->iteration == 1 ? 'gold' : ($loop->iteration == 2 ? 'silver' : ($loop->iteration == 3 ? 'bronze' : '')) }}"></i>
                                     </td>

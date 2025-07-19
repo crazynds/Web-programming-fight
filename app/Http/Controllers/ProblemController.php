@@ -58,13 +58,13 @@ class ProblemController extends Controller
                         $query->where('contest_id', $this->contestService->contest->id);
                     },
                     'submissions as accepted_submissions' => function ($query) {
-                        $query->where('submit_runs.result', SubmitResult::Accepted)
+                        $query->where('submissions.result', SubmitResult::Accepted)
                             ->where('contest_id', $this->contestService->contest->id);
                     },
                     'submissions as my_accepted_submissions' => function ($query) {
-                        $query->where('submit_runs.result', SubmitResult::Accepted)
-                            ->join('competitor_submit_run', 'submit_runs.id', 'competitor_submit_run.submit_run_id')
-                            ->where('competitor_submit_run.competitor_id', $this->contestService->competitor->id)
+                        $query->where('submissions.result', SubmitResult::Accepted)
+                            ->join('competitor_submission', 'submissions.id', 'competitor_submission.submission_id')
+                            ->where('competitor_submission.competitor_id', $this->contestService->competitor->id)
                             ->limit(1);
                     },
                 ])
@@ -74,11 +74,11 @@ class ProblemController extends Controller
             $problems = Problem::withCount([
                 'submissions',
                 'submissions as accepted_submissions' => function ($query) {
-                    $query->where('submit_runs.result', SubmitResult::Accepted);
+                    $query->where('submissions.result', SubmitResult::Accepted);
                 },
                 'submissions as my_accepted_submissions' => function ($query) {
-                    $query->where('submit_runs.result', SubmitResult::Accepted)
-                        ->where('submit_runs.user_id', Auth::user()->id)
+                    $query->where('submissions.result', SubmitResult::Accepted)
+                        ->where('submissions.user_id', Auth::user()->id)
                         ->limit(1);
                 },
                 'ranks',

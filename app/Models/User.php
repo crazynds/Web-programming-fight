@@ -10,29 +10,29 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-
     public $guarded = [];
 
     public function directory()
     {
-        return 'users/' . $this->id;
+        return 'users/'.$this->id;
     }
 
     public function submissions()
     {
-        return $this->hasMany(SubmitRun::class);
+        return $this->hasMany(Submission::class);
     }
 
     public function isAdmin()
     {
-        //return false;
-        return $this->id == 1 || $this->email=='pozzer3@gmail.com';
+        // return false;
+        return $this->id == 1 || $this->email == 'pozzer3@gmail.com';
     }
 
     public function problems()
     {
         return $this->hasMany(Problem::class);
     }
+
     public function contest()
     {
         return $this->hasMany(Contest::class);
@@ -40,7 +40,7 @@ class User extends Authenticatable
 
     public function lastRun()
     {
-        return $this->hasOne(SubmitRun::class)->latestOfMany();
+        return $this->hasOne(Submission::class)->latestOfMany();
     }
 
     public function teams()

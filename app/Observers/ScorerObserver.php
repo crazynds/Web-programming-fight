@@ -7,13 +7,15 @@ use App\Models\Scorer;
 class ScorerObserver
 {
     /**
-     * Handle the SubmitRun "deleted" event.
+     * Handle the Submission "deleted" event.
      */
     public function deleted(Scorer $scorer): void
     {
-        if (!!$scorer->file_id)
+        if ((bool) $scorer->file_id) {
             $scorer->file->delete();
-        if (!!$scorer->input_id)
+        }
+        if ((bool) $scorer->input_id) {
             $scorer->input->delete();
+        }
     }
 }

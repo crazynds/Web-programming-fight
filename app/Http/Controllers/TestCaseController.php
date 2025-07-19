@@ -25,24 +25,25 @@ class TestCaseController extends Controller
     {
         $testCases = $problem->testCases()
             ->withCount([
-                'submitRuns',
-                'submitRuns as accepted_runs' => function ($query) {
+                'submissions',
+                'submissions as accepted_runs' => function ($query) {
                     $query->where('submit_run_test_case.result', '=', SubmitResult::Accepted);
                 },
-                'submitRuns as runtime_error_runs' => function ($query) {
+                'submissions as runtime_error_runs' => function ($query) {
                     $query->where('submit_run_test_case.result', '=', SubmitResult::RuntimeError);
                 },
-                'submitRuns as memory_limit_runs' => function ($query) {
+                'submissions as memory_limit_runs' => function ($query) {
                     $query->where('submit_run_test_case.result', '=', SubmitResult::MemoryLimit);
                 },
-                'submitRuns as time_limit_runs' => function ($query) {
+                'submissions as time_limit_runs' => function ($query) {
                     $query->where('submit_run_test_case.result', '=', SubmitResult::TimeLimit);
                 },
-                'submitRuns as wrong_answer_runs' => function ($query) {
+                'submissions as wrong_answer_runs' => function ($query) {
                     $query->where('submit_run_test_case.result', '=', SubmitResult::WrongAnswer);
-                }
+                },
             ])
             ->orderBy('position')->get();
+
         return view('pages.testCase.index', [
             'problem' => $problem,
             'testCases' => $testCases,
@@ -55,53 +56,60 @@ class TestCaseController extends Controller
     public function create(Problem $problem)
     {
         $this->authorize('update', $problem);
+
         return view('pages.testCase.create', [
             'problem' => $problem,
-            'testCase' => new TestCase(),
+            'testCase' => new TestCase,
         ]);
     }
 
     public function createManual(Problem $problem)
     {
         $this->authorize('update', $problem);
+
         return view('pages.testCase.create-manual', [
             'problem' => $problem,
-            'testCase' => new TestCase(),
+            'testCase' => new TestCase,
         ]);
     }
 
     public function edit(Problem $problem, TestCase $testCase)
     {
         $this->authorize('update', $problem);
+
         return view('pages.testCase.create-manual', [
             'problem' => $problem,
             'testCase' => $testCase,
         ]);
     }
+
     /**
      * Show the form for creating a new resource.
      */
     public function show(Problem $problem, TestCase $testCase)
     {
         $this->authorize('update', $problem);
+
         return view('pages.testCase.show', [
             'problem' => $problem,
             'testCase' => $testCase,
             'input' => $testCase->inputfile->get(),
-            'output' => $testCase->outputfile->get()
+            'output' => $testCase->outputfile->get(),
         ]);
     }
 
     public function downloadInput(Problem $problem, TestCase $testCase)
     {
         $this->authorize('update', $problem);
-        return $testCase->inputFile->download(Str::slug($problem->title) . '_input_' . $testCase->position);
+
+        return $testCase->inputFile->download(Str::slug($problem->title).'_input_'.$testCase->position);
     }
 
     public function downloadOutput(Problem $problem, TestCase $testCase)
     {
         $this->authorize('update', $problem);
-        return $testCase->outputfile->download(Str::slug($problem->title) . '_output_' . $testCase->position);
+
+        return $testCase->outputfile->download(Str::slug($problem->title).'_output_'.$testCase->position);
     }
 
     public function up(Problem $problem, TestCase $testCase)
@@ -114,8 +122,10 @@ class TestCaseController extends Controller
                 ->decrement('position');
             $testCase->save();
         }
+
         return redirect()->route('problem.testCase.index', ['problem' => $problem->id]);
     }
+
     public function down(Problem $problem, TestCase $testCase)
     {
         $this->authorize('update', $problem);
@@ -126,17 +136,18 @@ class TestCaseController extends Controller
                 ->increment('position');
             $testCase->save();
         }
+
         return redirect()->route('problem.testCase.index', ['problem' => $problem->id]);
     }
 
     public function publicChange(Problem $problem, TestCase $testCase)
     {
         $this->authorize('update', $problem);
-        $testCase->public = !$testCase->public;
+        $testCase->public = ! $testCase->public;
         $testCase->save();
+
         return redirect()->route('problem.testCase.index', ['problem' => $problem->id]);
     }
-
 
     /**
      * Store a newly created resource in storage.
@@ -178,13 +189,13 @@ class TestCaseController extends Controller
                     $filesToDelete[] = $t->input_file;
                     $filesToDelete[] = $t->output_file;
 
-                    // Clear test who ran in this testcase 
+                    // Clear test who ran in this testcase
                     $testCase->validated = false;
-                    $testCase->submitRuns()->sync([]);
+                    $testCase->submissions()->sync([]);
                     $testCase->save();
 
-                    Cache::forget('file:input_' . $testCase->id);
-                    Cache::forget('file:output_' . $testCase->id);
+                    Cache::forget('file:input_'.$testCase->id);
+                    Cache::forget('file:output_'.$testCase->id);
                 }
             }
         });
@@ -192,6 +203,7 @@ class TestCaseController extends Controller
         foreach (File::whereIn('id', $filesToDelete)->lazy() as $file) {
             $file->delete();
         }
+
         return redirect()->route('problem.testCase.index', ['problem' => $problem->id]);
     }
 
@@ -202,24 +214,26 @@ class TestCaseController extends Controller
         DB::beginTransaction();
         $data = $request->safe()->all();
 
-        $comparator = fn($s1, $s2) => str_replace("\r\n", "\n", trim($s1)) == str_replace("\r\n", "\n", trim($s2));
+        $comparator = fn ($s1, $s2) => str_replace("\r\n", "\n", trim($s1)) == str_replace("\r\n", "\n", trim($s2));
 
         $filesToDelete = [];
         $t = $problem->testCases()->where('name', $data['name'])->first();
-        $changed = !$t;
+        $changed = ! $t;
 
-        if (!$t || !$comparator($t->inputfile->get(), $data['input'])) {
+        if (! $t || ! $comparator($t->inputfile->get(), $data['input'])) {
             $inputFile = File::createFileByData($data['input'], "problems/{$problem->id}/input");
-            if($t)
+            if ($t) {
                 $filesToDelete[] = $t->input_file;
+            }
             $changed = true;
         } else {
             $inputFile = $t->inputfile;
         }
-        if (!$t || !$comparator($t->outputfile->get(), $data['output'])) {
+        if (! $t || ! $comparator($t->outputfile->get(), $data['output'])) {
             $outputFile = File::createFileByData($data['output'], "problems/{$problem->id}/output");
-            if($t)
+            if ($t) {
                 $filesToDelete[] = $t->output_file;
+            }
             $changed = true;
         } else {
             $outputFile = $t->outputfile;
@@ -237,9 +251,9 @@ class TestCaseController extends Controller
         ]);
 
         if ($t) {
-            $testCase->submitRuns()->sync([]);
-            Cache::forget('file:input_' . $testCase->id);
-            Cache::forget('file:output_' . $testCase->id);
+            $testCase->submissions()->sync([]);
+            Cache::forget('file:input_'.$testCase->id);
+            Cache::forget('file:output_'.$testCase->id);
         }
 
         foreach (File::whereIn('id', $filesToDelete)->lazy() as $file) {
@@ -247,6 +261,7 @@ class TestCaseController extends Controller
         }
         DB::commit();
         CheckSubmissionsOnProblem::dispatch($problem)->delay(now()->addSeconds(300))->afterResponse();
+
         return redirect()->route('problem.testCase.index', ['problem' => $problem->id]);
     }
 
@@ -257,7 +272,7 @@ class TestCaseController extends Controller
     {
         $this->authorize('update', $problem);
         DB::transaction(function () use ($problem, $testCase) {
-            foreach ($testCase->submitRuns()->wherePivot('result', '!=', SubmitResult::Accepted)->lazy() as $run) {
+            foreach ($testCase->submissions()->wherePivot('result', '!=', SubmitResult::Accepted)->lazy() as $run) {
                 $run->status = SubmitStatus::WaitingInLine;
                 $run->result = SubmitResult::NoResult;
                 $run->save();
@@ -271,6 +286,7 @@ class TestCaseController extends Controller
 
         // Dispatch Job to check submissions
         CheckSubmissionsOnProblem::dispatch($problem)->delay(now()->addSeconds(300))->afterResponse();
+
         return redirect()->route('problem.testCase.index', ['problem' => $problem->id]);
     }
 }

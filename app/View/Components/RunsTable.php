@@ -3,7 +3,7 @@
 namespace App\View\Components;
 
 use App\Models\Contest;
-use App\Models\SubmitRun;
+use App\Models\Submission;
 use App\Models\User;
 use App\Services\ContestService;
 use Closure;
@@ -36,10 +36,10 @@ class RunsTable extends Component
                     ->with(['competitor', 'contest']);
 
                 if ($contest->endTime()->addMinutes(5)->gt(now())) {
-                    $query->where('submit_runs.created_at', '<', $contest->blindTime());
+                    $query->where('submissions.created_at', '<', $contest->blindTime());
                 }
             } else {
-                $query = SubmitRun::whereHas('problem', function ($query) {
+                $query = Submission::whereHas('problem', function ($query) {
                     // Hide not visible problems to global
                     $query->where('problems.visible', true);
                 })->where('contest_id', null);
@@ -96,7 +96,7 @@ class RunsTable extends Component
     {
         return view('components.runs-table', [
             'limit' => \Illuminate\Support\Facades\RateLimiter::remaining('resubmission:'.Auth::user()->id, 5),
-            'submitRuns' => $this->getQuery()->get(),
+            'submissions' => $this->getQuery()->get(),
             'channel' => $this->getChannel(),
             'contest' => $this->contest,
         ]);
