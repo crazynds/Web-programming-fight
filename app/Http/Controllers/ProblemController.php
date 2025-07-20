@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\SubmitResult;
+use App\Enums\SubmitStatus;
 use App\Http\Requests\StoreProblemRequest;
 use App\Models\Contest;
 use App\Models\Problem;
@@ -59,10 +60,12 @@ class ProblemController extends Controller
                     },
                     'submissions as accepted_submissions' => function ($query) {
                         $query->where('submissions.result', SubmitResult::Accepted)
+                            ->where('submissions.status', SubmitStatus::Judged)
                             ->where('contest_id', $this->contestService->contest->id);
                     },
                     'submissions as my_accepted_submissions' => function ($query) {
                         $query->where('submissions.result', SubmitResult::Accepted)
+                            ->where('submissions.status', SubmitStatus::Judged)
                             ->join('competitor_submission', 'submissions.id', 'competitor_submission.submission_id')
                             ->where('competitor_submission.competitor_id', $this->contestService->competitor->id)
                             ->limit(1);

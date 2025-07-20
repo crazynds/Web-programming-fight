@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Enums\SubmitResult;
+use App\Enums\SubmitStatus;
 use App\Models\Competitor;
 use App\Models\Contest;
 use App\Models\Submission;
@@ -53,28 +54,20 @@ class RecalculateCompetitorScore implements ShouldQueue
 
     protected function compute(): void
     {
-        $submissions = $this->competitor->submissions()->orderBy('id')->lazy();
+        $submissions = $this->competitor->submissions()
+            ->whereNotIn('result', $this->ignoreResults)
+            ->where('status', SubmitStatus::Judged)
+            ->orderBy('id')->lazy();
         $problemsPenality = [];
         DB::beginTransaction();
         $this->competitor->scores()->delete();
         /** @var Submission */
         foreach ($submissions as $submit) {
-            if ($submit->result == SubmitResult::fromValue(SubmitResult::Accepted)->description) {
+            if ($submit->result == SubmitResult::getDescription(SubmitResult::Accepted) || $submit->result == SubmitResult::getDescription(SubmitResult::AiDetected)) {
                 $computedPontuation = $this->calculateScore($this->contest, $submit);
                 $penality = $this->calculatePenality($submit, $problemsPenality[$submit->problem_id] ?? 0);
                 $this->updateCompetitorScore($submit, $computedPontuation, $penality);
             } else {
-                $ignore = false;
-                foreach ($this->ignoreResults as $result) {
-                    if ($submit->result == SubmitResult::fromValue($result)->description) {
-                        $ignore = true;
-                        // Ignore this problem
-                        break;
-                    }
-                }
-                if ($ignore) {
-                    continue;
-                }
                 $problemsPenality[$submit->problem_id] = ($problemsPenality[$submit->problem_id] ?? 0) + 1;
                 // erro no geral
             }
@@ -85,6 +78,14 @@ class RecalculateCompetitorScore implements ShouldQueue
 
     protected function updateCompetitorScore(Submission $submit, int $computedPontuation, int $penality)
     {
+        if ($submit->result == SubmitResult::getDescription(SubmitResult::AiDetected) || $this->competitor->submissions()
+            ->where('problem_id', $submit->problem_id)
+            ->where('result', SubmitResult::AiDetected)
+            ->where('id', '<', $submit->id)
+            ->exists()) {
+            $computedPontuation = 0;
+            $penality = 0;
+        }
         $score = $this->competitor->scores()->where('problem_id', $submit->problem_id)->first();
         if (! $score) {
             $this->competitor->scores()->create([

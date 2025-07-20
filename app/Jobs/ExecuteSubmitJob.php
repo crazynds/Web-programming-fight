@@ -189,13 +189,14 @@ class ExecuteSubmitJob implements ShouldBeUnique, ShouldQueue
             $problem = $contest->problems()->where('id', $this->submit->problem_id)->first();
             if ($problem && ! $problem->pivot->auto_judge && $this->submit->result == SubmitResult::getDescription(SubmitResult::Accepted)) {
                 $this->submit->status = SubmitStatus::AwaitingAdminJudge;
+                $this->submit->save();
             } else {
                 $this->submit->status = SubmitStatus::Judged;
+                $this->submit->save();
                 $competidor = $this->submit->competitor;
                 // Synchronously
                 ContestComputeScore::dispatchSync($this->submit, $this->submit->contest, $competidor);
             }
-            $this->submit->save();
         } else {
             $this->submit->status = SubmitStatus::Judged;
             $this->submit->save();

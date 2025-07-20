@@ -35,8 +35,9 @@ class ContestComputeScore extends RecalculateCompetitorScore implements ShouldQu
                 $computedPontuation = $this->calculateScore($this->contest, $this->submission);
                 $problemsCount = $this->competitor->submissions()
                     ->where('problem_id', $this->submission->problem_id)
+                    ->where('id', '<', $this->submission->id)
                     ->whereNotIn('result', $this->ignoreResults)->count();
-                $penality = $this->calculatePenality($this->submission, $problemsCount - 1);
+                $penality = $this->calculatePenality($this->submission, $problemsCount);
 
                 $this->updateCompetitorScore($this->submission, $computedPontuation, $penality);
 

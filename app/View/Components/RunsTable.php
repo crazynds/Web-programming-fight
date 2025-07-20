@@ -78,7 +78,7 @@ class RunsTable extends Component
 
     protected function getChannel()
     {
-        if ($this->contestService->inContest) {
+        if ($this->contestService->inContest || $this->contest) {
             if ($this->global) {
                 return 'contest.submissions.'.$this->contest->id;
             } else {

@@ -247,15 +247,22 @@
                             @php($questions++)
                             @php($score = $competitor->scores[$problem] ?? null)
 
-                            <span class="d-flex @if (isset($competitor->scores[$problem])) scored @endif"
+                            <span class="d-flex @if ($score && $score->score > 0) scored @endif @if ($score && $score->score <= 0) preventScore @endif"
                                 id="score-{{ $competitor->id }}-{{ $problem }}"
                                 data-attempts="{{ $competitor->__get('sum_submissions_' . $problem) }}"
-                                data-penality="{{ $score->penality ?? 0 }}">
+                                data-penality="{{ $score->penality ?? 0 }}"
+                                @if($score)data-submission_id="{{ $score->submission_id }}"@endif>
                                 @if ($score)
-                                    <div style="position:relative; width: 20px; height: 32px">
-                                        <div class="balloon balloon-{{ $letter }}"></div>
-                                        <div class="balloon-shadow"></div>
-                                    </div>
+                                    @if($score->score<=0)
+                                        <div style="position:relative; width: 20px; height: 32px; font-size:20px; color: red">
+                                            <i class="las la-times"></i>
+                                        </div>
+                                    @else
+                                        <div style="position:relative; width: 20px; height: 32px">
+                                            <div class="balloon balloon-{{ $letter }}"></div>
+                                            <div class="balloon-shadow"></div>
+                                        </div>
+                                    @endif
                                     <span style="padding-top: 14px;font-size: smaller">
                                         {{ $competitor->__get('sum_submissions_' . $problem) . '/' . floor(abs($score->submission->created_at->diffInMinutes($contest->start_time))) }}
                                     </span>
@@ -378,7 +385,7 @@
                 row.removeClass('notJudged blink');
                 const attempts = Number(row.data('attempts'));
                 switch (data.result) {
-                    case 'Accepted':
+                    case 'Accepted':{
                         const ballon = problemNumber[data.problem.id]
                         const submissao = new Date(data.full_datetime.replace(' ', 'T'));
                         const inicio = new Date('{{ $contest->start_time }}');
@@ -392,11 +399,24 @@
                             '</span>'
 
                         row.html(ballonHtml);
-
-
                         row.data('penality', attempts * {{ $contest->penality }} + diffMin);
-                        break;
+                        }break;
+                    case 'Ai detected':{
+                        const submissao = new Date(data.full_datetime.replace(' ', 'T'));
+                        const inicio = new Date('{{ $contest->start_time }}');
+                        const diffMs = submissao - inicio;
+                        const diffMin = Math.floor(diffMs / 1000 / 60);
+                        const crossHtml =
+                            '<div style="position:relative; width: 20px; height: 32px; font-size:20px; color: red"><i class="las la-times"></i></div>' +
+                            '<span style="padding-top: 14px;font-size: smaller">' +
+                            (attempts + 1) + '/' + diffMin +
+                            '</span>'
+                        row.html(crossHtml);
+                        row.data('penality', 0);
+                        break
+                        }
                     default:
+                        row.data('penality', 0);
                         row.data('attempts', attempts + 1);
                         row.attr('data-attempts', attempts + 1);
                         row.text('-- (' + (attempts + 1) + ')');
@@ -454,7 +474,10 @@
         window.updateSubmission = function(data) {
             if (!data.contest) return;
             var row = $('#score-' + data.contest.competitor_id + '-' + data.problem.id);
-            if (row.length == 0 || row.hasClass('scored2')) return; // Ignore competidors not here
+            console.log(row.data('submission_id'), data)
+            if (row.length == 0 && data.id > row.data('submission_id')
+                || (row.hasClass('scored') && data.result!='Ai detected')
+                || (row.hasClass('preventScore'))) return; // Ignore competidors not here
             if (data.status != 'Judged' && data.status != 'Error') {
                 updateRow(row, data);
             } else {
@@ -485,6 +508,7 @@
                         case 'Time limit':
                         case 'Memory limit':
                         default:
+                            row.removeClass('scored');
                             break;
                         case 'Accepted':
                             row.addClass('scored');

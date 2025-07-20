@@ -54,13 +54,17 @@
                         'date' => '18-07-2025',
                         'author' => 'Crazynds',
                         'features' => [
-                            'Added Tag crud for adms.',
+                            'Added Tag crud for admins.',
                             'Added leaderboard filters.'
+                            'Added manual judge in contest admin pannel.'
+                            'Added AI detection on contest submissions.'
+                            'Add fields location information required in teams creation.'
                         ],
                         'changes' => [
-                            'Add location information required in teams creation.'
                         ],
-                        'styles' => [],
+                        'styles' => [
+                            'New background in new clarifications in admin pannel.'
+                        ],
                         'fixes' => [
                             'When sending a binary as auto detect result in an internal error.',
                             'When a new team enters the contest, the leaderboard does not update.'

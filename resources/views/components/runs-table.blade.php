@@ -60,6 +60,7 @@
             </tr>
             @php
                 $lastUpdated = \Illuminate\Support\Carbon::now()->subHour();
+                $contest ??= ($contestService->contest ?? null);
             @endphp
             @foreach ($submissions as $submission)
                 @php
@@ -149,6 +150,7 @@
                                     @break
                                 @case('Time limit')
                                 @case('Memory limit')
+                                @case('Ai detected')
                                     style="color:#00a"
                                     @break
                                 @default
@@ -177,6 +179,7 @@
                                     @break
                                 @case('Time limit')
                                 @case('Memory limit')
+                                @case('Ai detected')
                                     style="color:#00a"
                                     @break
                                 @default
@@ -197,7 +200,6 @@
                                     @case('Memory limit')
                                         {{ $submission->num_test_cases + 1 }}
                                     @break
-
                                     @default
                                         ---
                                     @break
@@ -247,6 +249,25 @@
                                     </a>
                                 @endif
                             @endcan
+                            @if($contest && $submission->status == 'Judged')
+                                @can('admin',$contest)
+                                    @if($submission->result == 'Ai detected')
+                                        <form action="{{ route('contest.submission.accept',['contest' => $contest->id, 'submission' => $submission->id]) }}" method="post" class="d-inline-block">
+                                            @csrf
+                                            <button type="submit" class="d-flex action-btn" style="all: unset; cursor: pointer">
+                                                <i class="las la-check-square"></i>
+                                            </button>
+                                        </form>
+                                    @else
+                                        <form action="{{ route('contest.submission.rejectAI',['contest' => $contest->id, 'submission' => $submission->id]) }}" method="post" class="d-inline-block">
+                                            @csrf
+                                            <button type="submit" class="d-flex action-btn" style="all: unset; cursor: pointer">
+                                                <i class="las la-robot"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                @endcan
+                            @endif
                         </div>
                     </td>
                 </tr>
@@ -267,7 +288,7 @@
         </div>
     </div>
     @if (config('app.livewire'))
-        <livewire:sync-submission-component :global="$global" :contest="$contest ?? ($contestService->contest ?? null)" :lastCheck="$lastUpdated" />
+        <livewire:sync-submission-component :global="$global" :contest="$contest" :lastCheck="$lastUpdated" />
     @endif
 </div>
 
@@ -474,6 +495,7 @@
                 style = "#aa0"
                 break;
 
+            case 'Ai detected':
             case 'Time limit':
             case 'Memory limit':
                 style = "#00a"
@@ -514,6 +536,7 @@
                 case 'Memory limit':
                 case 'Runtime error':
                 case 'Accepted':
+                case 'Ai detected':
                     suspense = data.suspense;
                     break;
                 case 'Compilation error':
@@ -530,6 +553,7 @@
                     case 'Compilation error':
                     case 'Runtime error':
                     case 'Error':
+                    case 'Ai detected':
                     case 'Wrong answer':
                     case 'Time limit':
                     case 'Memory limit':

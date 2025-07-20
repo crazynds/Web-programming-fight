@@ -17,7 +17,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-4" style="border-right: black dashed 1px; min-height: 70vh">
+        <div class="col-5" style="border-right: black dashed 1px; min-height: 70vh">
             <form action="{{ route('contest.recomputateScores', ['contest' => $contest->id]) }}" method="post">
                 @csrf
                 <button type="submit" style="float:right"> Re-computate Scores </button>
@@ -106,7 +106,7 @@
                 @endforeach
             </div>
         </div>
-        <div class="col-4" style="border-right: black dashed 1px; min-height: 70vh">
+        <div class="col-3" style="border-right: black dashed 1px; min-height: 70vh">
             <h4>Clarifications</h4>
             @if ($errors->any())
                 <div class="row mt-3">
@@ -155,7 +155,7 @@
                 <hr />
             @endforeach
         </div>
-        <div class="col-4">
+        <div class="col-2">
             <table border="1" id="ranking">
                 <thead>
                     <tr>
