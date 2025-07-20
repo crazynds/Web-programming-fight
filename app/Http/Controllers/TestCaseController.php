@@ -27,19 +27,19 @@ class TestCaseController extends Controller
             ->withCount([
                 'submissions',
                 'submissions as accepted_runs' => function ($query) {
-                    $query->where('submit_run_test_case.result', '=', SubmitResult::Accepted);
+                    $query->where('submission_test_case.result', '=', SubmitResult::Accepted);
                 },
                 'submissions as runtime_error_runs' => function ($query) {
-                    $query->where('submit_run_test_case.result', '=', SubmitResult::RuntimeError);
+                    $query->where('submission_test_case.result', '=', SubmitResult::RuntimeError);
                 },
                 'submissions as memory_limit_runs' => function ($query) {
-                    $query->where('submit_run_test_case.result', '=', SubmitResult::MemoryLimit);
+                    $query->where('submission_test_case.result', '=', SubmitResult::MemoryLimit);
                 },
                 'submissions as time_limit_runs' => function ($query) {
-                    $query->where('submit_run_test_case.result', '=', SubmitResult::TimeLimit);
+                    $query->where('submission_test_case.result', '=', SubmitResult::TimeLimit);
                 },
                 'submissions as wrong_answer_runs' => function ($query) {
-                    $query->where('submit_run_test_case.result', '=', SubmitResult::WrongAnswer);
+                    $query->where('submission_test_case.result', '=', SubmitResult::WrongAnswer);
                 },
             ])
             ->orderBy('position')->get();
