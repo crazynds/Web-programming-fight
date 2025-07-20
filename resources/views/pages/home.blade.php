@@ -55,9 +55,9 @@
                         'author' => 'Crazynds',
                         'features' => [
                             'Added Tag crud for admins.',
-                            'Added leaderboard filters.'
-                            'Added manual judge in contest admin pannel.'
-                            'Added AI detection on contest submissions.'
+                            'Added leaderboard filters.',
+                            'Added manual judge in contest admin pannel.',
+                            'Added AI detection on contest submissions.',
                             'Add fields location information required in teams creation.'
                         ],
                         'changes' => [
