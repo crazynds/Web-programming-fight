@@ -120,7 +120,9 @@
                         @if (!$contestService->inContest || $contestService->started)
                             <a href="{{ route('problem.index') }}">Problems</a> |
                             {{-- <a href="{{ route('submission.create') }}">Submit</a> | --}}
-                            <a href="{{ route('tag.index') }}">Tags</a> |
+                            @if (!$contestService->inContest)
+                                <a href="{{ route('tag.index') }}">Tags</a> |
+                            @endif
                             <a href="{{ route('submission.index') }}">Runs</a>
                         @else
                             <span style="font-size: 12pt;">

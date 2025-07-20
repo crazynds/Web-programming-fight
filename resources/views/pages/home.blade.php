@@ -68,6 +68,8 @@
                         'fixes' => [
                             'When sending a binary as auto detect result in an internal error.',
                             'When a new team enters the contest, the leaderboard does not update.'
+                            'Removed searchbar in problems during a contest.'
+                            'Removed tags in menu during a contest.'
                         ]
                     ],
                     [

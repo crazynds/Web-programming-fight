@@ -12,26 +12,28 @@
             <b>
                 Problems:
             </b>
-            <form style="display: inline-block;" col="row">
-                @if ($vjudgeService->isEnabled() && !$contestService->inContest)
+            @if(!$contestService->inContest)
+                <form style="display: inline-block;" col="row">
+                    @if ($vjudgeService->isEnabled())
+                        <div style="display: inline-block;">
+                            <select class="form-select select2" name="onlineJudge">
+                                <option value="" @if (!($onlineJudge ?? false)) selected @endif>Local</option>
+                                @foreach ($vjudgeService->avaliableJudges() as $judge)
+                                    <option value="{{ $judge }}" @if (($onlineJudge ?? false) == $judge) selected @endif>
+                                        {{ $judge }}</option>
+                                @endforeach
+                                <input type="hidden" name="tag" value="{{ $tag ?? '' }}">
+                            </select>
+                        </div>
+                    @endif
                     <div style="display: inline-block;">
-                        <select class="form-select select2" name="onlineJudge">
-                            <option value="" @if (!($onlineJudge ?? false)) selected @endif>Local</option>
-                            @foreach ($vjudgeService->avaliableJudges() as $judge)
-                                <option value="{{ $judge }}" @if (($onlineJudge ?? false) == $judge) selected @endif>
-                                    {{ $judge }}</option>
-                            @endforeach
-                            <input type="hidden" name="tag" value="{{ $tag ?? '' }}">
-                        </select>
+                        <input class="form-control" name="search" value="{{ $search ?? '' }}" />
                     </div>
-                @endif
-                <div style="display: inline-block;">
-                    <input class="form-control" name="search" value="{{ $search ?? '' }}" />
-                </div>
-                <div style="display: inline-block;">
-                    <button type="submit">Search</button>
-                </div>
-            </form>
+                    <div style="display: inline-block;">
+                        <button type="submit">Search</button>
+                    </div>
+                </form>
+            @endif
         </div>
         <div class="col-4">
             @if (!$contestService->inContest)
