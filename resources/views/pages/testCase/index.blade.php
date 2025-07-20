@@ -126,10 +126,10 @@
                         {{ $testCase->wrong_answer_runs }}
                     </td>
                     <td class="text-center">
-                        @if ($testCase->submit_runs_count == 0)
+                        @if ($testCase->submissions_count == 0)
                             --%
                         @else
-                            {{ round(($testCase->accepted_runs / $testCase->submit_runs_count) * 100, 2) }}%
+                            {{ round(($testCase->accepted_runs / $testCase->submissions_count) * 100, 2) }}%
                         @endif
                     </td>
                     <td class="text-center">
