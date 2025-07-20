@@ -50,7 +50,7 @@
                 $changelogs = [
                     [
                         'version' => 'v1.1.1',
-                        'title' => '!',
+                        'title' => 'Preparation for "II Maratona Gaúcha"!',
                         'date' => '18-07-2025',
                         'author' => 'Crazynds',
                         'features' => [
