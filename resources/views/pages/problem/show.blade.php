@@ -63,7 +63,9 @@
                     </div>
                     <div class="vr"></div>
                     <a href="{{ route('submission.create', ['problem' => $problem->id]) }}">
+                        <button type="button">
                         Submit
+                        </button>
                     </a>
 
                 </div>

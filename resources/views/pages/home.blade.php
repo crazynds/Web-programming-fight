@@ -58,18 +58,19 @@
                             'Added leaderboard filters.',
                             'Added manual judge in contest admin pannel.',
                             'Added AI detection on contest submissions.',
-                            'Add fields location information required in teams creation.'
+                            'Add fields location information required in teams creation.',
                         ],
                         'changes' => [
                         ],
                         'styles' => [
-                            'New background in new clarifications in admin pannel.'
+                            'New background in new clarifications in admin pannel.',
+                            'Submit button inside a problem is now highlighted.',
                         ],
                         'fixes' => [
                             'When sending a binary as auto detect result in an internal error.',
-                            'When a new team enters the contest, the leaderboard does not update.'
-                            'Removed searchbar in problems during a contest.'
-                            'Removed tags in menu during a contest.'
+                            'When a new team enters the contest, the leaderboard does not update.',
+                            'Removed searchbar in problems during a contest.',
+                            'Removed tags in menu during a contest.',
                         ]
                     ],
                     [
