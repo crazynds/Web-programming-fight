@@ -18,19 +18,19 @@ RUN apt-get update \
 RUN add-apt-repository ppa:deadsnakes/ppa 
 
 RUN apt-get update \
-    && apt-get install -y php8.2-cli php8.2-dev \
-    php8.2-gd \
-    php8.2-curl \
-    php8.2-imap php8.2-mysql php8.2-mbstring \
-    php8.2-zip \
-    php8.2-intl php8.2-readline php8.2-fpm \
-    php8.2-ldap \
-    php8.2-xml \
-    php8.2-redis php8.2-swoole \
+    && apt-get install -y php8.3-cli php8.3-dev \
+    php8.3-gd \
+    php8.3-curl \
+    php8.3-imap php8.3-mysql php8.3-mbstring \
+    php8.3-zip \
+    php8.3-intl php8.3-readline php8.3-fpm \
+    php8.3-ldap \
+    php8.3-xml \
+    php8.3-redis php8.3-swoole \
     && curl -sLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
 
 
-RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.2
+RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.3
 
 RUN apt-get install -y dos2unix mariadb-client python3.11 python3-pip
 
