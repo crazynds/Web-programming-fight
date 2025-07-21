@@ -1,0 +1,1 @@
+import{c as n,j as e,R as o,A as s}from"./assets/index-BdBlAGk9.js";const t=document.getElementById("root"),a=(t==null?void 0:t.dataset.path)||"";n.createRoot(t).render(e.jsx(o.StrictMode,{children:e.jsx(s,{path:a,environment:"development"})}));

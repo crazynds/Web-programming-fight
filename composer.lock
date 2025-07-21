@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aad32b40d13a4599b7af4aa92177dc88",
+    "content-hash": "ea74bbd4f486e0054f8720eb7d850b77",
     "packages": [
         {
             "name": "alexusmai/laravel-file-manager",
@@ -3978,6 +3978,94 @@
             "time": "2025-07-17T05:12:15+00:00"
         },
         {
+            "name": "luminarix/laravel-web-tinker",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/luminarix/laravel-web-tinker.git",
+                "reference": "7884a85a7afd0faa4b0719f2ccdea00f0a25172c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/luminarix/laravel-web-tinker/zipball/7884a85a7afd0faa4b0719f2ccdea00f0a25172c",
+                "reference": "7884a85a7afd0faa4b0719f2ccdea00f0a25172c",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^11.0|^12.0",
+                "php": "^8.3",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "larastan/larastan": "^v3.1.0",
+                "laravel/pint": "^v1.21.0",
+                "nunomaduro/collision": "^8.1.1",
+                "orchestra/testbench": "^9.0.0|^10.0.0",
+                "pestphp/pest": "^v3.7.4",
+                "pestphp/pest-plugin-arch": "^v3.0.0",
+                "pestphp/pest-plugin-laravel": "^v3.1.0",
+                "phpstan/extension-installer": "^1.4.2",
+                "phpstan/phpstan-deprecation-rules": "^2.0.1",
+                "phpstan/phpstan-phpunit": "^2.0.4"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "LaravelWebTinker": "Luminarix\\LaravelWebTinker\\Facades\\LaravelWebTinker"
+                    },
+                    "providers": [
+                        "Luminarix\\LaravelWebTinker\\LaravelWebTinkerServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Luminarix\\LaravelWebTinker\\": "src/",
+                    "Luminarix\\LaravelWebTinker\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Luminarix Labs",
+                    "email": "hello@luminarix.dev",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Lajos Gere",
+                    "email": "streetnoizenova@gmail.com",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Mark Magyar",
+                    "email": "notpsychopath@proton.me",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Small Laravel package to use Tinker in your browser",
+            "homepage": "https://github.com/luminarix/laravel-web-tinker",
+            "keywords": [
+                "Luminarix Labs",
+                "laravel",
+                "laravel-web-tinker"
+            ],
+            "support": {
+                "issues": "https://github.com/luminarix/laravel-web-tinker/issues",
+                "source": "https://github.com/luminarix/laravel-web-tinker/tree/v1.1.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/luminarix",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-04-07T11:37:27+00:00"
+        },
+        {
             "name": "maennchen/zipstream-php",
             "version": "2.4.0",
             "source": {
@@ -6843,78 +6931,6 @@
                 }
             ],
             "time": "2025-07-17T15:46:43+00:00"
-        },
-        {
-            "name": "spatie/laravel-web-tinker",
-            "version": "1.10.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/spatie/laravel-web-tinker.git",
-                "reference": "08f04b640d72c8987999e562fa0e0c5f86c12455"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-web-tinker/zipball/08f04b640d72c8987999e562fa0e0c5f86c12455",
-                "reference": "08f04b640d72c8987999e562fa0e0c5f86c12455",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/cookie": "^10.0|^11.0|^12.0",
-                "illuminate/session": "^10.0|^11.0|^12.0",
-                "illuminate/support": "^10.0|^11.0|^12.0",
-                "laravel/tinker": "^2.0",
-                "php": "^8.2"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^8.0|^9.0|^10.0",
-                "phpunit/phpunit": "^9.0|^10.5|^11.5.3"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Spatie\\WebTinker\\WebTinkerServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Spatie\\WebTinker\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
-                    "homepage": "https://spatie.be",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Artisan Tinker in your browser",
-            "homepage": "https://github.com/spatie/laravel-web-tinker",
-            "keywords": [
-                "Tinker",
-                "debug",
-                "development",
-                "laravel",
-                "spatie",
-                "web-tinker"
-            ],
-            "support": {
-                "issues": "https://github.com/spatie/laravel-web-tinker/issues",
-                "source": "https://github.com/spatie/laravel-web-tinker/tree/1.10.1"
-            },
-            "funding": [
-                {
-                    "url": "https://spatie.be/open-source/support-us",
-                    "type": "custom"
-                }
-            ],
-            "time": "2025-02-17T10:39:12+00:00"
         },
         {
             "name": "spatie/pdf-to-text",

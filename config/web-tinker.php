@@ -3,16 +3,10 @@
 use Laravel\Pulse\Http\Middleware\Authorize;
 
 return [
-
     /*
      * The web tinker page will be available on this path.
      */
     'path' => '/tinker',
-
-    /*
-     * Possible values are 'auto', 'light' and 'dark'.
-     */
-    'theme' => 'auto',
 
     /*
      * By default this package will only run in local development.
@@ -22,9 +16,9 @@ return [
 
     /*
     * This class can modify the output returned by Tinker. You can replace this with
-    * any class that implements \Spatie\WebTinker\OutputModifiers\OutputModifier.
+    * any class that implements \Luminarix\WebTinker\OutputModifiers\OutputModifier.
     */
-    'output_modifier' => \Spatie\WebTinker\OutputModifiers\PrefixDateTime::class,
+    'output_modifier' => Luminarix\LaravelWebTinker\OutputModifiers\PrefixDateTime::class,
 
     /*
     * These middleware will be assigned to every WebTinker route, giving you the chance
