@@ -195,6 +195,13 @@
       0 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
     ),
   ),
+  'spatie/laravel-web-tinker' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Spatie\\WebTinker\\WebTinkerServiceProvider',
+    ),
+  ),
   'stechstudio/laravel-zipstream' => 
   array (
     'aliases' => 
