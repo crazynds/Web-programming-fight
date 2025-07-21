@@ -61,7 +61,7 @@ class ExecutorService
 
     public function setup(Problem $problem, File $code, string $language)
     {
-        if ($problem->diff_program_language) {
+        if ($problem->diff_program_language && $problem->diffProgram) {
             // Compile diff program
             $result = $this->buildProgram($problem->diffProgram, $problem->diff_program_language, 'diff_exec');
             // Get diff config from current config
