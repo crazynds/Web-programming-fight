@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e2a3e8d591b9792ae35e30fa4d3bd5e4",
+    "content-hash": "1c1834bf90e8ec61fe30dbca93816e24",
     "packages": [
         {
             "name": "alexusmai/laravel-file-manager",
@@ -3976,94 +3976,6 @@
                 }
             ],
             "time": "2025-07-17T05:12:15+00:00"
-        },
-        {
-            "name": "luminarix/laravel-web-tinker",
-            "version": "v1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/luminarix/laravel-web-tinker.git",
-                "reference": "7884a85a7afd0faa4b0719f2ccdea00f0a25172c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/luminarix/laravel-web-tinker/zipball/7884a85a7afd0faa4b0719f2ccdea00f0a25172c",
-                "reference": "7884a85a7afd0faa4b0719f2ccdea00f0a25172c",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/contracts": "^11.0|^12.0",
-                "php": "^8.3",
-                "spatie/laravel-package-tools": "^1.16"
-            },
-            "require-dev": {
-                "larastan/larastan": "^v3.1.0",
-                "laravel/pint": "^v1.21.0",
-                "nunomaduro/collision": "^8.1.1",
-                "orchestra/testbench": "^9.0.0|^10.0.0",
-                "pestphp/pest": "^v3.7.4",
-                "pestphp/pest-plugin-arch": "^v3.0.0",
-                "pestphp/pest-plugin-laravel": "^v3.1.0",
-                "phpstan/extension-installer": "^1.4.2",
-                "phpstan/phpstan-deprecation-rules": "^2.0.1",
-                "phpstan/phpstan-phpunit": "^2.0.4"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "aliases": {
-                        "LaravelWebTinker": "Luminarix\\LaravelWebTinker\\Facades\\LaravelWebTinker"
-                    },
-                    "providers": [
-                        "Luminarix\\LaravelWebTinker\\LaravelWebTinkerServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Luminarix\\LaravelWebTinker\\": "src/",
-                    "Luminarix\\LaravelWebTinker\\Database\\Factories\\": "database/factories/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Luminarix Labs",
-                    "email": "hello@luminarix.dev",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Lajos Gere",
-                    "email": "streetnoizenova@gmail.com",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Mark Magyar",
-                    "email": "notpsychopath@proton.me",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Small Laravel package to use Tinker in your browser",
-            "homepage": "https://github.com/luminarix/laravel-web-tinker",
-            "keywords": [
-                "Luminarix Labs",
-                "laravel",
-                "laravel-web-tinker"
-            ],
-            "support": {
-                "issues": "https://github.com/luminarix/laravel-web-tinker/issues",
-                "source": "https://github.com/luminarix/laravel-web-tinker/tree/v1.1.0"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/luminarix",
-                    "type": "github"
-                }
-            ],
-            "time": "2025-04-07T11:37:27+00:00"
         },
         {
             "name": "maennchen/zipstream-php",
