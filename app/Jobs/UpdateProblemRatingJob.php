@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Enums\SubmitResult;
 use App\Models\Problem;
 use App\Models\Rating;
 use Illuminate\Bus\Queueable;
@@ -9,9 +10,8 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
-class UpdateProblemRatingJob implements ShouldQueue, ShouldBeUnique
+class UpdateProblemRatingJob implements ShouldBeUnique, ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
@@ -28,12 +28,75 @@ class UpdateProblemRatingJob implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
+        $problemIds = [];
         Rating::where('computed', false)->select('problem_id')->distinct()->get()->each(function ($rating) {
             /** @var Problem */
-            $problem = Problem::find($rating->problem_id);
-            $problem->rating = $problem->ratings()->avg('value');
-            $problem->save();
+            $rating->computed = true;
+            $rating->save();
+            $problemIds[] = $rating->problem_id;
         });
-        Rating::where('computed', false)->update(['computed' => true]);
+        $sumUsers = 0;
+        $sumResolutions = 0;
+        $problemCount = Problem::count();
+        $problems = [];
+        foreach (Problem::lazy() as $problem) {
+            $usersWhoTried = $problem->submissions()->whereHas('user')->distinct('user_id')->where('user_id', '!=', $problem->user_id)->count()
+                           + $problem->submissions()->join('competitor_submission', 'submissions.id', 'competitor_submission.submission_id')->distinct('competitor_id')->count();
+            $usersWhoResolved = $problem->submissions()->whereHas('user')->distinct('user_id')->where('user_id', '!=', $problem->user_id)->where('result', SubmitResult::Accepted)->count();
+            $totalTries = $problem->submissions()->where('user_id', '!=', $problem->user_id)->count();
+            $totalResolutions = $problem->submissions()->where('result', SubmitResult::Accepted)->where('user_id', '!=', $problem->user_id)->count();
+            $sumUsers += $usersWhoResolved / max(1, $usersWhoTried);
+            $sumResolutions += $totalResolutions / max(1, $totalTries);
+            $problems[$problem->id] = [
+                'usersWhoTried' => $usersWhoTried,
+                'usersWhoResolved' => $usersWhoResolved,
+                'totalTries' => $totalTries,
+                'totalResolutions' => $totalResolutions,
+            ];
+        }
+        $meanUsers = $sumUsers / $problemCount;
+        $meanResolutions = $sumResolutions / $problemCount;
+        foreach (Problem::lazy() as $problem) {
+            $sum = $problem->ratings()->sum('value');
+            $count = $problem->ratings()->count();
+            $data = $problems[$problem->id];
+            $difficulty = $this->calcular_dificuldade(
+                $data['usersWhoTried'],
+                $data['usersWhoResolved'],
+                $data['totalTries'],
+                $data['totalResolutions'],
+                $meanUsers,
+                $meanResolutions
+            );
+            $problem->rating = ($sum + $difficulty) / ($count + 1);
+            $problem->save();
+        }
+    }
+
+    private function calcular_dificuldade(
+        $n_total_pessoas,
+        $n_pessoas_que_resolveram,
+        $n_total_tentativas,
+        $n_resolucoes,
+        $media_pessoas_que_resolveram,
+        $media_taxa_acerto_tentativas
+    ) {
+        if ($n_total_pessoas == 0 || $media_pessoas_que_resolveram == 0 || $media_taxa_acerto_tentativas == 0) {
+            return 10.0;
+        }
+
+        // Parte 1: dificuldade baseada na comparação de resoluções
+        $resolucoes_relativas = ($n_pessoas_que_resolveram / $n_total_pessoas) / max(1, $media_pessoas_que_resolveram);
+        $dificuldade_resolucao = max(0.0, 1 - $resolucoes_relativas); // mais resoluções que a média = mais fácil
+
+        // Parte 2: dificuldade baseada em taxa de acerto por tentativa
+        $taxa_relativa = ($n_resolucoes / max(1, $n_total_tentativas)) / max(1, $media_taxa_acerto_tentativas);
+        $dificuldade_tentativas = max(0.0, 1 - $taxa_relativa); // taxa de acerto maior = mais fácil
+
+        // Combinação ponderada (ajuste os pesos conforme desejar)
+        $dificuldade_bruta = 0.75 * $dificuldade_resolucao + 0.25 * $dificuldade_tentativas;
+
+        // Escala final de 0 a 10
+        return round($dificuldade_bruta * 10, 2);
     }
 }
