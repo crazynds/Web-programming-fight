@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Enums\SubmitStatus;
 use App\Events\UpdateSubmissionEvent;
 use App\Models\Contest;
 use App\Models\Submission;
@@ -82,6 +83,9 @@ class SyncSubmissionComponent extends Component
     {
         $newests = $this->getQuery()->where('submissions.updated_at', '>', $this->lastCheck)->get();
         foreach ($newests as $run) {
+            if ($run->status == SubmitStatus::getDescription(SubmitStatus::AwaitingAdminJudge)) {
+                continue;
+            }
             $event = new UpdateSubmissionEvent($run);
             $this->dispatch('updateSubmissionEvent', $event->data);
             $this->lastCheck = max($this->lastCheck, $run->updated_at);
