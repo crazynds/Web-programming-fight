@@ -228,7 +228,8 @@
                         @continue
                     @endif
                 @endif
-                <tr id="row{{ $competitor->id }}" data-id="{{ $competitor->id }}">
+                <tr id="row{{ $competitor->id }}" data-id="{{ $competitor->id }}"
+                    style="@if($competitor->id == $contestService->competitor->id)background: lightsteelblue; @endif">
                     <td class="px-1">
                         {{ $loop->iteration }}⁰
                     </td>

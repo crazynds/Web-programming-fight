@@ -65,7 +65,8 @@
                         'styles' => [
                             'New background in new clarifications in admin pannel.',
                             'Submit button inside a problem is now highlighted.',
-                            'Real time update in contest leaderboard.'
+                            'Real time update in contest leaderboard.',
+                            'Added background color in leaderboard for your team.'
                         ],
                         'fixes' => [
                             'When sending a binary as auto detect result in an internal error.',
