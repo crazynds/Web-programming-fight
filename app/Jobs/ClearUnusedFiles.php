@@ -68,10 +68,12 @@ class ClearUnusedFiles implements ShouldBeUnique, ShouldQueue
         }
 
         $recovered = 0;
+        $files = 0;
         foreach (File::lazy() as $file) {
             try {
                 $file->delete();
                 $recovered += $file->size;
+                $files++;
                 Log::channel('leakedfiles')->info(
                     sprintf('Deletei um file inutil: %s', $file)
                 );
@@ -80,7 +82,12 @@ class ClearUnusedFiles implements ShouldBeUnique, ShouldQueue
         }
         if ($recovered > 0) {
             Log::channel('leakedfiles')->warning(
-                sprintf('Recuperado em bytes de arquivos inuteis', $recovered)
+                sprintf('Recuperado em bytes de arquivos inuteis', [
+                    'bytes' => $recovered,
+                    'megabytes' => $recovered / 1024,
+                    'gigabytes' => $recovered / (1024 * 1024),
+                    'files' => $files,
+                ])
             );
         }
     }
