@@ -135,11 +135,11 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
         ->name('contest.register');
     Route::post('/contest/{contest}/unregister', [ContestController::class, 'unregister'])
         ->name('contest.unregister');
-    Route::post('/constest/{contest}/enter', [ContestController::class, 'enter'])
+    Route::post('/contest/{contest}/enter', [ContestController::class, 'enter'])
         ->name('contest.enter');
-    Route::get('/constest/{contest}/leaderboard', [ContestController::class, 'leaderboard'])
+    Route::get('/contest/{contest}/leaderboard', [ContestController::class, 'leaderboard'])
         ->name('contest.leaderboard');
-    Route::get('/constest/{contest}/submissions', [SubmissionController::class, 'global'])
+    Route::get('/contest/{contest}/submissions', [SubmissionController::class, 'global'])
         ->name('contest.submissions')
         ->can('viewSubmissions', 'contest');
     Route::get('/contest/{contest}/admin', [ContestController::class, 'admin'])

@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Enums\SubmitResult;
 use App\Models\Competitor;
 use App\Models\Contest;
 use App\Models\Submission;
@@ -30,33 +29,8 @@ class ContestComputeScore extends RecalculateCompetitorScore implements ShouldQu
 
     protected function compute(): void
     {
-        switch ($this->submission->result) {
-            case SubmitResult::fromValue(SubmitResult::Accepted)->description:
-                $computedPontuation = $this->calculateScore($this->contest, $this->submission);
-                $problemsCount = $this->competitor->submissions()
-                    ->where('problem_id', $this->submission->problem_id)
-                    ->where('id', '<', $this->submission->id)
-                    ->whereNotIn('result', $this->ignoreResults)->count();
-                $penality = $this->calculatePenality($this->submission, $problemsCount);
-
-                $this->updateCompetitorScore($this->submission, $computedPontuation, $penality);
-
-                // Clear leaderboard cache
-                Cache::forget('contest:leaderboard:'.$this->contest->id);
-                break;
-            case SubmitResult::fromValue(SubmitResult::TimeLimit)->description:
-            case SubmitResult::fromValue(SubmitResult::MemoryLimit)->description:
-            case SubmitResult::fromValue(SubmitResult::RuntimeError)->description:
-            case SubmitResult::fromValue(SubmitResult::WrongAnswer)->description:
-                if ($this->contest->parcial_solution && false) {
-                    // TODO: COMPUTE IF IS PARCIAL SOLUTION
-                }
-                Cache::forget('contest:leaderboard:'.$this->contest->id);
-                break;
-            case SubmitResult::fromValue(SubmitResult::CompilationError)->description:
-            default:
-                Cache::forget('contest:leaderboard:'.$this->contest->id);
-                break;
-        }
+        $arr = [];
+        $this->computeSubmit($this->submission, $arr);
+        Cache::forget('contest:leaderboard:'.$this->contest->id);
     }
 }

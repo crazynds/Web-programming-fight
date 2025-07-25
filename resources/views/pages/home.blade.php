@@ -65,10 +65,12 @@
                         'styles' => [
                             'New background in new clarifications in admin pannel.',
                             'Submit button inside a problem is now highlighted.',
+                            'Real time update in contest leaderboard.'
                         ],
                         'fixes' => [
                             'When sending a binary as auto detect result in an internal error.',
                             'When a new team enters the contest, the leaderboard does not update.',
+                            'Renamed \'constest\' routes to \'contest\'.',
                             'Removed searchbar in problems during a contest.',
                             'Removed tags in menu during a contest.',
                         ]

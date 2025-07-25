@@ -14,6 +14,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class RecalculateCompetitorScore implements ShouldQueue
 {
@@ -63,17 +64,33 @@ class RecalculateCompetitorScore implements ShouldQueue
         $this->competitor->scores()->delete();
         /** @var Submission */
         foreach ($submissions as $submit) {
-            if ($submit->result == SubmitResult::getDescription(SubmitResult::Accepted) || $submit->result == SubmitResult::getDescription(SubmitResult::AiDetected)) {
-                $computedPontuation = $this->calculateScore($this->contest, $submit);
-                $penality = $this->calculatePenality($submit, $problemsPenality[$submit->problem_id] ?? 0);
-                $this->updateCompetitorScore($submit, $computedPontuation, $penality);
-            } else {
-                $problemsPenality[$submit->problem_id] = ($problemsPenality[$submit->problem_id] ?? 0) + 1;
-                // erro no geral
-            }
+            $this->computeSubmit($submit, $problemsPenality);
         }
         DB::commit();
         Cache::forget('contest:leaderboard:'.$this->contest->id);
+    }
+
+    protected function computeSubmit(Submission $submit, array &$problemsPenality)
+    {
+        if ($submit->result == SubmitResult::getDescription(SubmitResult::Accepted) || $submit->result == SubmitResult::getDescription(SubmitResult::AiDetected)) {
+            $computedPontuation = $this->calculateScore($this->contest, $submit);
+            if (! isset($problemsPenality[$submit->problem_id])) {
+                $problemsPenality[$submit->problem_id] = $this->competitor->submissions()
+                    ->where('problem_id', $submit->problem_id)
+                    ->where('id', '<', $submit->id)
+                    ->whereNotIn('result', $this->ignoreResults)->count();
+            }
+            $penality = $this->calculatePenality($submit, $problemsPenality[$submit->problem_id] ?? 0);
+            $this->updateCompetitorScore($submit, $computedPontuation, $penality);
+        } elseif (! in_array($submit->result, array_map(fn ($result) => SubmitResult::getDescription($result), $this->ignoreResults))) {
+            $problemsPenality[$submit->problem_id] = ($problemsPenality[$submit->problem_id] ?? 0) + 1;
+            // erro no geral
+        }
+    }
+
+    public function failed(Throwable $exception): void
+    {
+        dump($exception);
     }
 
     protected function updateCompetitorScore(Submission $submit, int $computedPontuation, int $penality)

@@ -112,7 +112,7 @@ class SubmissionController extends Controller
                 $run->contest()->associate($this->contestService->contest);
                 $this->contestService->competitor->submissions()->attach($run);
             }
-            if ($run->status == SubmitStatus::fromValue(SubmitStatus::WaitingInLine)->description) {
+            if ($run->status == SubmitStatus::getDescription(SubmitStatus::WaitingInLine)) {
                 if ($run->language == LanguagesType::name(LanguagesType::Auto_detect)) {
                     switch (strtolower($originalFile->getClientOriginalExtension())) {
                         case 'c':
@@ -136,17 +136,19 @@ class SubmissionController extends Controller
                         default:
                             $run->language = LanguagesType::BINARY;
                             $run->result = SubmitResult::LanguageNotSupported;
-                            $run->file->delete();
+                            $run->status = SubmitStatus::Judged;
+                            $file = $run->file;
+                            $run->file_id = null;
+                            $run->save();
+                            $file->delete();
                             break;
-
                     }
                 }
-                if ($run->language != LanguagesType::BINARY) {
+                if ($run->status == SubmitStatus::getDescription(SubmitStatus::WaitingInLine)) {
                     $job = ExecuteSubmitJob::dispatch($run)->delay(now()->addSeconds(5))->afterCommit();
                     if ($this->contestService->started && $this->contestService->inContest) {
                         $job->onQueue('contest');
                     }
-
                 }
             }
             $run->save();
