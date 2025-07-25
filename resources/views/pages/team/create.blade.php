@@ -78,7 +78,7 @@
 
         <div class="row mt-3">
             <div class="col">
-                <label for="membersjson" class="form-label">Membros: </label><br />
+                <label for="membersjson" class="form-label">Members: </label><br />
                 <input id="tags" name="membersjson" placeholder="Members nickname"
                     value="{{ old('membersjson', $team->membersjson()) }}">
                 <small>
