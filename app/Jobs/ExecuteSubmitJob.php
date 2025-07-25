@@ -167,6 +167,18 @@ class ExecuteSubmitJob implements ShouldBeUnique, ShouldQueue
     {
         // Log::channel('events')->info('Executing submit ' . $this->submit->id);
         $file = $this->submit->file;
+
+        if (! $file) {
+            $this->submit->status = SubmitStatus::Judged;
+            $this->submit->result = SubmitResult::InvalidUtf8File;
+            $this->submit->output = null;
+            $this->submit->execution_memory = null;
+            $this->submit->execution_time = null;
+            $this->submit->save();
+
+            return;
+        }
+
         $this->submit->status = SubmitStatus::Judging;
         $this->submit->result = SubmitResult::NoResult;
         $this->submit->output = null;

@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\File;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -11,10 +12,10 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Sysatom\BloomFilter;
 use Illuminate\Support\Str;
+use Sysatom\BloomFilter;
 
-class ClearUnusedFiles implements ShouldQueue, ShouldBeUnique
+class ClearUnusedFiles implements ShouldBeUnique, ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -38,13 +39,13 @@ class ClearUnusedFiles implements ShouldQueue, ShouldBeUnique
         $randPrefix = Str::random(12);
         foreach (File::whereNull('content')->lazy() as $file) {
             $path = $file->path;
-            $filter->add($randPrefix . $path);
+            $filter->add($randPrefix.$path);
         }
         $toDelete = [];
         $storage = Storage::disk(config('filesystems.default'));
         foreach ($storage->allFiles() as $file) {
 
-            if (!$filter->lookup($randPrefix . $file)) {
+            if (! $filter->lookup($randPrefix.$file)) {
                 $toDelete[] = $file;
                 $size = $storage->size($file);
                 Log::channel('leakedfiles')->info(
@@ -64,6 +65,23 @@ class ClearUnusedFiles implements ShouldQueue, ShouldBeUnique
             } else {
                 $storage->delete($path);
             }
+        }
+
+        $recovered = 0;
+        foreach (File::lazy() as $file) {
+            try {
+                $file->delete();
+                $recovered += $file->size;
+                Log::channel('leakedfiles')->info(
+                    sprintf('Deletei um file inutil: %s', $file)
+                );
+            } catch (Exception $exection) {
+            }
+        }
+        if ($recovered > 0) {
+            Log::channel('leakedfiles')->warning(
+                sprintf('Recuperado em bytes de arquivos inuteis', $recovered)
+            );
         }
     }
 }
