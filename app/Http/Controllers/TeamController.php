@@ -13,7 +13,6 @@ use Illuminate\Support\Str;
 
 class TeamController extends Controller
 {
-
     public function __construct()
     {
         $this->authorizeResource(Team::class, 'team');
@@ -26,18 +25,20 @@ class TeamController extends Controller
     {
         /** @var User */
         $user = Auth::user();
+
         return view('pages.team.index', [
-            'teams' => $user->teams()->withPivot(['accepted', 'owner'])->withCount(['members', 'invited'])->get()
+            'teams' => $user->teams()->withPivot(['accepted', 'owner'])->withCount(['members', 'invited'])->get(),
         ]);
     }
 
     public function accept(Team $team)
     {
-        Gate::authorize('modifyMembers', $team);
+        // Gate::authorize('modifyMembers', $team);
         $user = Auth::user();
         $team->related()->updateExistingPivot($user, [
-            'accepted' => true
+            'accepted' => true,
         ]);
+
         return redirect()->route('team.index');
     }
 
@@ -46,6 +47,7 @@ class TeamController extends Controller
         Gate::authorize('leave', $team);
         $user = Auth::user();
         $team->related()->detach($user);
+
         return redirect()->route('team.index');
     }
 
@@ -53,6 +55,7 @@ class TeamController extends Controller
     {
         $user = Auth::user();
         $team->related()->detach($user);
+
         return redirect()->route('team.index');
     }
 
@@ -61,7 +64,7 @@ class TeamController extends Controller
      */
     public function create(Request $request)
     {
-        return $this->edit(new Team());
+        return $this->edit(new Team);
     }
 
     /**
@@ -73,6 +76,8 @@ class TeamController extends Controller
             'name',
             'acronym',
             'institution_acronym',
+            'country',
+            'state',
         ]);
         if (isset($data['institution_acronym'])) {
             $data['institution_acronym'] = Str::upper($data['institution_acronym']);
@@ -83,7 +88,7 @@ class TeamController extends Controller
         $team->save();
         $team->members()->attach($user, [
             'owner' => true,
-            'accepted' => true
+            'accepted' => true,
         ]);
 
         return $this->update($request, $team);
@@ -103,7 +108,7 @@ class TeamController extends Controller
     public function edit(Team $team)
     {
         return view('pages.team.create', [
-            'team' => $team
+            'team' => $team,
         ]);
     }
 
@@ -117,6 +122,8 @@ class TeamController extends Controller
                 'name',
                 'acronym',
                 'institution_acronym',
+                'country',
+                'state',
             ]);
             if (isset($data['institution_acronym'])) {
                 $data['institution_acronym'] = Str::upper($data['institution_acronym']);
@@ -149,6 +156,7 @@ class TeamController extends Controller
             $removeMembers = $team->members()->where('owner', false)->whereNotIn('id', $idsAdded)->get();
             $team->related()->detach($removeMembers);
         });
+
         return redirect()->route('team.index');
     }
 
@@ -158,6 +166,7 @@ class TeamController extends Controller
     public function destroy(Team $team)
     {
         $team->delete();
+
         return redirect()->route('team.index');
     }
 }

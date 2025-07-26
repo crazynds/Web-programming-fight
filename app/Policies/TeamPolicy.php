@@ -5,7 +5,6 @@ namespace App\Policies;
 use App\Models\Competitor;
 use App\Models\Team;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class TeamPolicy
 {
@@ -43,14 +42,14 @@ class TeamPolicy
 
     public function modifyMembers(User $user, Team $team): bool
     {
-        return !Competitor::where('team_id', $team->id)->whereHas('contest', function ($query) {
+        return ! Competitor::where('team_id', $team->id)->whereHas('contest', function ($query) {
             $query->whereRaw('DATE_ADD(start_time, INTERVAL duration MINUTE) > ?', [now()]);
         })->exists();
     }
 
     public function leave(User $user, Team $team): bool
     {
-        return $user->teams()->where('teams.id', $team->id)->exists() && !$user->myTeams()->where('teams.id', $team->id)->exists() && $this->modifyMembers($user, $team);
+        return $user->teams()->where('teams.id', $team->id)->exists() && ! $user->myTeams()->where('teams.id', $team->id)->exists() && $this->modifyMembers($user, $team);
     }
 
     /**

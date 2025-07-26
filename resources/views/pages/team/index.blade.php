@@ -58,14 +58,14 @@
                     <td class="px-2">
                         <div class="hstack gap-1">
                             @if ($team->pivot->accepted == false)
-                                @can('modifyMembers', $team)
+                                {{-- @can('modifyMembers', $team) --}}
                                     <a href="{{ route('team.accept', ['team' => $team->id]) }}" class="d-flex action-btn">
                                         <i class="las la-check-circle"></i>
                                     </a>
                                     <a href="{{ route('team.deny', ['team' => $team->id]) }}" class="d-flex action-btn">
                                         <i class="lar la-times-circle"></i>
                                     </a>
-                                @endcan
+                                {{-- @endcan --}}
                             @else
                                 @can('leave', $team)
                                     <a href="{{ route('team.leave', ['team' => $team->id]) }}" class="d-flex action-btn"

@@ -197,7 +197,7 @@ class ContestController extends Controller
             if (! $team) {
                 return Redirect::back()->withErrors(['team' => 'Please, select a team that you are the owner of.']);
             }
-            if ($team->members()->count() > 3) {
+            if ($team->related()->count() > 3) {
                 return Redirect::back()->withErrors(['team' => 'Only up to 3 members are allowed in a team to participate in this contest.']);
             }
 
