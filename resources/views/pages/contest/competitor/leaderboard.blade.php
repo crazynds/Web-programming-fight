@@ -180,7 +180,6 @@
         <div class="collapse mt-2 @if(request()->has('contry') || request()->has('state') || request()->has('institution_acronym'))show @endif" id="filterCollapse">
             <div class="card-body">
                 <div style="max-width:800px">
-                    {{dd($competitors->pluck('team')->unique());}}
                     @foreach ($competitors->pluck('team.country')->unique()->sort() as $country)
                         <a @if(request()->input('country')==$country)style="color:blue"@endif href="?country={{ $country }}">{{$country}}</a>
                     @endforeach
