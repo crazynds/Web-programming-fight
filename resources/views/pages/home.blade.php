@@ -58,7 +58,8 @@
                             'Added leaderboard filters.',
                             'Added manual judge in contest admin pannel.',
                             'Added AI detection on contest submissions.',
-                            'Add fields location information required in teams creation.',
+                            'Added fields location information required in teams creation.',
+                            'Added admin competitor review.',
                         ],
                         'changes' => [
                         ],

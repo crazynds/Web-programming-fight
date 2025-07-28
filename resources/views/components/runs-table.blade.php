@@ -70,7 +70,7 @@
                     @if ($submission->status != 'Judged' && $submission->status != 'Error') class="notJudged blink" @endif>
                     <td>
                         @can('view', $submission)
-                            <a href="#" onclick="openModal({{ $submission->id }})">
+                            <a href="#row{{ $submission->id }}" onclick="openModal({{ $submission->id }})">
                                 #{{ $submission->id }}
                             </a>
                         @else

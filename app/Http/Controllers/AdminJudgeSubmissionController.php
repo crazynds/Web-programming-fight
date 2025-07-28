@@ -6,6 +6,7 @@ use App\Enums\SubmitResult;
 use App\Enums\SubmitStatus;
 use App\Jobs\ContestComputeScore;
 use App\Jobs\RecalculateCompetitorScore;
+use App\Models\Competitor;
 use App\Models\Contest;
 use App\Models\Submission;
 
@@ -76,5 +77,16 @@ class AdminJudgeSubmissionController extends Controller
         }
 
         return redirect()->back();
+    }
+
+    public function reviewCompetitor(Contest $contest, Competitor $competitor)
+    {
+        $this->authorize('admin', $contest);
+        $offset = request()->input('offset', 0);
+
+        $total = $competitor->submissions()->count();
+        $submission = $competitor->submissions()->orderBy('id')->offset($offset)->first();
+
+        return view('pages.contest.competitor.review', compact('contest', 'competitor', 'submission', 'offset', 'total'));
     }
 }

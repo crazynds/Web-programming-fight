@@ -158,6 +158,8 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
         ->name('contest.submission.rejectAI');
     Route::resource('contest.clarification', ClarificationController::class)
         ->only(['update', 'destroy']);
+    Route::get('/contest/{contest}/competitor/{competitor}/review', [AdminJudgeSubmissionController::class, 'reviewCompetitor'])
+        ->name('contest.competitor.review');
 });
 
 Route::get('/', function () {

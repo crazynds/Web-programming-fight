@@ -170,7 +170,9 @@
                             {{ $competitor->fullName() }}
                         </td>
                         <td>
-
+                            <a href="{{ route('contest.competitor.review',['contest'=>$contest,'competitor'=>$competitor]) }}" class="d-flex">
+                                <i class="las la-search"></i>
+                            </a>
                         </td>
                     </tr>
                     @endforeach
