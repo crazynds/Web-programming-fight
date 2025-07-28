@@ -7,6 +7,8 @@
             <b>
                 Submission: #{{$submission->id}} ({{ $submission->user->name }})
             </b>
+            <br>
+            {{ $submission->created_at }}
         </div>
     </div>
 
