@@ -112,8 +112,13 @@ class UpdateProblemRatingJob implements ShouldBeUnique, ShouldQueue
 
         // Parte 3: dificuldade baseada em taxa de tentativas
         $taxa_tentativas_relativa = $n_total_pessoas / max(1, $media_pessoas_que_tentou_algum_problema);
-        $dificultade_tentativas_relativa = max(0.0, 1 - $taxa_tentativas_relativa); // mais tentativas que a média = mais difícil
+        $dificultade_tentativas_relativa = max(0.0, 1 - ($taxa_tentativas_relativa / 2)); // mais tentativas que a média = mais difícil
 
+        dump([
+            'dificuldade_resolucao' => $dificuldade_resolucao,
+            'dificuldade_tentativas' => $dificuldade_tentativas,
+            'dificultade_tentativas_relativa' => $dificultade_tentativas_relativa,
+        ]);
         // Combinação ponderada (ajuste os pesos conforme desejar)
         $dificuldade_bruta = 0.35 * $dificuldade_resolucao + 0.20 * $dificuldade_tentativas + 0.45 * $dificultade_tentativas_relativa;
 
