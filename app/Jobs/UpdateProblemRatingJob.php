@@ -36,7 +36,7 @@ class UpdateProblemRatingJob implements ShouldBeUnique, ShouldQueue
             $problemIds[] = $rating->problem_id;
         });
         $sumUsersResolvedPercentage = 0;
-        $sumUsersTried = 0;
+        $sumUsersResolved = 0;
         $sumResolutionsPercentage = 0;
         $problemCount = Problem::count();
         if ($problemCount == 0) {
@@ -50,7 +50,7 @@ class UpdateProblemRatingJob implements ShouldBeUnique, ShouldQueue
             $totalTries = $problem->submissions()->where('user_id', '!=', $problem->user_id)->count();
             $totalResolutions = $problem->submissions()->where('result', SubmitResult::Accepted)->where('user_id', '!=', $problem->user_id)->count();
             $sumUsersResolvedPercentage += $usersWhoResolved / max(1, $usersWhoTried);
-            $sumUsersTried += $usersWhoTried;
+            $sumUsersResolved += $usersWhoResolved;
             $sumResolutionsPercentage += $totalResolutions / max(1, $totalTries);
             $problems[$problem->id] = [
                 'usersWhoTried' => $usersWhoTried,
@@ -59,8 +59,8 @@ class UpdateProblemRatingJob implements ShouldBeUnique, ShouldQueue
                 'totalResolutions' => $totalResolutions,
             ];
         }
-        $meanUserTried = $sumUsersTried / $problemCount;
-        $meanUsersResolved = $sumUsersResolvedPercentage / $problemCount;
+        $meanUserResolved = $sumUsersResolved / $problemCount;
+        $meanUsersResolvedPercetage = $sumUsersResolvedPercentage / $problemCount;
         $meanResolutions = $sumResolutionsPercentage / $problemCount;
         foreach (Problem::lazy() as $problem) {
             $sum = $problem->ratings()->sum('value');
@@ -71,9 +71,9 @@ class UpdateProblemRatingJob implements ShouldBeUnique, ShouldQueue
                 $data['usersWhoResolved'],
                 $data['totalTries'],
                 $data['totalResolutions'],
-                $meanUsersResolved,
+                $meanUsersResolvedPercetage,
                 $meanResolutions,
-                $meanUserTried
+                $meanUserResolved
             );
             dump($problem->title, $difficulty);
             dump([
@@ -81,7 +81,7 @@ class UpdateProblemRatingJob implements ShouldBeUnique, ShouldQueue
                 $data['usersWhoResolved'],
                 $data['totalTries'],
                 $data['totalResolutions'],
-                $meanUsersResolved,
+                $meanUsersResolvedPercetage,
                 $meanResolutions,
             ]);
             $problem->rating = (($sum) / ($count > 0 ? $count : 1) + $difficulty) / ($count > 0 ? 2 : 1);
@@ -94,24 +94,24 @@ class UpdateProblemRatingJob implements ShouldBeUnique, ShouldQueue
         $n_pessoas_que_resolveram,
         $n_total_tentativas,
         $n_resolucoes,
-        $media_pessoas_que_resolveram,
-        $media_taxa_acerto_tentativas,
-        $media_pessoas_que_tentou_algum_problema
+        $media_pessoas_que_resolveram_porcentagem,
+        $media_taxa_acerto_tentativas_procentagem,
+        $media_pessoas_que_resolveram_problemas
     ) {
-        if ($n_total_pessoas == 0 || $media_pessoas_que_resolveram == 0 || $media_taxa_acerto_tentativas == 0) {
+        if ($n_total_pessoas == 0 || $media_pessoas_que_resolveram_porcentagem == 0 || $media_taxa_acerto_tentativas_procentagem == 0) {
             return 10.0;
         }
 
         // Parte 1: dificuldade baseada na comparação de resoluções
-        $resolucoes_relativas = ($n_pessoas_que_resolveram / $n_total_pessoas) / max(1, $media_pessoas_que_resolveram);
-        $dificuldade_resolucao = max(0.0, 1 - $resolucoes_relativas); // mais resoluções que a média = mais fácil
+        $resolucoes_relativas = ($n_pessoas_que_resolveram / $n_total_pessoas) / max(1, $media_pessoas_que_resolveram_porcentagem);
+        $dificuldade_resolucao = max(0.0, 1 - ($resolucoes_relativas / 2)); // mais resoluções que a média = mais fácil
 
         // Parte 2: dificuldade baseada em taxa de acerto por tentativa
-        $taxa_relativa = ($n_resolucoes / max(1, $n_total_tentativas)) / max(1, $media_taxa_acerto_tentativas);
-        $dificuldade_tentativas = max(0.0, 1 - $taxa_relativa); // taxa de acerto maior = mais fácil
+        $taxa_relativa = ($n_resolucoes / max(1, $n_total_tentativas)) / max(1, $media_taxa_acerto_tentativas_procentagem);
+        $dificuldade_tentativas = max(0.0, 1 - ($taxa_relativa / 2)); // taxa de acerto maior = mais fácil
 
         // Parte 3: dificuldade baseada em taxa de tentativas
-        $taxa_tentativas_relativa = $n_total_pessoas / max(1, $media_pessoas_que_tentou_algum_problema);
+        $taxa_tentativas_relativa = $n_pessoas_que_resolveram / max(1, $media_pessoas_que_resolveram_problemas);
         $dificultade_tentativas_relativa = max(0.0, 1 - ($taxa_tentativas_relativa / 2)); // mais tentativas que a média = mais difícil
 
         dump([
@@ -120,7 +120,7 @@ class UpdateProblemRatingJob implements ShouldBeUnique, ShouldQueue
             'dificultade_tentativas_relativa' => $dificultade_tentativas_relativa,
         ]);
         // Combinação ponderada (ajuste os pesos conforme desejar)
-        $dificuldade_bruta = 0.35 * $dificuldade_resolucao + 0.20 * $dificuldade_tentativas + 0.45 * $dificultade_tentativas_relativa;
+        $dificuldade_bruta = 0.40 * $dificuldade_resolucao + 0.20 * $dificuldade_tentativas + 0.40 * $dificultade_tentativas_relativa;
 
         // Escala final de 0 a 10
         return round($dificuldade_bruta * 10, 2);
