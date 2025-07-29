@@ -38,6 +38,9 @@ class UpdateProblemRatingJob implements ShouldBeUnique, ShouldQueue
         $sumUsers = 0;
         $sumResolutions = 0;
         $problemCount = Problem::count();
+        if ($problemCount == 0) {
+            return;
+        }
         $problems = [];
         foreach (Problem::lazy() as $problem) {
             $usersWhoTried = $problem->submissions()->whereHas('user')->distinct('user_id')->where('user_id', '!=', $problem->user_id)->count()
@@ -68,7 +71,16 @@ class UpdateProblemRatingJob implements ShouldBeUnique, ShouldQueue
                 $meanUsers,
                 $meanResolutions
             );
-            $problem->rating = ($sum + $difficulty) / ($count + 1);
+            dump($problem->title, $difficulty);
+            dump([
+                $data['usersWhoTried'],
+                $data['usersWhoResolved'],
+                $data['totalTries'],
+                $data['totalResolutions'],
+                $meanUsers,
+                $meanResolutions,
+            ]);
+            $problem->rating = (($sum) / ($count > 0 ? $count : 1) + $difficulty) / ($count > 0 ? 2 : 1);
             $problem->save();
         }
     }
