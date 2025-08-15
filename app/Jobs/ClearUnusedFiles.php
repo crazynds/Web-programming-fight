@@ -72,6 +72,7 @@ class ClearUnusedFiles implements ShouldBeUnique, ShouldQueue
         foreach (File::lazy() as $file) {
             try {
                 $file->delete();
+                
                 $recovered += $file->size;
                 $files++;
                 Log::channel('leakedfiles')->info(

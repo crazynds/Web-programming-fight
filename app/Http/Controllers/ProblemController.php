@@ -23,6 +23,11 @@ class ProblemController extends Controller
         $this->authorizeResource(Problem::class, 'problem');
     }
 
+    public function downloadDiff(Problem $problem)
+    {
+        return $problem->diffProgram->download($problem->diff_program_language);
+    }
+
     public function publicChange(Problem $problem)
     {
         $this->authorize('update', $problem);

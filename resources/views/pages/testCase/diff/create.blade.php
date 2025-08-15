@@ -26,6 +26,7 @@
                             <option value="{{ $code }}">{{ App\Enums\LanguagesType::name($code) }}</option>
                         @endif
                     @endforeach
+                    <option value="99">Binary</option>
                 </select>
             </div>
         </div>

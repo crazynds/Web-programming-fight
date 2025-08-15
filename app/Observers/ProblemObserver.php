@@ -50,7 +50,11 @@ class ProblemObserver
             $scorer->delete();
         }
         if ($problem->diffProgram) {
-            $problem->diffProgram->delete();
+            $file = $problem->diffProgram;
+            $problem->diffProgram()->dissociate();
+            $problem->save();
+            $file->delete();
         }
+
     }
 }

@@ -50,7 +50,7 @@ RUN pip install cloudscraper
 
 COPY docker/start-container /usr/local/bin/start-container
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY docker/php.ini /etc/php/8.2/cli/conf.d/99-sail.ini
+COPY docker/php.ini /etc/php/8.3/cli/conf.d/99-sail.ini
 RUN mkdir /var/scripts
 RUN chmod 0777 /var/scripts
 COPY docker/scripts /var/scripts

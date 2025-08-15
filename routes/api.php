@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\BackupController;
+use App\Http\Controllers\ProblemController;
 use App\Http\Controllers\SubmissionController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,4 +39,6 @@ Route::middleware('auth:web')->group(function () {
             ->name('backup.upload');
     });
 
+    Route::get('/problem/{problem}/downloadDiff', [ProblemController::class, 'downloadDiff'])
+        ->name('problem.downloadDiff');
 });

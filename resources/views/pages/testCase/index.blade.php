@@ -14,9 +14,12 @@
                     <button>New Diff Program +</button>
                 </a>
                 @if ($problem->diffProgram()->exists())
+                    <a href="{{ route('api.problem.downloadDiff', ['problem' => $problem]) }}">
+                        <button type="submit">Download</button>
+                    </a>
                     <a href="#">
-                        <form action="{{ route('problem.diff.destroy', ['problem' => $problem->id, 'diff' => 0]) }}" method="POST"
-                            style="display: inline;">
+                        <form action="{{ route('problem.diff.destroy', ['problem' => $problem->id, 'diff' => 0]) }}"
+                            method="POST" style="display: inline;">
                             @method('DELETE')
                             @csrf
                             <button type="submit">❌</button>

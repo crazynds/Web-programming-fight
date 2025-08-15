@@ -103,8 +103,8 @@ final class LanguagesType extends Enum
                 ];
             case self::BINARY:
                 return [
-                    File::defaults()
-                        ->max('0mb'), // 0 MB   - Prevent upload of binary file
+                    // File::defaults()
+                    //    ->max('0mb'), // 0 MB   - Prevent upload of binary file
                 ];
         }
 
