@@ -8,7 +8,6 @@ use App\Jobs\PrepareSBCProblemsJob;
 use App\Models\File;
 use App\Models\Problem;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Zip;
@@ -16,16 +15,17 @@ use ZipArchive;
 
 class IOProblemController extends Controller
 {
-
     public function import()
     {
         Gate::authorize('import-zip');
+
         return view('pages.problem.import');
     }
 
     public function importSbc()
     {
         Gate::authorize('import-zip');
+
         return view('pages.problem.importSbc');
     }
 
@@ -35,7 +35,7 @@ class IOProblemController extends Controller
         $file = $request->file('file');
 
         $inputFile = File::createFile($file, 'problems/sbc', true);
-        PrepareSBCProblemsJob::dispatch($inputFile, Auth::user(), $request->input('event', 'Maratona SBC'));
+        PrepareSBCProblemsJob::dispatch($inputFile, $this->user(), $request->input('event', 'Maratona SBC'));
 
         return redirect()->back();
     }
@@ -48,7 +48,7 @@ class IOProblemController extends Controller
 
         DB::beginTransaction();
 
-        $zp = new ZipArchive();
+        $zp = new ZipArchive;
 
         $zp->open($file->path(), ZipArchive::RDONLY);
 
@@ -58,7 +58,7 @@ class IOProblemController extends Controller
             $file = $zp->statIndex($i);
             $files[$file['name']] = $file;
         }
-        if (!isset($files['testCases.json']) || !isset($files['config.json'])) {
+        if (! isset($files['testCases.json']) || ! isset($files['config.json'])) {
             return redirect()->back()->withErrors(['msg' => 'Invalid File.']);
         }
 
@@ -68,28 +68,31 @@ class IOProblemController extends Controller
         /** @var Problem $problem */
         $problem = Problem::create([
             ...$config,
-            'user_id' => Auth::user()->id
+            'user_id' => $this->user()->id,
         ]);
 
         $hashStream = function ($fp) {
             $ctx = hash_init('sha256');
             hash_update_stream($ctx, $fp);
             fclose($fp);
+
             return hash_final($ctx);
         };
 
         foreach ($testCases as $testCase) {
-            $inFile = $files['input/' . $testCase['name']];
-            if (!$inFile)
+            $inFile = $files['input/'.$testCase['name']];
+            if (! $inFile) {
                 return redirect()->back()->withErrors(['msg' => 'Invalid File.']);
+            }
             $stream = $zp->getStream($inFile['name']);
             $hash = $hashStream($stream);
             $stream = $zp->getStream($inFile['name']);
             $inputFile = File::createFileByStream($stream, $inFile['size'], $hash, "problems/{$problem->id}/input");
 
-            $outFile = $files['output/' . $testCase['name']];
-            if (!$outFile)
+            $outFile = $files['output/'.$testCase['name']];
+            if (! $outFile) {
                 return redirect()->back()->withErrors(['msg' => 'Invalid File.']);
+            }
             $stream = $zp->getStream($outFile['name']);
             $hash = $hashStream($stream);
             $stream = $zp->getStream($outFile['name']);
@@ -114,8 +117,8 @@ class IOProblemController extends Controller
 
     public function download(Problem $problem)
     {
-        $this->authorize('update', $problem);
-        $zipFileName = 'problem_' . $problem->id . '.zip';
+        $this->authorize('download', $problem);
+        $zipFileName = 'problem_'.$problem->id.'.zip';
 
         $zip = Zip::create($zipFileName);
         $titulo = $problem->title;
@@ -152,27 +155,25 @@ class IOProblemController extends Controller
             /** @var File $outFile */
             $outFile = $testCase->outputFile;
 
-            $inFile->addToZip($zip, 'input/' . $testCase->name);
-            $outFile->addToZip($zip, 'output/' . $testCase->name);
+            $inFile->addToZip($zip, 'input/'.$testCase->name);
+            $outFile->addToZip($zip, 'output/'.$testCase->name);
         }
         $testCases = $problem->testCases()->select([
             'position',
             'type',
             'public',
-            'name'
+            'name',
         ])->get()->each->toArray();
         $zip->addRaw(json_encode($testCases->toArray()), 'testCases.json');
-
-
 
         foreach ($problem->scores()->with(['input', 'file'])->lazy() as $scorer) {
             $file = $scorer->file;
             $input = $scorer->input;
 
-            $folderName = 'scores/' . $scorer->name . '#' . $scorer->id;
+            $folderName = 'scores/'.$scorer->name.'#'.$scorer->id;
 
-            $file->addToZip($zip, $folderName . '/code');
-            $input->addToZip($zip, $folderName . '/input');
+            $file->addToZip($zip, $folderName.'/code');
+            $input->addToZip($zip, $folderName.'/input');
         }
 
         return $zip;

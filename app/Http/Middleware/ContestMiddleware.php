@@ -14,10 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ContestMiddleware
 {
-
-    public function __construct(protected ContestService $contestService)
-    {
-    }
+    public function __construct(protected ContestService $contestService) {}
 
     /**
      * Handle an incoming request.
@@ -27,22 +24,24 @@ class ContestMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         View::share('contestService', $this->contestService);
-        if (Auth::user() && Cache::has($key = 'contest:user:' . Auth::user()->id)) {
+        if (Auth::user() && Cache::has($key = 'contest:user:'.Auth::id())) {
             $contestData = Cache::get($key);
             $contest = Contest::find($contestData['contest'] ?? 0);
             $competitor = Competitor::find($contestData['competitor'] ?? 0);
-            if (!$contest || !$competitor || $contest->id != $competitor->contest_id) {
+            if (! $contest || ! $competitor || $contest->id != $competitor->contest_id) {
                 Cache::forget($key);
             } else {
                 // Check if the contest is already finished and throw away all competitors
                 if ($contest->start_time->addMinutes($contest->duration)->lt(now())) {
                     Cache::forget($key);
+
                     return redirect()->route('contest.leaderboard', ['contest' => $contest->id]);
                 } else {
                     $this->contestService->setContestCompetitor($contest, $competitor);
                 }
             }
         }
+
         return $next($request);
     }
 }

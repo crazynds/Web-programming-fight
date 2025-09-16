@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Enums\SubmitResult;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -20,7 +19,7 @@ class UserController extends Controller
     public function profile()
     {
         /** @var User */
-        $user = Auth::user();
+        $user = $this->user();
 
         return $this->profileUser($user);
     }

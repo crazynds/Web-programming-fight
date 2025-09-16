@@ -22,7 +22,7 @@
                     <div style="margin-bottom: 4px; height: 32px;">
                         Problem: {{ $submission->problem->title }} | Result: {{ $submission->result }}
                         <a href="{{$total > $offset+1 
-                                            ? route('contest.competitor.review',['contest'=>$contest,'competitor'=>$competitor, 'offset'=>$offset+1])
+                                            ? route('contest.admin.competitor.review',['contest'=>$contest,'competitor'=>$competitor, 'offset'=>$offset+1])
                                             : '#'
                                 }}">
                             <button style="float:right; margin-left:8px" type="button">
@@ -30,7 +30,7 @@
                             </button>
                         </a>
                         <a href="{{$offset > 0 
-                                            ? route('contest.competitor.review',['contest'=>$contest,'competitor'=>$competitor, 'offset'=>$offset-1])
+                                            ? route('contest.admin.competitor.review',['contest'=>$contest,'competitor'=>$competitor, 'offset'=>$offset-1])
                                             : '#'
                                 }}">
                             <button style="float:right; margin-left:8px" type="button">

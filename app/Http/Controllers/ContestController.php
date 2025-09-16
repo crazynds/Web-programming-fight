@@ -10,7 +10,6 @@ use App\Models\Contest;
 use App\Models\Problem;
 use App\Models\Team;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -79,7 +78,7 @@ class ContestController extends Controller
         }
 
         /** @var User $user */
-        $user = Auth::user();
+        $user = $this->user();
         /** @var Competitor $competitor */
         if (! Gate::allows('enter', $contest)) {
             return Redirect::back()->withErrors(['contest' => 'You are\'nt participating this contest.']);
@@ -97,7 +96,7 @@ class ContestController extends Controller
 
     public function leave(Contest $contest)
     {
-        Cache::forget('contest:user:'.Auth::user()->id);
+        Cache::forget('contest:user:'.$this->user()->id);
 
         return redirect()->route('contest.index');
     }
@@ -160,7 +159,7 @@ class ContestController extends Controller
 
     public function unregister(Contest $contest)
     {
-        $competitor = $contest->getCompetitor(Auth::user());
+        $competitor = $contest->getCompetitor($this->user());
         if (! $competitor) {
             return back()->withErrors([
                 'unregister' => 'You are not participating in this contest.',
@@ -175,7 +174,7 @@ class ContestController extends Controller
     public function register(StoreCompetitorRequest $request, Contest $contest)
     {
         /** @var User $user */
-        $user = Auth::user();
+        $user = $this->user();
         if ($contest->is_private && $request->input('password') != $contest->password) {
             return Redirect::back()->withErrors(['password' => 'Wrong password']);
         }
@@ -231,7 +230,7 @@ class ContestController extends Controller
     public function create()
     {
         /** @var User $user */
-        $user = Auth::user();
+        $user = $this->user();
         if ($user->isAdmin()) {
             $problems = Problem::all();
         } else {
@@ -250,7 +249,7 @@ class ContestController extends Controller
     {
         $data = $request->safe()->except(['problems', 'g-recaptcha-response']);
         /** @var User $user */
-        $user = Auth::user();
+        $user = $this->user();
 
         $data['description'] = strip_tags($data['description']);
 
@@ -273,7 +272,7 @@ class ContestController extends Controller
     {
         return view('pages.contest.show', [
             'contest' => $contest,
-            'competitor' => $contest->getCompetitor(Auth::user()),
+            'competitor' => $contest->getCompetitor($this->user()),
         ]);
     }
 
@@ -283,7 +282,7 @@ class ContestController extends Controller
     public function edit(Contest $contest)
     {
         /** @var User $user */
-        $user = Auth::user();
+        $user = $this->user();
         if ($user->isAdmin()) {
             $problems = Problem::all();
         } else {
@@ -303,7 +302,7 @@ class ContestController extends Controller
     {
         $data = $request->safe()->except(['problems', 'g-recaptcha-response']);
         /** @var User $user */
-        $user = Auth::user();
+        $user = $this->user();
 
         if (isset($data['description'])) {
             $data['description'] = strip_tags($data['description']);

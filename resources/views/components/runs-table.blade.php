@@ -252,14 +252,14 @@
                             @if($contest && $submission->status == 'Judged')
                                 @can('admin',$contest)
                                     @if($submission->result == 'Ai detected')
-                                        <form action="{{ route('contest.submission.accept',['contest' => $contest->id, 'submission' => $submission->id]) }}" method="post" class="d-inline-block">
+                                        <form action="{{ route('contest.admin.submission.accept',['contest' => $contest->id, 'submission' => $submission->id]) }}" method="post" class="d-inline-block">
                                             @csrf
                                             <button type="submit" class="d-flex action-btn" style="all: unset; cursor: pointer">
                                                 <i class="las la-check-square"></i>
                                             </button>
                                         </form>
                                     @else
-                                        <form action="{{ route('contest.submission.rejectAI',['contest' => $contest->id, 'submission' => $submission->id]) }}" method="post" class="d-inline-block">
+                                        <form action="{{ route('contest.admin.submission.rejectAI',['contest' => $contest->id, 'submission' => $submission->id]) }}" method="post" class="d-inline-block">
                                             @csrf
                                             <button type="submit" class="d-flex action-btn" style="all: unset; cursor: pointer">
                                                 <i class="las la-robot"></i>
@@ -293,7 +293,7 @@
 </div>
 
 <script type='module'>
-    const userId = {{ $global ? 'null' : \Auth::user()->id }}
+    const userId = {{ $global ? 'null' : \Auth::id() }}
 
     window.copyCode = function() {
         var range = document.createRange();

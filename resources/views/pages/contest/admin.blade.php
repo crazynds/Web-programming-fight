@@ -18,11 +18,11 @@
     </div>
     <div class="row">
         <div class="col-5" style="border-right: black dashed 1px; min-height: 70vh">
-            <form action="{{ route('contest.recomputateScores', ['contest' => $contest->id]) }}" method="post">
+            <form action="{{ route('contest.admin.recomputateScores', ['contest' => $contest->id]) }}" method="post">
                 @csrf
                 <button type="submit" style="float:right"> Re-computate Scores </button>
             </form>
-            <form action="{{ route('contest.settings', ['contest' => $contest->id]) }}" method="POST">
+            <form action="{{ route('contest.admin.settings', ['contest' => $contest->id]) }}" method="POST">
                 <button type="submit">
                     Save Settings
                 </button>
@@ -76,25 +76,25 @@
                             </div>
 
                             <div>
-                                <form action="{{ route('contest.submission.accept',['contest' => $contest->id, 'submission' => $submission->id]) }}" method="post" class="d-inline-block">
+                                <form action="{{ route('contest.admin.submission.accept',['contest' => $contest->id, 'submission' => $submission->id]) }}" method="post" class="d-inline-block">
                                     @csrf
                                     <button type="submit" title="Accept">
                                         Accept
                                     </button>
                                 </form>
-                                <form action="{{ route('contest.submission.rejectAI',['contest' => $contest->id, 'submission' => $submission->id]) }}" method="post" class="d-inline-block">
+                                <form action="{{ route('contest.admin.submission.rejectAI',['contest' => $contest->id, 'submission' => $submission->id]) }}" method="post" class="d-inline-block">
                                     @csrf
                                     <button type="submit" title="Reject AI">
                                         Reject AI
                                     </button>
                                 </form>
-                                <form action="{{ route('contest.submission.rejectWA',['contest' => $contest->id, 'submission' => $submission->id]) }}" method="post" class="d-inline-block">
+                                <form action="{{ route('contest.admin.submission.rejectWA',['contest' => $contest->id, 'submission' => $submission->id]) }}" method="post" class="d-inline-block">
                                     @csrf
                                     <button type="submit" title="Reject WA">
                                         Reject WA
                                     </button>
                                 </form>
-                                <form action="{{ route('contest.submission.rejectTL',['contest' => $contest->id, 'submission' => $submission->id]) }}" method="post" class="d-inline-block">
+                                <form action="{{ route('contest.admin.submission.rejectTL',['contest' => $contest->id, 'submission' => $submission->id]) }}" method="post" class="d-inline-block">
                                     @csrf
                                     <button type="submit" title="Reject TL">
                                         Reject TL
@@ -170,7 +170,7 @@
                             {{ $competitor->fullName() }}
                         </td>
                         <td>
-                            <a href="{{ route('contest.competitor.review',['contest'=>$contest,'competitor'=>$competitor]) }}" class="d-flex">
+                            <a href="{{ route('contest.admin.competitor.review',['contest'=>$contest,'competitor'=>$competitor]) }}" class="d-flex">
                                 <i class="las la-search"></i>
                             </a>
                         </td>

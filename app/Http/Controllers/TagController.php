@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreTagRequest;
 use App\Models\Problem;
 use App\Models\Tag;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class TagController extends Controller
@@ -72,7 +71,7 @@ class TagController extends Controller
             'problems' => Problem::whereNull('problems.online_judge')
                 ->where(function ($query) {
                     /** @var User */
-                    $user = Auth::user();
+                    $user = $this->user();
                     if (! $user->isAdmin()) {
                         $query->where('user_id', $user->id)
                             ->orWhere('visible', true);

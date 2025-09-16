@@ -2,21 +2,19 @@
 
 namespace App\Policies;
 
+use App\Enums\SubmitResult;
 use App\Models\Problem;
 use App\Models\User;
 use App\Services\ContestService;
-use Illuminate\Auth\Access\Response;
 
 class ProblemPolicy
 {
-    public function __construct(protected ContestService $contestService)
-    {
-    }
+    public function __construct(protected ContestService $contestService) {}
 
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(?User $user): bool
     {
         return true;
     }
@@ -24,8 +22,12 @@ class ProblemPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Problem $problem): bool
+    public function view(?User $user, Problem $problem): bool
     {
+        if (! $user) {
+            return $problem->visible;
+        }
+
         return ($this->contestService->inContest && $this->contestService->contest->problems()->where('id', $problem->id)->exists()) ||
             $problem->visible || $this->update($user, $problem);
     }
@@ -68,5 +70,15 @@ class ProblemPolicy
     public function forceDelete(User $user, Problem $problem): bool
     {
         return $user->isAdmin();
+    }
+
+    public function submit(User $user, Problem $problem)
+    {
+        return $this->view($user, $problem);
+    }
+
+    public function download(User $user, Problem $problem)
+    {
+        return $this->update($user, $problem) || $user->submissions()->where('problem_id', $problem->id)->where('result', SubmitResult::Accepted)->exists();
     }
 }

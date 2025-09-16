@@ -103,50 +103,52 @@
             </div>
         </div>
 
-        @if (!$competitor && $contest->start_time->addMinutes($contest->duration)->gt(now()))
-            <hr />
-            <div class="row">
-                <div class="col">
-                    <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data"
-                        style="justify-content: end;display:flex;"
-                        action="{{ route('contest.register', ['contest' => $contest->id]) }}">
-                        @csrf
+        @auth
+            @if (!$competitor && $contest->start_time->addMinutes($contest->duration)->gt(now()))
+                <hr />
+                <div class="row">
+                    <div class="col">
+                        <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data"
+                            style="justify-content: end;display:flex;"
+                            action="{{ route('contest.register', ['contest' => $contest->id]) }}">
+                            @csrf
 
-                        @if ($contest->is_private)
-                            <input style="margin-right:10px; max-width: 300px" type="text" class="form-control"
-                                name="password" placeholder="Password" />
-                        @endif
+                            @if ($contest->is_private)
+                                <input style="margin-right:10px; max-width: 300px" type="text" class="form-control"
+                                    name="password" placeholder="Password" />
+                            @endif
 
-                        @if (!$contest->individual)
-                            <select name="team" style="margin-right:10px" placeholder="Select a Team">
-                                <option value="" disabled selected>Select a Team</option>
-                                @foreach (Auth::user()->myTeams as $team)
-                                    <option value="{{ $team->id }}">
-                                        #{{ $team->acronym }} - {{ $team->name }}</option>
-                                @endforeach
-                            </select>
-                        @endif
-                        {!! htmlFormButton('Register', [
-                            'style' => 'padding: 0px 20px;margin-bottom: 8px;',
-                        ]) !!}
-                    </form>
+                            @if (!$contest->individual)
+                                <select name="team" style="margin-right:10px" placeholder="Select a Team">
+                                    <option value="" disabled selected>Select a Team</option>
+                                    @foreach (Auth::user()->myTeams as $team)
+                                        <option value="{{ $team->id }}">
+                                            #{{ $team->acronym }} - {{ $team->name }}</option>
+                                    @endforeach
+                                </select>
+                            @endif
+                            {!! htmlFormButton('Register', [
+                                'style' => 'padding: 0px 20px;margin-bottom: 8px;',
+                            ]) !!}
+                        </form>
+                    </div>
                 </div>
-            </div>
-        @elseif($competitor && $contest->start_time->addMinutes($contest->duration)->gt(now()))
-            <hr />
-            <div class="row">
-                <div class="col">
-                    <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data"
-                        style="justify-content: end;display:flex;"
-                        action="{{ route('contest.unregister', ['contest' => $contest->id]) }}">
-                        @csrf
-                        {!! htmlFormButton('Cancel Registration', [
-                            'style' => 'padding: 0px 20px;margin-bottom: 8px;',
-                        ]) !!}
-                    </form>
+            @elseif($competitor && $contest->start_time->addMinutes($contest->duration)->gt(now()))
+                <hr />
+                <div class="row">
+                    <div class="col">
+                        <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data"
+                            style="justify-content: end;display:flex;"
+                            action="{{ route('contest.unregister', ['contest' => $contest->id]) }}">
+                            @csrf
+                            {!! htmlFormButton('Cancel Registration', [
+                                'style' => 'padding: 0px 20px;margin-bottom: 8px;',
+                            ]) !!}
+                        </form>
+                    </div>
                 </div>
-            </div>
-        @endif
+            @endif
+        @endauth
     </div>
     @if ($competitor)
         <div class="row mt-3">

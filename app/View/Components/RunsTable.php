@@ -28,6 +28,8 @@ class RunsTable extends Component
 
     protected function getQuery()
     {
+        /** @var User */
+        $user = Auth::user() ?? User::guest();
         if ($this->global) {
             if ($this->contest) {
                 $contest = $this->contest;
@@ -49,8 +51,6 @@ class RunsTable extends Component
                 $query = $this->contestService->competitor->submissions()
                     ->with('contest');
             } else {
-                /** @var User */
-                $user = Auth::user();
                 $query = $user->submissions()->where('contest_id', null);
             }
         }
@@ -63,8 +63,6 @@ class RunsTable extends Component
                 $query->select('id', 'acronym', 'name');
             });
         }
-        /** @var User */
-        $user = Auth::user();
         if (! $user->isAdmin()) {
             $query->limit(300);
         }
@@ -95,7 +93,7 @@ class RunsTable extends Component
     public function render(): View|Closure|string
     {
         return view('components.runs-table', [
-            'limit' => \Illuminate\Support\Facades\RateLimiter::remaining('resubmission:'.Auth::user()->id, 5),
+            'limit' => \Illuminate\Support\Facades\RateLimiter::remaining('resubmission:'.(Auth::user()?->id ?? 0), 5),
             'submissions' => $this->getQuery()->get(),
             'channel' => $this->getChannel(),
             'contest' => $this->contest,

@@ -10,7 +10,7 @@ class ForumPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(?User $user): bool
     {
         return true;
     }
@@ -18,7 +18,7 @@ class ForumPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Forum $forum): bool
+    public function view(?User $user, Forum $forum): bool
     {
         return true;
     }

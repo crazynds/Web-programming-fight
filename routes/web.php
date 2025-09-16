@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AdminJudgeSubmissionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Contest\ClarificationController;
 use App\Http\Controllers\ContestController;
@@ -45,48 +44,61 @@ Route::middleware(['auth'])->group(function () {
     // Rotas de dentro do contest
     Route::name('contest.')->prefix('contest/')->group(base_path('routes/contest.php'));
     Route::name('admin.')->group(base_path('routes/admin.php'))->middleware('can:viewPulse');
+
+    // Contest admin
+    Route::name('contest.admin.')->group(base_path('routes/contestAdmin.php'));
 });
 
 // Rotas do sistema normal
-Route::middleware(['auth', PreventAccessDuringContest::class])->group(function () {
-    Route::resource('problem', ProblemController::class);
+Route::middleware([PreventAccessDuringContest::class])->group(function () {
 
+    Route::middleware('auth')->group(function () {
+        Route::resource('team', TeamController::class)
+            ->only(['index', 'store', 'create', 'edit', 'update', 'destroy']);
+        Route::get('/team/{team}/accept', [TeamController::class, 'accept'])
+            ->name('team.accept');
+        Route::get('/team/{team}/deny', [TeamController::class, 'deny'])
+            ->name('team.deny');
+        Route::get('/team/{team}/leave', [TeamController::class, 'leave'])
+            ->name('team.leave');
+
+        Route::resource('problem.diff', DiffController::class)
+            ->only(['create', 'store', 'destroy'])->middleware('auth');
+        Route::resource('problem.scorer', ScorerController::class)
+            ->except(['edit', 'update'])->middleware('auth');
+        Route::get('/problem_import', [IOProblemController::class, 'import'])
+            ->name('problem.import');
+        Route::get('/problem_import/sbc', [IOProblemController::class, 'importSbc'])
+            ->name('problem.import.sbc');
+        Route::post('/problem_upload', [IOProblemController::class, 'upload'])
+            ->name('problem.upload');
+        Route::post('/problem_upload/sbc', [IOProblemController::class, 'uploadSbc'])
+            ->name('problem.upload.sbc');
+
+        Route::get('/problem/{problem}/testcase/create/manual', [TestCaseController::class, 'createManual'])
+            ->name('problem.testCase.create.manual');
+        Route::post('/problem/{problem}/testcase/create/manual', [TestCaseController::class, 'storeManual'])
+            ->name('problem.testCase.store.manual');
+        Route::resource('problem.rating', RatingController::class)
+            ->only('store');
+
+        Route::resource('contest.clarification', ClarificationController::class)
+            ->only(['update', 'destroy']);
+    });
+
+    Route::resource('problem', ProblemController::class);
     Route::resource('tag', TagController::class);
 
     Route::resource('problem.testCase', TestCaseController::class)
         ->except(['update']);
-    Route::get('/problem/{problem}/testcase/create/manual', [TestCaseController::class, 'createManual'])
-        ->name('problem.testCase.create.manual');
-    Route::post('/problem/{problem}/testcase/create/manual', [TestCaseController::class, 'storeManual'])
-        ->name('problem.testCase.store.manual');
-
-    Route::resource('problem.rating', RatingController::class)
-        ->only('store');
-
-    Route::resource('problem.diff', DiffController::class)
-        ->only(['create', 'store', 'destroy']);
-
-    Route::resource('problem.scorer', ScorerController::class)
-        ->except(['edit', 'update']);
-
-    Route::get('/problem_import', [IOProblemController::class, 'import'])
-        ->name('problem.import');
-    Route::get('/problem_import/sbc', [IOProblemController::class, 'importSbc'])
-        ->name('problem.import.sbc');
-    Route::post('/problem_upload', [IOProblemController::class, 'upload'])
-        ->name('problem.upload');
-    Route::post('/problem_upload/sbc', [IOProblemController::class, 'uploadSbc'])
-        ->name('problem.upload.sbc');
 
     Route::controller(TestCaseController::class)
         ->name('problem.')->prefix('problem/{problem}')
         ->group(function () {
-            Route::get('public', [ProblemController::class, 'publicChange'])
-                ->name('public');
-            Route::get('download', [ProblemController::class, 'download'])
-                ->name('download');
             Route::get('podium', [ProblemController::class, 'podium'])
                 ->name('podium');
+            Route::get('public', [ProblemController::class, 'publicChange'])
+                ->name('public');
             Route::get('download', [IOProblemController::class, 'download'])
                 ->name('download');
 
@@ -105,9 +117,6 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
                 ->name('scorer.reavaliate');
         });
 
-    // Forum Routes
-    Route::resource('forum', ForumController::class);
-
     // run routes
     Route::resource('submission', SubmissionController::class)
         ->only(['index', 'store', 'create', 'show']);
@@ -124,46 +133,22 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
     Route::get('/user/profile/{user}', [UserController::class, 'profileUser'])
         ->name('user.profile');
 
-    Route::resource('team', TeamController::class)
-        ->only(['index', 'store', 'create', 'edit', 'update', 'destroy']);
-    Route::get('/team/{team}/accept', [TeamController::class, 'accept'])
-        ->name('team.accept');
-    Route::get('/team/{team}/deny', [TeamController::class, 'deny'])
-        ->name('team.deny');
-    Route::get('/team/{team}/leave', [TeamController::class, 'leave'])
-        ->name('team.leave');
-
     Route::resource('contest', ContestController::class)
         ->only(['index', 'show', 'store', 'create', 'edit', 'update', 'destroy']);
     Route::post('/contest/{contest}/register', [ContestController::class, 'register'])
-        ->name('contest.register');
+        ->name('contest.register')->middleware('auth');
     Route::post('/contest/{contest}/unregister', [ContestController::class, 'unregister'])
-        ->name('contest.unregister');
+        ->name('contest.unregister')->middleware('auth');
     Route::post('/contest/{contest}/enter', [ContestController::class, 'enter'])
-        ->name('contest.enter');
+        ->name('contest.enter')->middleware('auth');
     Route::get('/contest/{contest}/leaderboard', [ContestController::class, 'leaderboard'])
         ->name('contest.leaderboard');
     Route::get('/contest/{contest}/submissions', [SubmissionController::class, 'global'])
         ->name('contest.submissions')
         ->can('viewSubmissions', 'contest');
-    Route::get('/contest/{contest}/admin', [ContestController::class, 'admin'])
-        ->name('contest.admin');
-    Route::post('/contest/{contest}/recomputateScores', [ContestController::class, 'recomputateScores'])
-        ->name('contest.recomputateScores');
-    Route::put('/contest/{contest}/settings', [ContestController::class, 'settings'])
-        ->name('contest.settings');
-    Route::post('/contest/{contest}/submission/{submission}/accept', [AdminJudgeSubmissionController::class, 'accept'])
-        ->name('contest.submission.accept');
-    Route::post('/contest/{contest}/submission/{submission}/rejectWA', [AdminJudgeSubmissionController::class, 'rejectWA'])
-        ->name('contest.submission.rejectWA');
-    Route::post('/contest/{contest}/submission/{submission}/rejectTL', [AdminJudgeSubmissionController::class, 'rejectTL'])
-        ->name('contest.submission.rejectTL');
-    Route::post('/contest/{contest}/submission/{submission}/rejectAI', [AdminJudgeSubmissionController::class, 'rejectAI'])
-        ->name('contest.submission.rejectAI');
-    Route::resource('contest.clarification', ClarificationController::class)
-        ->only(['update', 'destroy']);
-    Route::get('/contest/{contest}/competitor/{competitor}/review', [AdminJudgeSubmissionController::class, 'reviewCompetitor'])
-        ->name('contest.competitor.review');
+
+    // Forum Routes
+    Route::resource('forum', ForumController::class);
 });
 
 Route::get('/', function () {

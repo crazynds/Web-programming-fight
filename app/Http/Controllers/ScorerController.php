@@ -8,23 +8,19 @@ use App\Jobs\ScoreSubmitJob;
 use App\Models\File;
 use App\Models\Problem;
 use App\Models\Scorer;
-use App\Policies\ScorerPolicy;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Redirect;
 
 class ScorerController extends Controller
 {
-
-
     /**
      * Display a listing of the resource.
      */
     public function index(Problem $problem)
     {
         $this->authorize('update', $problem);
+
         return view('pages.scorer.index', [
             'problem' => $problem,
             'scores' => $problem->scores,
@@ -37,22 +33,26 @@ class ScorerController extends Controller
     public function create(Problem $problem)
     {
         $this->authorize('update', $problem);
+
         return view('pages.scorer.create', [
             'problem' => $problem,
-            'scorer' => new Scorer(),
+            'scorer' => new Scorer,
         ]);
     }
 
     public function reavaliate(Problem $problem)
     {
-        $user = Auth::user();
-        if (RateLimiter::tooManyAttempts('scores:reavaliate:' . $user->id, 3)) {
+        $this->authorize('update', $problem);
+
+        $user = $this->user();
+        if (RateLimiter::tooManyAttempts('scores:reavaliate:'.$user->id, 3)) {
             return Redirect::back()->withErrors(['msg' => 'Too many attempts! Wait a moment and try again!']);
         }
-        RateLimiter::hit('scores:reavaliate:' . $user->id, $problem->submissions()->where('result', '=', SubmitResult::Accepted)->count() * 60);
+        RateLimiter::hit('scores:reavaliate:'.$user->id, $problem->submissions()->where('result', '=', SubmitResult::Accepted)->count() * 60);
         foreach ($problem->submissions()->where('result', '=', SubmitResult::Accepted)->lazy() as $submit) {
             ScoreSubmitJob::dispatch($submit)->onQueue('low');
         }
+
         return redirect()->back();
     }
 
@@ -80,6 +80,7 @@ class ScorerController extends Controller
                 ScoreSubmitJob::dispatch($submit)->onQueue('low')->afterCommit();
             }
         });
+
         return redirect()->route('problem.scorer.index', ['problem' => $problem->id]);
         //
     }
@@ -100,6 +101,7 @@ class ScorerController extends Controller
     {
         $this->authorize('update', $problem);
         $scorer->delete();
+
         return redirect()->route('problem.scorer.index', ['problem' => $problem->id]);
     }
 }

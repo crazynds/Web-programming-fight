@@ -62,11 +62,13 @@
                         {{ $problem->time_limit / 1000 }}s
                     </div>
                     <div class="vr"></div>
-                    <a href="{{ route('submission.create', ['problem' => $problem->id]) }}">
-                        <button type="button">
-                        Submit
-                        </button>
-                    </a>
+                    @can('submit', $problem)
+                        <a href="{{ route('submission.create', ['problem' => $problem->id]) }}">
+                            <button type="button">
+                            Submit
+                            </button>
+                        </a>
+                    @endcan
 
                 </div>
                 <div class="hstack gap-2 justify-content-center">

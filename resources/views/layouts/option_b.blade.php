@@ -43,6 +43,11 @@
                         <li><a href="{{ route('contest.competitor.leaderboard') }}" class="{{ request()->routeIs('contest.competitor.leaderboard') ? 'active' : '' }}">Leaderboard</a></li>
                         <li><a href="{{ route('contest.competitor.index') }}" class="{{ request()->routeIs('contest.competitor.*') ? 'active' : '' }}">Competitors</a></li>
                     @endif
+                @else
+                    <li><a href="{{ route('problem.index') }}" class="{{ request()->routeIs('problem.*') ? 'active' : '' }}">Problems</a></li>
+                    <li><a href="{{ route('tag.index') }}" class="{{ request()->routeIs('tag.*') ? 'active' : '' }}">Tags</a></li>
+                    <li><a href="{{ route('submission.global') }}" class="{{ request()->routeIs('submission.global') ? 'active' : '' }}">Global Runs</a></li>
+                    <li><a href="{{ route('contest.index') }}" class="{{ request()->routeIs('contest.*') ? 'active' : '' }}">Contests</a></li>
                 @endauth
             </ul>
 

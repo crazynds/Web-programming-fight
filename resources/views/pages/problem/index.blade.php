@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    @php($user = Auth::user())
+    @php($user = Auth::user() ?? \App\Models\User::guest())
     <div class="row mb-4">
         <div class="col-8">
             <x-ballon />
@@ -37,9 +37,11 @@
         </div>
         <div class="col-4">
             @if (!$contestService->inContest)
-                <a style="float:right" href="{{ route('problem.create') }}">
-                    <button>New +</button>
-                </a>
+                @can('create', \App\Models\Problem::class)
+                    <a style="float:right" href="{{ route('problem.create') }}">
+                        <button>New +</button>
+                    </a>
+                @endcan
                 @if ($user->isAdmin())
                     <a style="float:right; margin-right: 5px;" href="{{ route('problem.import') }}">
                         <button>Import +</button>
@@ -145,9 +147,16 @@
                                         </a>
                                     @endif
                                     <div class="vr"></div>
-                                    <a href="{{ route('problem.testCase.index', ['problem' => $problem->id]) }}"
-                                        title="Test cases" class="d-flex action-btn">
-                                        <i class="las la-vial"></i>
+                                        <a href="{{ route('problem.testCase.index', ['problem' => $problem->id]) }}"
+                                            title="Test cases" class="d-flex action-btn">
+                                            <i class="las la-vial"></i>
+                                        </a>
+                                @endcan
+                                @can('download', $problem)
+                                    <div class="vr"></div>
+                                    <a href="{{ route('problem.download', ['problem' => $problem->id]) }}"
+                                        title="Download this problem" target="_blank" class="d-flex action-btn">
+                                        <i class="las la-file-archive"></i>
                                     </a>
                                 @endcan
                                 @can('update', $problem)
@@ -158,12 +167,6 @@
                                             <i class="las la-star"></i>
                                         </a>
                                     @endif
-
-                                    <div class="vr"></div>
-                                    <a href="{{ route('problem.download', ['problem' => $problem->id]) }}"
-                                        title="Download this problem" target="_blank" class="d-flex action-btn">
-                                        <i class="las la-file-archive"></i>
-                                    </a>
 
                                     <div class="vr"></div>
                                     <a href="{{ route('problem.edit', ['problem' => $problem->id]) }}"

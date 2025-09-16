@@ -16,7 +16,6 @@ use App\Models\Submission;
 use App\Models\User;
 use App\Services\ContestService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Redirect;
@@ -53,7 +52,7 @@ class SubmissionController extends Controller
     public function create(Request $request)
     {
         /** @var User $user */
-        $user = Auth::user();
+        $user = $this->user();
 
         if ($this->contestService->inContest) {
             $problems = $this->contestService->contest->problems()->get();
@@ -74,7 +73,7 @@ class SubmissionController extends Controller
      */
     public function store(StoreSubmissionRequest $request)
     {
-        $user = Auth::user();
+        $user = $this->user();
         if (RateLimiter::tooManyAttempts('submission:'.$user->id, 30)) {
             return Redirect::back()->withErrors(['msg' => 'Too many attempts! Wait a moment and try again!']);
         }
@@ -204,7 +203,7 @@ class SubmissionController extends Controller
     {
         $this->authorize('update', $submission);
         /** @var User */
-        $user = Auth::user();
+        $user = $this->user();
         if (RateLimiter::tooManyAttempts('resubmission:'.$user->id, 5)) {
             return response()->json([
                 'status' => 'error',

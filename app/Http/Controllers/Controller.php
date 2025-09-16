@@ -12,9 +12,12 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
-    public function user():User{
-        /** @var User */
-        return Auth::user();
-    }
+    public function user(): ?User
+    {
+        /** @var User|null */
+        $user = Auth::user();
+        $user ??= User::guest();
 
+        return $user;
+    }
 }

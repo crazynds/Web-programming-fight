@@ -28,9 +28,9 @@ class StoreCompetitorRequest extends FormRequest
             'team' => [
                 'sometimes',
                 Rule::exists('team_user', 'team_id')
-                    ->where('user_id', Auth::user()->id)
-                    ->where('owner', true)
-            ]
+                    ->where('user_id', Auth::id())
+                    ->where('owner', true),
+            ],
         ];
     }
 }

@@ -6,7 +6,6 @@ use App\Http\Requests\StoreRatingRequest;
 use App\Models\Problem;
 use App\Models\Rating;
 use App\Services\ContestService;
-use Illuminate\Support\Facades\Auth;
 
 class RatingController extends Controller
 {
@@ -17,7 +16,7 @@ class RatingController extends Controller
         } else {
             $problems = Problem::where(function ($query) {
                 /** @var User */
-                $user = Auth::user();
+                $user = $this->user();
                 if (! $user->isAdmin()) {
                     $query->where('user_id', $user->id)
                         ->orWhere('visible', true);
@@ -30,7 +29,7 @@ class RatingController extends Controller
 
         return Rating::updateOrCreate([
             'problem_id' => $problem->id,
-            'user_id' => Auth::user()->id,
+            'user_id' => $this->user()->id,
         ], [
             'value' => $request->value,
             'computed' => false,

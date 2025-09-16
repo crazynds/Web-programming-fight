@@ -6,7 +6,6 @@ use App\Http\Requests\StoreTeamRequest;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
@@ -24,7 +23,7 @@ class TeamController extends Controller
     public function index()
     {
         /** @var User */
-        $user = Auth::user();
+        $user = $this->user();
 
         return view('pages.team.index', [
             'teams' => $user->teams()->withPivot(['accepted', 'owner'])->withCount(['members', 'invited'])->get(),
@@ -34,7 +33,7 @@ class TeamController extends Controller
     public function accept(Team $team)
     {
         // Gate::authorize('modifyMembers', $team);
-        $user = Auth::user();
+        $user = $this->user();
         $team->related()->updateExistingPivot($user, [
             'accepted' => true,
         ]);
@@ -45,7 +44,7 @@ class TeamController extends Controller
     public function leave(Team $team)
     {
         Gate::authorize('leave', $team);
-        $user = Auth::user();
+        $user = $this->user();
         $team->related()->detach($user);
 
         return redirect()->route('team.index');
@@ -53,7 +52,7 @@ class TeamController extends Controller
 
     public function deny(Team $team)
     {
-        $user = Auth::user();
+        $user = $this->user();
         $team->related()->detach($user);
 
         return redirect()->route('team.index');
@@ -83,7 +82,7 @@ class TeamController extends Controller
             $data['institution_acronym'] = Str::upper($data['institution_acronym']);
         }
         /** @var User */
-        $user = Auth::user();
+        $user = $this->user();
         $team = new Team($data);
         $team->save();
         $team->members()->attach($user, [
@@ -130,7 +129,7 @@ class TeamController extends Controller
             }
             $members = $request->input('membersjson');
             /** @var User */
-            $user = Auth::user();
+            $user = $this->user();
             $team->update($data);
             $team->related()->detach($team->invited);
             $idsAdded = [];

@@ -87,6 +87,6 @@ class AdminJudgeSubmissionController extends Controller
         $total = $competitor->submissions()->count();
         $submission = $competitor->submissions()->orderBy('id')->offset($offset)->first();
 
-        return view('pages.contest.competitor.review', compact('contest', 'competitor', 'submission', 'offset', 'total'));
+        return view('pages.contest.admin.competitor.review', compact('contest', 'competitor', 'submission', 'offset', 'total'));
     }
 }

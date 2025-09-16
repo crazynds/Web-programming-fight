@@ -16,6 +16,10 @@ body {
     color: var(--text-color);
 }
 
+table{
+    margin: auto;
+}
+
 /* Header */
 .header {
     background-color: white;

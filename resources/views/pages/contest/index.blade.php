@@ -79,12 +79,12 @@
                                     👥
                                 @endif
                             </span>
-                            @if ($contest->user_id == Auth::user()->id)
+                            @if ($contest->user_id == Auth::id())
                                 <span title="Owner of the contest" style="cursor:help">
                                     👑
                                 </span>
                             @endif
-                        @elseif ($contest->user_id == Auth::user()->id)
+                        @elseif ($contest->user_id == Auth::id())
                             <span title="Owner of the contest" style="cursor:help">
                                 👑
                             </span>

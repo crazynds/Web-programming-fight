@@ -86,7 +86,7 @@ class ProblemController extends Controller
                 },
                 'submissions as my_accepted_submissions' => function ($query) {
                     $query->where('submissions.result', SubmitResult::Accepted)
-                        ->where('submissions.user_id', Auth::user()->id)
+                        ->where('submissions.user_id', $this->user()->id)
                         ->limit(1);
                 },
                 'ranks',
@@ -94,13 +94,14 @@ class ProblemController extends Controller
                 ->whereNull('problems.online_judge')
                 ->where(function ($query) {
                     /** @var User */
-                    $user = Auth::user();
+                    $user = $this->user();
                     if (! $user->isAdmin()) {
                         $query->where('user_id', $user->id)
                             ->orWhere('visible', true);
                     }
                 })
                 ->orderBy('id');
+
             if ($search) {
                 if (DB::getDriverName() == 'pgsql') {
                     $problems->where('title', 'ilike', '%'.$search.'%');
@@ -125,8 +126,10 @@ class ProblemController extends Controller
             foreach ($problems as $problem) {
                 $ids[] = $problem->id;
             }
-            foreach (Rating::where('user_id', Auth::id())->whereIn('id', $ids)->get() as $rating) {
-                $ratings[$rating->problem_id] = $rating;
+            if (Auth::user()) {
+                foreach (Rating::where('user_id', $this->user()->id)->whereIn('id', $ids)->get() as $rating) {
+                    $ratings[$rating->problem_id] = $rating;
+                }
             }
         } else {
             // $vjudge = new VJudgeService;
@@ -163,7 +166,7 @@ class ProblemController extends Controller
     public function store(StoreProblemRequest $request)
     {
         /** @var User $user */
-        $user = Auth::user();
+        $user = $this->user();
         $data = $request->safe([
             'title',
             'author',
@@ -211,7 +214,7 @@ class ProblemController extends Controller
                 ->orderBy('id')->get();
         }
         /** @var User */
-        $user = Auth::user();
+        $user = $this->user();
         $rating = Rating::find([
             'user_id' => $user->id,
             'problem_id' => $problem->id,
@@ -240,7 +243,7 @@ class ProblemController extends Controller
     public function update(StoreProblemRequest $request, Problem $problem)
     {
         /** @var User $user */
-        $user = Auth::user();
+        $user = $this->user();
         $data = $request->safe([
             'title',
             'author',

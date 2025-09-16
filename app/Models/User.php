@@ -12,6 +12,18 @@ class User extends Authenticatable
 
     public $guarded = [];
 
+    public static function guest()
+    {
+        return once(function () {
+            return new User([
+                'id' => 0,
+                'name' => 'Guest',
+                'email' => 'guest@localhost',
+                'email_verified_at' => now(),
+            ]);
+        });
+    }
+
     public function directory()
     {
         return 'users/'.$this->id;
