@@ -58,7 +58,7 @@
                         {{-- <a href="./Statistics.html">Ranking</a> | --}}
                         <div class="dropdown me-2" style="float:right">
                             @if (!$contestService->inContest)
-                                <a href="{{ route('forum.index') }}">Forum</a> |
+                                {{-- <a href="{{ route('forum.index') }}">Forum</a> | --}}
                                 <a href="{{ route('team.index') }}">Teams</a> |
                                 <a href="{{ route('contest.index') }}">Contests</a> |
                             @else

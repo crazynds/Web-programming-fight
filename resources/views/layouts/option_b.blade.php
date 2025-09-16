@@ -38,7 +38,7 @@
                     
                     @if (!$contestService->inContest)
                         <li><a href="{{ route('contest.index') }}" class="{{ request()->routeIs('contest.*') && !$contestService->inContest ? 'active' : '' }}">Contests</a></li>
-                        <li><a href="{{ route('forum.index') }}" class="{{ request()->routeIs('forum.*') ? 'active' : '' }}">Forum</a></li>
+                        {{-- <li><a href="{{ route('forum.index') }}" class="{{ request()->routeIs('forum.*') ? 'active' : '' }}">Forum</a></li> --}}
                     @else
                         <li><a href="{{ route('contest.competitor.leaderboard') }}" class="{{ request()->routeIs('contest.competitor.leaderboard') ? 'active' : '' }}">Leaderboard</a></li>
                         <li><a href="{{ route('contest.competitor.index') }}" class="{{ request()->routeIs('contest.competitor.*') ? 'active' : '' }}">Competitors</a></li>
