@@ -1,0 +1,73 @@
+a {
+    color: #000000;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: #1a5a96;
+}
+
+table{
+    border: #E1E1E1 5px solid;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+
+td, th{
+    border-top: 1px solid #e1e1e1;
+    padding: 0.4em;
+    /* font-size: 0.9em; */
+    text-align: center;
+    overflow: hidden;
+}
+
+th {
+    font-weight: 700;
+    background-color: #fff;
+}
+
+/* Default button styles */
+button:not([class]),
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+    background-color: #568dc4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 6px;
+    font-size: 0.9em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+button:hover,
+input[type="button"]:hover,
+input[type="submit"]:hover,
+input[type="reset"]:hover {
+    background-color: #7aade0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+button:active,
+input[type="button"]:active,
+input[type="submit"]:active,
+input[type="reset"]:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+button:disabled,
+input[type="button"]:disabled,
+input[type="submit"]:disabled,
+input[type="reset"]:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+    box-shadow: none;
+}

@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Contest\ClarificationController;
 use App\Http\Controllers\ContestController;
 use App\Http\Controllers\DiffController;
+use App\Http\Controllers\ForumController;
 use App\Http\Controllers\IOProblemController;
 use App\Http\Controllers\ProblemController;
 use App\Http\Controllers\RatingController;
@@ -103,6 +104,9 @@ Route::middleware(['auth', PreventAccessDuringContest::class])->group(function (
             Route::get('scorer/all/reavaliate', [ScorerController::class, 'reavaliate'])
                 ->name('scorer.reavaliate');
         });
+
+    // Forum Routes
+    Route::resource('forum', ForumController::class);
 
     // run routes
     Route::resource('submission', SubmissionController::class)

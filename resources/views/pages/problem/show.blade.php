@@ -1,4 +1,4 @@
-@extends('layouts.boca')
+@extends('layouts.base')
 
 @section('head')
     <script>

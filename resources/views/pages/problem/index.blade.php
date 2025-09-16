@@ -1,4 +1,4 @@
-@extends('layouts.boca')
+@extends('layouts.base')
 
 @section('head')
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -60,13 +60,13 @@
                 @if (!$contestService->inContest)
                     <th class="text-center px-2"><b>Difficulty</b></th>
                 @endif
-                <th class="text-center px-2"><b>Mem</b></th>
-                <th class="text-center px-2"><b>Time</b></th>
+                {{-- <th class="text-center px-2"><b>Mem</b></th>
+                <th class="text-center px-2"><b>Time</b></th> --}}
                 <th class="text-center px-2"><b>Accepts</b></th>
-                <th class="text-center px-2"><b>Attempts</b></th>
-                @if (!$contestService->inContest)
+                {{-- <th class="text-center px-2"><b>Attempts</b></th> --}}
+                {{-- @if (!$contestService->inContest)
                     <th class="text-center px-2"><b>Maintainer</b></th>
-                @endif
+                @endif --}}
                 <th style="text-align: end;" class="px-2"><b>Actions</b></th>
             </tr>
         </thead>
@@ -97,12 +97,12 @@
                                 @else data-my-ratting="{{ ($rating[$problem->id]?->value ?? $problem->rating) / 2.0 }}" @endif>
                         </td>
                     @endif
-                    <td class="px-2 text-center">
+                    {{-- <td class="px-2 text-center">
                         {{ $problem->memory_limit }}MB
                     </td>
                     <td class="px-2 text-center">
                         {{ $problem->time_limit / 1000 }}s
-                    </td>
+                    </td> --}}
                     <td class="text-center">
                         @if ($problem->submissions_count == 0)
                             --%
@@ -110,7 +110,7 @@
                             {{ round(($problem->accepted_submissions / $problem->submissions_count) * 100, 2) }}%
                         @endif
                     </td>
-                    <td class="text-center">
+                    {{-- <td class="text-center">
                         {{ $problem->submissions_count }}
                     </td>
                     @if (!$contestService->inContest)
@@ -123,7 +123,7 @@
                                 ------
                             @endif
                         </td>
-                    @endif
+                    @endif --}}
                     <td class="px-2">
                         <div class="hstack gap-1">
                             @if ($contestService->inContest)

@@ -273,6 +273,6 @@ class ProblemController extends Controller
     {
         $problem->delete();
 
-        return $this->index($request);
+        return redirect()->back();
     }
 }

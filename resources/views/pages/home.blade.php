@@ -1,4 +1,4 @@
-@extends('layouts.boca')
+@extends('layouts.base')
 
 
 @section('head')
@@ -48,6 +48,24 @@
         @else
             @php
                 $changelogs = [
+                    [
+                        'version' => 'v1.2.0',
+                        'title' => 'New horizons 🌠',
+                        'date' => '18-07-2025',
+                        'author' => 'Crazynds',
+                        'features' => [
+                            'Added forum.',
+                        ],
+                        'changes' => [
+                            'Now all problems are rated based on the solutions.'
+                        ],
+                        'styles' => [
+                            'New layout page.',
+                            'Hidden some problem columns (Mem, Tries, Mainteiner)'
+                        ],
+                        'fixes' => [
+                        ]
+                    ],
                     [
                         'version' => 'v1.1.1',
                         'title' => 'Preparation for "II Maratona Gaúcha"!',

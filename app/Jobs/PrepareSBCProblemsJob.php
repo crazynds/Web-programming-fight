@@ -87,22 +87,35 @@ class PrepareSBCProblemsJob implements ShouldQueue
             'memory_limit' => $memorylimit,
         ]);
 
-        // Pegar os testes cases
-        $num = 0;
-        while ($inputTestCase = $zp->getFromName('input/'.$letter.'_'.++$num)) {
-            $file = $letter.'_'.$num;
-            $outputTestCase = $zp->getFromName('output/'.$file);
-            $inputFile = File::createFileByData($inputTestCase, "problems/{$problem->id}/input");
-            $outputFile = File::createFileByData($outputTestCase, "problems/{$problem->id}/output");
-            $problem->testCases()->create([
-                'name' => $file,
-                'type' => TestCaseType::FileDiff,
-                'input_file' => $inputFile->id,
-                'output_file' => $outputFile->id,
-                'validated' => true,
-                'public' => $num <= 2, // Show only the first 2 test cases
-                'position' => $problem->testCases()->count() + 1,
-            ]);
+        $testCaseCount = 0;
+        $publicTestCases = 2;
+
+        for ($i = 0; $i < $zp->numFiles; $i++) {
+            $filename = $zp->getNameIndex($i);
+
+            if (str_starts_with($filename, 'input/') && ! str_ends_with($filename, '/')) {
+                $baseFilename = basename($filename);
+                $outputFilename = 'output/'.$baseFilename;
+
+                if (($inputContent = $zp->getFromName($filename)) !== false &&
+                    ($outputContent = $zp->getFromName($outputFilename)) !== false) {
+
+                    $inputFile = File::createFileByData($inputContent, "problems/{$problem->id}/input");
+                    $outputFile = File::createFileByData($outputContent, "problems/{$problem->id}/output");
+
+                    $problem->testCases()->create([
+                        'name' => $baseFilename,
+                        'type' => TestCaseType::FileDiff,
+                        'input_file' => $inputFile->id,
+                        'output_file' => $outputFile->id,
+                        'validated' => true,
+                        'public' => $testCaseCount < $publicTestCases,
+                        'position' => $problem->testCases()->count() + 1,
+                    ]);
+
+                    $testCaseCount++;
+                }
+            }
         }
         // Vincular as tags
         $problem->tags()->attach(Tag::firstOrCreate(

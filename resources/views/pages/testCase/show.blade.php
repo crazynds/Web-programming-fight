@@ -1,4 +1,4 @@
-@extends('layouts.boca')
+@extends('layouts.base')
 
 @section('content')
     <div class="row mb-4 justify-content-between">

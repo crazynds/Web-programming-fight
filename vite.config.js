@@ -9,6 +9,8 @@ export default defineConfig({
                 "resources/sass/app.scss",
                 "resources/css/boca.css",
                 "resources/css/custom.css",
+                "resources/css/modern.css",
+                "resources/css/option_b.css",
                 "resources/js/app.js",
             ],
             refresh: true,

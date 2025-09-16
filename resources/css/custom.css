@@ -71,3 +71,55 @@ body.contest {
 body.contest #headerTab td{
     background-color: #fffb46;
 }
+
+
+.action-btn{
+    text-decoration:none !important;
+}
+
+
+.social-media-menu {
+    background-repeat: no-repeat;
+    display: inline-block;
+    border-radius: 3px;
+    border: 1px solid #bbb;
+    margin: 0 0.5px;
+    width: 33px;
+    height: 33px;
+    background-color: white;
+    margin-bottom: -10px;
+}
+
+.blink {
+    -webkit-animation: blink 2s infinite both;
+    animation: blink 2s infinite both;
+}
+
+@-webkit-keyframes blink {
+
+    0%,
+    50%,
+    100% {
+        opacity: 1;
+    }
+
+    25%,
+    75% {
+        opacity: 0.4;
+    }
+}
+
+@keyframes blink {
+
+    0%,
+    50%,
+    100% {
+        opacity: 1;
+    }
+
+    25%,
+    75% {
+        opacity: 0.4;
+    }
+}
+  

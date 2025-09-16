@@ -2,81 +2,9 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
-    <title>{{ config('app.name') }}</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <script>
-        window.env = {
-            REVERB_APP_KEY: '{{ config('reverb.apps.apps.0.key') }}',
-            REVERB_HOST: '{{ config('reverb.apps.apps.0.options.host') }}',
-            REVERB_SCHEME: '{{ config('reverb.apps.apps.0.options.scheme') }}',
-            REVERB_PORT: '{{ config('reverb.apps.apps.0.options.port') }}',
-            REVERB_PATH: '',
-            LIVEWIRE: {{ config('app.livewire') ? 'true' : 'false' }},
-        }
-    </script>
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
-
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     @vite(['resources/css/boca.css'])
-    @vite(['resources/css/custom.css'])
-
-    <style>
-        .sm-github {
-            background-image: url({{ asset('img/socialmediasHorizontal.webp') }});
-            background-position: -66px 0;
-            height: 33px;
-            display: block;
-        }
-
-        .social-media-menu {
-            background-repeat: no-repeat;
-            display: inline-block;
-            border-radius: 3px;
-            border: 1px solid #bbb;
-            margin: 0 0.5px;
-            width: 33px;
-            height: 33px;
-            background-color: white;
-            margin-bottom: -10px;
-        }
-
-        .blink {
-            -webkit-animation: blink 2s infinite both;
-            animation: blink 2s infinite both;
-        }
-
-        @-webkit-keyframes blink {
-
-            0%,
-            50%,
-            100% {
-                opacity: 1;
-            }
-
-            25%,
-            75% {
-                opacity: 0.4;
-            }
-        }
-
-        @keyframes blink {
-
-            0%,
-            50%,
-            100% {
-                opacity: 1;
-            }
-
-            25%,
-            75% {
-                opacity: 0.4;
-            }
-        }
-    </style>
+    @yield('layout-head')
     @livewireStyles
     @yield('head')
 </head>
@@ -106,8 +34,6 @@
                             <span style="float:left">
                                 {{ now()->year }} |
                             </span>
-                            <!-- Place this tag where you want the button to render. -->
-                            <!-- Place this tag where you want the button to render. -->
                             <a class="github-button" href="https://github.com/crazynds/Web-programming-fight"
                                 data-color-scheme="no-preference: light; light: light; dark: dark;"
                                 data-icon="octicon-star"
@@ -121,7 +47,7 @@
                             <a href="{{ route('problem.index') }}">Problems</a> |
                             {{-- <a href="{{ route('submission.create') }}">Submit</a> | --}}
                             @if (!$contestService->inContest)
-                                <a href="{{ route('tag.index') }}">Tags</a> |
+                            <a href="{{ route('tag.index') }}">Tags</a> |
                             @endif
                             <a href="{{ route('submission.index') }}">Runs</a>
                         @else
@@ -132,6 +58,7 @@
                         {{-- <a href="./Statistics.html">Ranking</a> | --}}
                         <div class="dropdown me-2" style="float:right">
                             @if (!$contestService->inContest)
+                                <a href="{{ route('forum.index') }}">Forum</a> |
                                 <a href="{{ route('team.index') }}">Teams</a> |
                                 <a href="{{ route('contest.index') }}">Contests</a> |
                             @else

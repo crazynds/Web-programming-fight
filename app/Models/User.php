@@ -25,7 +25,7 @@ class User extends Authenticatable
     public function isAdmin()
     {
         // return false;
-        return $this->id == 1 || $this->email == 'pozzer3@gmail.com';
+        return $this->id == 1 || $this->email == 'pozzer3@gmail.com' || $this->email == 'lh.lagonds@gmail.com';
     }
 
     public function problems()

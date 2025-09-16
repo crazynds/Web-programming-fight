@@ -120,7 +120,7 @@ class UpdateProblemRatingJob implements ShouldBeUnique, ShouldQueue
             'dificultade_tentativas_relativa' => $dificultade_tentativas_relativa,
         ]);
         // Combinação ponderada (ajuste os pesos conforme desejar)
-        $dificuldade_bruta = 0.40 * $dificuldade_resolucao + 0.20 * $dificuldade_tentativas + 0.40 * $dificultade_tentativas_relativa;
+        $dificuldade_bruta = 0.20 * $dificuldade_resolucao + 0.20 * $dificuldade_tentativas + 0.60 * $dificultade_tentativas_relativa;
 
         // Escala final de 0 a 10
         return round($dificuldade_bruta * 10, 2);
