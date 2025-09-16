@@ -78,6 +78,10 @@ body.contest #headerTab td{
 }
 
 
+img{
+    max-width: 100%;
+}
+
 .social-media-menu {
     background-repeat: no-repeat;
     display: inline-block;
