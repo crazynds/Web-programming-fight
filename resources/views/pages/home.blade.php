@@ -52,13 +52,14 @@
                     'author' => 'Crazynds',
                     'features' => [
                         'Added forum.',
+                        'Guests now can have free access without login.',
                     ],
                     'changes' => [
                         'Now all problems are rated based on the solutions.'
                     ],
                     'styles' => [
                         'New layout page.',
-                        'Hidden some problem columns (Mem, Tries, Mainteiner)'
+                        'Hidden some problem columns (Mem, Tries, Mainteiner).'
                     ],
                     'fixes' => [
                     ]
