@@ -89,32 +89,37 @@ class PrepareSBCProblemsJob implements ShouldQueue
 
         $testCaseCount = 0;
         $publicTestCases = 2;
-
+        $files = [];
         for ($i = 0; $i < $zp->numFiles; $i++) {
             $filename = $zp->getNameIndex($i);
 
             if (str_starts_with($filename, 'input/') && ! str_ends_with($filename, '/')) {
                 $baseFilename = basename($filename);
-                $outputFilename = 'output/'.$baseFilename;
+                $files[] = $baseFilename;
+            }
+        }
+        sort($files);
+        foreach ($files as $file) {
+            $filename = 'input/'.$file;
+            $outputFilename = 'output/'.$file;
 
-                if (($inputContent = $zp->getFromName($filename)) !== false &&
-                    ($outputContent = $zp->getFromName($outputFilename)) !== false) {
+            if (($inputContent = $zp->getFromName($filename)) !== false &&
+                ($outputContent = $zp->getFromName($outputFilename)) !== false) {
 
-                    $inputFile = File::createFileByData($inputContent, "problems/{$problem->id}/input");
-                    $outputFile = File::createFileByData($outputContent, "problems/{$problem->id}/output");
+                $inputFile = File::createFileByData($inputContent, "problems/{$problem->id}/input");
+                $outputFile = File::createFileByData($outputContent, "problems/{$problem->id}/output");
 
-                    $problem->testCases()->create([
-                        'name' => $baseFilename,
-                        'type' => TestCaseType::FileDiff,
-                        'input_file' => $inputFile->id,
-                        'output_file' => $outputFile->id,
-                        'validated' => true,
-                        'public' => $testCaseCount < $publicTestCases,
-                        'position' => $problem->testCases()->count() + 1,
-                    ]);
+                $problem->testCases()->create([
+                    'name' => $file,
+                    'type' => TestCaseType::FileDiff,
+                    'input_file' => $inputFile->id,
+                    'output_file' => $outputFile->id,
+                    'validated' => true,
+                    'public' => $testCaseCount < $publicTestCases,
+                    'position' => $problem->testCases()->count() + 1,
+                ]);
 
-                    $testCaseCount++;
-                }
+                $testCaseCount++;
             }
         }
         // Vincular as tags
