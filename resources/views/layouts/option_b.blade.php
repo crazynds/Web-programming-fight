@@ -11,7 +11,7 @@
     @vite(['resources/css/modern.css', 'resources/css/option_b.css'])
     @yield('layout-head')
     @livewireStyles
-    @stack('styles')
+    @yield('head')
 </head>
 
 <body class="no-mathjax @if ($contestService->inContest) contest @endif">
@@ -182,6 +182,7 @@
             }
         });
     </script>
+    @yield('script')
     @stack('scripts')
 </body>
 
