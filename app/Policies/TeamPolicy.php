@@ -65,7 +65,7 @@ class TeamPolicy
      */
     public function restore(User $user, Team $team): bool
     {
-        return $user->isAdmin();
+        return $user?->isAdmin();
     }
 
     /**
@@ -73,6 +73,6 @@ class TeamPolicy
      */
     public function forceDelete(User $user, Team $team): bool
     {
-        return $user->isAdmin();
+        return $user?->isAdmin();
     }
 }

@@ -48,7 +48,7 @@
                 [
                     'version' => 'v1.2.0',
                     'title' => 'New horizons 🌠',
-                    'date' => '18-07-2025',
+                    'date' => 'XX-10-2025',
                     'author' => 'Crazynds',
                     'features' => [
                         'Added forum.',

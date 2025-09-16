@@ -17,7 +17,7 @@
                 <th class="text-center" colspan="2"><b>User</b></th>
                 <th class="text-center"><b>Created At</b></th>
                 <th class="text-center"><b>Last Run</b></th>
-                @if(\Auth::user()->isAdmin())
+                @if(\Auth::user()?->isAdmin())
                 <th style="text-align: end;"><b>Actions</b></th>
                 @endif
             </tr>

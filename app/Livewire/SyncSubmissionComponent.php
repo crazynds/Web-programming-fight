@@ -68,7 +68,7 @@ class SyncSubmissionComponent extends Component
         }
         /** @var User */
         $user = Auth::user();
-        if (! $user->isAdmin()) {
+        if (! $user?->isAdmin()) {
             $query->limit(100);
         }
 

@@ -24,12 +24,12 @@ class SubmissionPolicy
      */
     public function view(User $user, Submission $submission): bool
     {
-        return $user->id == $submission->user_id || $user->isAdmin();
+        return $user->id == $submission->user_id || $user?->isAdmin();
     }
 
     public function viewOutput(User $user, Submission $submission): bool
     {
-        if ($user->isAdmin()) {
+        if ($user?->isAdmin()) {
             return true;
         }
         if (! $this->view($user, $submission)) {
@@ -55,7 +55,7 @@ class SubmissionPolicy
      */
     public function update(User $user, Submission $submission): bool
     {
-        if ($user->isAdmin()) {
+        if ($user?->isAdmin()) {
             return true;
         }
         if ($submission->contest_id) {
@@ -65,7 +65,7 @@ class SubmissionPolicy
             return false;
         }
 
-        return ($user->id == $submission->user_id && $submission->contest_id == null) || $user->isAdmin();
+        return ($user->id == $submission->user_id && $submission->contest_id == null) || $user?->isAdmin();
     }
 
     /**
@@ -73,6 +73,6 @@ class SubmissionPolicy
      */
     public function delete(User $user, Submission $submission): bool
     {
-        return $user->isAdmin();
+        return $user?->isAdmin();
     }
 }

@@ -42,7 +42,7 @@
                         <button>New +</button>
                     </a>
                 @endcan
-                @if ($user->isAdmin())
+                @if ($user??->isAdmin())
                     <a style="float:right; margin-right: 5px;" href="{{ route('problem.import') }}">
                         <button>Import +</button>
                     </a>
@@ -160,7 +160,7 @@
                                     </a>
                                 @endcan
                                 @can('update', $problem)
-                                    @if ($user->isAdmin())
+                                    @if ($user?->isAdmin())
                                         <div class="vr"></div>
                                         <a href="{{ route('problem.scorer.index', ['problem' => $problem->id]) }}"
                                             title="Edit scores" class="d-flex action-btn">

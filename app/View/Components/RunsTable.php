@@ -63,7 +63,7 @@ class RunsTable extends Component
                 $query->select('id', 'acronym', 'name');
             });
         }
-        if (! $user->isAdmin()) {
+        if (! $user?->isAdmin()) {
             $query->limit(300);
         }
 

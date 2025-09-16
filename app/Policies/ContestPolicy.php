@@ -38,7 +38,7 @@ class ContestPolicy
 
     public function admin(User $user, Contest $contest): bool
     {
-        return $user->id == $contest->user_id || $user->isAdmin();
+        return $user->id == $contest->user_id || $user?->isAdmin();
     }
 
     /**
@@ -70,7 +70,7 @@ class ContestPolicy
      */
     public function restore(User $user, Contest $contest): bool
     {
-        return $user->isAdmin() || $user->id == $contest->user_id;
+        return $user?->isAdmin() || $user->id == $contest->user_id;
     }
 
     /**
@@ -78,6 +78,6 @@ class ContestPolicy
      */
     public function forceDelete(User $user, Contest $contest): bool
     {
-        return $user->isAdmin();
+        return $user?->isAdmin();
     }
 }

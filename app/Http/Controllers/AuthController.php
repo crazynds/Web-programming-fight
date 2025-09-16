@@ -50,7 +50,7 @@ class AuthController extends Controller
         $users = User::all();
         $users->shuffle();
         foreach ($users as $user) {
-            if (! $user->isAdmin()) {
+            if (! $user?->isAdmin()) {
                 Auth::login($user, true);
 
                 return redirect()->route('user.profile', [

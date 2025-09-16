@@ -95,7 +95,7 @@ class ProblemController extends Controller
                 ->where(function ($query) {
                     /** @var User */
                     $user = $this->user();
-                    if (! $user->isAdmin()) {
+                    if (! $user?->isAdmin()) {
                         $query->where('user_id', $user->id)
                             ->orWhere('visible', true);
                     }
@@ -176,7 +176,7 @@ class ProblemController extends Controller
             'input_description',
             'output_description',
         ]);
-        if (! $user->isAdmin()) {
+        if (! $user?->isAdmin()) {
             $data['description'] = strip_tags($data['description']);
             $data['input_description'] = strip_tags($data['input_description']);
             $data['output_description'] = strip_tags($data['output_description']);
@@ -253,7 +253,7 @@ class ProblemController extends Controller
             'input_description',
             'output_description',
         ]);
-        if (! $user->isAdmin()) {
+        if (! $user?->isAdmin()) {
             if (isset($data['description'])) {
                 $data['description'] = strip_tags($data['description']);
             }

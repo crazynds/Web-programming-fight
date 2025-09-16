@@ -45,7 +45,7 @@ class ProblemPolicy
      */
     public function update(User $user, Problem $problem): bool
     {
-        return $user->isAdmin() || $user->id == $problem->user_id;
+        return $user?->isAdmin() || $user->id == $problem->user_id;
     }
 
     /**
@@ -69,7 +69,7 @@ class ProblemPolicy
      */
     public function forceDelete(User $user, Problem $problem): bool
     {
-        return $user->isAdmin();
+        return $user?->isAdmin();
     }
 
     public function submit(User $user, Problem $problem)

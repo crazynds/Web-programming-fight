@@ -231,7 +231,7 @@ class ContestController extends Controller
     {
         /** @var User $user */
         $user = $this->user();
-        if ($user->isAdmin()) {
+        if ($user?->isAdmin()) {
             $problems = Problem::all();
         } else {
             $problems = Problem::where('visible', true)->orWhere('user_id', $user->id)->get();
@@ -283,7 +283,7 @@ class ContestController extends Controller
     {
         /** @var User $user */
         $user = $this->user();
-        if ($user->isAdmin()) {
+        if ($user?->isAdmin()) {
             $problems = Problem::all();
         } else {
             $problems = Problem::where('visible', true)->orWhere('user_id', $user->id)->get();

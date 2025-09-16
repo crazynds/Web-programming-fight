@@ -17,7 +17,7 @@ class RatingController extends Controller
             $problems = Problem::where(function ($query) {
                 /** @var User */
                 $user = $this->user();
-                if (! $user->isAdmin()) {
+                if (! $user?->isAdmin()) {
                     $query->where('user_id', $user->id)
                         ->orWhere('visible', true);
                 }

@@ -56,7 +56,7 @@ class SubmissionController extends Controller
 
         if ($this->contestService->inContest) {
             $problems = $this->contestService->contest->problems()->get();
-        } elseif ($user->isAdmin()) {
+        } elseif ($user?->isAdmin()) {
             $problems = Problem::all();
         } else {
             $problems = Problem::where('visible', true)->orWhere('user_id', $user->id)->get();
@@ -211,7 +211,7 @@ class SubmissionController extends Controller
             ], 429);
         }
         // 10 minutes
-        if (! $user->isAdmin()) {
+        if (! $user?->isAdmin()) {
             RateLimiter::hit('resubmission:'.$user->id, 60 * 10);
         }
 

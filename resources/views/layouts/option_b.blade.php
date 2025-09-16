@@ -72,7 +72,7 @@
                                 <a href="{{ route('submission.global') }}" class="dropdown-item">
                                     <i class="fas fa-globe"></i> Global Runs
                                 </a>
-                                @if (Auth::user()->isAdmin())
+                                @if (Auth::user()?->isAdmin())
                                     <div class="dropdown-divider"></div>
                                     <a href="{{ route('auth.changeUser') }}" class="dropdown-item">
                                         <i class="fas fa-exchange-alt"></i> Change User
@@ -104,7 +104,7 @@
                                 <a href="{{ route('submission.global') }}" class="dropdown-item">
                                     <i class="fas fa-globe"></i> Global Runs
                                 </a>
-                                @if (Auth::user()->isAdmin())
+                                @if (Auth::user()?->isAdmin())
                                     <div class="dropdown-divider"></div>
                                     <a href="{{ route('auth.changeUser') }}" class="dropdown-item">
                                         <i class="fas fa-exchange-alt"></i> Change User

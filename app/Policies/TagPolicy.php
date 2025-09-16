@@ -28,7 +28,7 @@ class TagPolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $user?->isAdmin();
     }
 
     /**
@@ -36,7 +36,7 @@ class TagPolicy
      */
     public function update(User $user, Tag $tag): bool
     {
-        return $user->isAdmin();
+        return $user?->isAdmin();
     }
 
     /**
@@ -44,6 +44,6 @@ class TagPolicy
      */
     public function delete(User $user, Tag $tag): bool
     {
-        return $user->isAdmin();
+        return $user?->isAdmin();
     }
 }

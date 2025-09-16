@@ -28,7 +28,7 @@ class ForumPolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $user?->isAdmin();
     }
 
     /**
@@ -36,7 +36,7 @@ class ForumPolicy
      */
     public function update(User $user, Forum $forum): bool
     {
-        return $user->isAdmin();
+        return $user?->isAdmin();
     }
 
     /**
@@ -44,6 +44,6 @@ class ForumPolicy
      */
     public function delete(User $user, Forum $forum): bool
     {
-        return $user->isAdmin();
+        return $user?->isAdmin();
     }
 }

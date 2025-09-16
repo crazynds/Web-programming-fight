@@ -45,12 +45,12 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Gate::define('import-zip', function (User $user) {
-            return $user->isAdmin()
+            return $user?->isAdmin()
                 ? Response::allow()
                 : Response::deny('You must be an administrator.');
         });
         Gate::define('viewPulse', function (User $user) {
-            return $user->isAdmin();
+            return $user?->isAdmin();
         });
         Paginator::useBootstrap();
         View::share('vjudgeService', new VJudgeService);

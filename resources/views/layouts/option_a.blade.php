@@ -265,7 +265,7 @@
                             <a href="{{ route('user.me') }}">
                                 <img src="{{ Auth::user()->avatar }}" class="user-avatar" alt="Avatar" />
                             </a>
-                            @if (Auth::user()->isAdmin())
+                            @if (Auth::user()?->isAdmin())
                                 <a href="{{ route('auth.changeUser') }}">Change User</a>
                             @endif
                             <a href="{{ route('auth.logout') }}">Logout</a>

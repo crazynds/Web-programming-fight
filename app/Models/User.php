@@ -12,7 +12,7 @@ class User extends Authenticatable
 
     public $guarded = [];
 
-    public static function guest()
+    public static function guest(): User
     {
         return once(function () {
             return new User([
