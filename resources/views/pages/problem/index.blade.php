@@ -42,7 +42,7 @@
                         <button>New +</button>
                     </a>
                 @endcan
-                @if ($user??->isAdmin())
+                @if ($user?->isAdmin())
                     <a style="float:right; margin-right: 5px;" href="{{ route('problem.import') }}">
                         <button>Import +</button>
                     </a>
