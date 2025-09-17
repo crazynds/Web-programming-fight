@@ -106,7 +106,7 @@
                 @endforeach
             </div>
         </div>
-        <div class="col-3" style="border-right: black dashed 1px; min-height: 70vh">
+        <div class="col-4" style="border-right: black dashed 1px; min-height: 70vh">
             <h4>Clarifications</h4>
             @if ($errors->any())
                 <div class="row mt-3">
@@ -135,7 +135,7 @@
                         <small>{{ $clarification->problem->title }}</small><br>
                         {{ $clarification->question }}
                     </div>
-                    <textarea name="answer" id="answer" cols="50" rows="4">{{ $clarification->answer ?? '' }}</textarea>
+                    <textarea name="answer" id="answer" cols="50" rows="4" style="max-width: 100%;">{{ $clarification->answer ?? '' }}</textarea>
 
                     <br>
                     <label for="public" class="form-label">Public: </label>
@@ -155,7 +155,7 @@
                 <hr />
             @endforeach
         </div>
-        <div class="col-2">
+        <div class="col-3">
             <table border="1" id="ranking">
                 <thead>
                     <tr>
