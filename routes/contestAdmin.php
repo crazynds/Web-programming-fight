@@ -8,7 +8,8 @@ use App\Http\Middleware\PreventAccessDuringContest;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware([PreventAccessDuringContest::class, 'auth'])->group(function () {
-    Route::get('/contest/{contest}/admin', [ContestController::class, 'admin']);
+    Route::get('/contest/{contest}/admin', [ContestController::class, 'admin'])
+        ->name('dashboard');
     Route::post('/contest/{contest}/admin/recomputateScores', [ContestController::class, 'recomputateScores'])
         ->name('recomputateScores');
     Route::put('/contest/{contest}/admin/settings', [ContestController::class, 'settings'])

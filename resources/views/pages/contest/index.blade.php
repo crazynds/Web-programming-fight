@@ -143,7 +143,7 @@
 
                             @can('admin', $contest)
                                 <div class="vr"></div>
-                                <a href="{{ route('contest.admin', ['contest' => $contest->id]) }}"
+                                <a href="{{ route('contest.admin.dashboard', ['contest' => $contest->id]) }}"
                                     title="Admin panel of this contest" class="d-flex action-btn">
                                     <i class="las la-chalkboard-teacher"></i>
                                 </a>
