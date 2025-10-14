@@ -163,41 +163,44 @@
                 </span>
             @endif
 
-            <button style="float:right" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
+            <button style="float:right" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse"
+                aria-expanded="false" aria-controls="filterCollapse">
                 <i class="fas fa-filter"></i> Show Filters
             </button>
 
-            @if(request()->has('contry') || request()->has('state') || request()->has('institution_acronym'))
+            @if (request()->has('contry') || request()->has('state') || request()->has('institution_acronym'))
                 <a style="float:right; margin-right:10px" href="?">
                     <button>Clear Filters</button>
                 </a>
             @endif
         </div>
     </div>
-    @if(!$contest->individual)
-    <div class="mb-3">
-        
-        <div class="collapse mt-2 @if(request()->has('contry') || request()->has('state') || request()->has('institution_acronym'))show @endif" id="filterCollapse">
-            <div class="card-body">
-                <div style="max-width:800px">
-                    @foreach ($competitors->pluck('team.country')->unique()->sort() as $country)
-                        <a @if(request()->input('country')==$country)style="color:blue"@endif href="?country={{ $country }}">{{$country}}</a>
-                    @endforeach
-                </div>
-                <div style="max-width:800px">
-                    @foreach ($competitors->pluck('team.state')->unique()->sort() as $state)
-                        <a @if(request()->input('state')==$state)style="color:blue"@endif href="?state={{ $state }}">{{$state}}</a>
-                    @endforeach
-                </div>
-                <div style="max-width:800px">
-                    @foreach ($competitors->pluck('team.institution_acronym')->unique()->sort() as $institution)
-                        <a @if(request()->input('institution_acronym')==$institution)style="color:blue"@endif href="?institution_acronym={{ $institution }}">{{$institution}}</a>
-                    @endforeach
+    @if (!$contest->individual)
+        <div class="mb-3">
+
+            <div class="collapse mt-2 @if (request()->has('contry') || request()->has('state') || request()->has('institution_acronym')) show @endif" id="filterCollapse">
+                <div class="card-body">
+                    <div style="max-width:800px">
+                        @foreach ($competitors->pluck('team.country')->unique()->sort() as $country)
+                            <a @if (request()->input('country') == $country) style="color:blue" @endif
+                                href="?country={{ $country }}">{{ $country }}</a>
+                        @endforeach
+                    </div>
+                    <div style="max-width:800px">
+                        @foreach ($competitors->pluck('team.state')->unique()->sort() as $state)
+                            <a @if (request()->input('state') == $state) style="color:blue" @endif
+                                href="?state={{ $state }}">{{ $state }}</a>
+                        @endforeach
+                    </div>
+                    <div style="max-width:800px">
+                        @foreach ($competitors->pluck('team.institution_acronym')->unique()->sort() as $institution)
+                            <a @if (request()->input('institution_acronym') == $institution) style="color:blue" @endif
+                                href="?institution_acronym={{ $institution }}">{{ $institution }}</a>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-            
     @endif
     <table border="1"@if ($blind) style="background-color: #0002" @endif id="ranking">
         <thead>
@@ -217,18 +220,19 @@
         <tbody>
             @foreach ($competitors as $competitor)
                 @if (!$contest->individual)
-                    @if(request()->has('institution_acronym') && request()->input('institution_acronym')!=$competitor->team->institution_acronym)
+                    @if (request()->has('institution_acronym') &&
+                            request()->input('institution_acronym') != $competitor->team?->institution_acronym)
                         @continue
                     @endif
-                    @if(request()->has('country') && request()->input('country')!=$competitor->team->institution_acronym)
+                    @if (request()->has('country') && request()->input('country') != $competitor->team?->country)
                         @continue
                     @endif
-                    @if(request()->has('state') && request()->input('state')!=$competitor->team->institution_acronym)
+                    @if (request()->has('state') && request()->input('state') != $competitor->team?->state)
                         @continue
                     @endif
                 @endif
                 <tr id="row{{ $competitor->id }}" data-id="{{ $competitor->id }}"
-                    style="@if($competitor->id == $contestService->competitor?->id)background: lightsteelblue; @endif">
+                    style="@if ($competitor->id == $contestService->competitor?->id) background: lightsteelblue; @endif">
                     <td class="px-1">
                         {{ $loop->iteration }}⁰
                     </td>
@@ -247,14 +251,16 @@
                             @php($questions++)
                             @php($score = $competitor->scores[$problem] ?? null)
 
-                            <span class="d-flex @if ($score && $score->score > 0) scored @endif @if ($score && $score->score <= 0) preventScore @endif"
+                            <span
+                                class="d-flex @if ($score && $score->score > 0) scored @endif @if ($score && $score->score <= 0) preventScore @endif"
                                 id="score-{{ $competitor->id }}-{{ $problem }}"
                                 data-attempts="{{ $competitor->__get('sum_submissions_' . $problem) }}"
                                 data-penality="{{ $score->penality ?? 0 }}"
-                                @if($score)data-submission_id="{{ $score->submission_id }}"@endif>
+                                @if ($score) data-submission_id="{{ $score->submission_id }}" @endif>
                                 @if ($score)
-                                    @if($score->score<=0)
-                                        <div style="position:relative; width: 20px; height: 32px; font-size:20px; color: red">
+                                    @if ($score->score <= 0)
+                                        <div
+                                            style="position:relative; width: 20px; height: 32px; font-size:20px; color: red">
                                             <i class="las la-times"></i>
                                         </div>
                                     @else
@@ -300,14 +306,14 @@
     <script type='module'>
         const channel = '{{ $channel }}'
         const filter = {
-            @if(request()->has('institution_acronym'))
-            institution_acronym: '{{ request()->input('institution_acronym') }}',
+            @if (request()->has('institution_acronym'))
+                institution_acronym: '{{ request()->input('institution_acronym') }}',
             @endif
-            @if(request()->has('country'))
-            country: '{{ request()->input('country') }}',
+            @if (request()->has('country'))
+                country: '{{ request()->input('country') }}',
             @endif
-            @if(request()->has('state'))
-            state: '{{ request()->input('state') }}',
+            @if (request()->has('state'))
+                state: '{{ request()->input('state') }}',
             @endif
         }
 
@@ -385,7 +391,7 @@
                 row.removeClass('notJudged blink');
                 const attempts = Number(row.data('attempts'));
                 switch (data.result) {
-                    case 'Accepted':{
+                    case 'Accepted': {
                         const ballon = problemNumber[data.problem.id]
                         const submissao = new Date(data.full_datetime.replace(' ', 'T'));
                         const inicio = new Date('{{ $contest->start_time }}');
@@ -400,8 +406,9 @@
 
                         row.html(ballonHtml);
                         row.data('penality', attempts * {{ $contest->penality }} + diffMin);
-                        }break;
-                    case 'Ai detected':{
+                    }
+                    break;
+                    case 'Ai detected': {
                         const submissao = new Date(data.full_datetime.replace(' ', 'T'));
                         const inicio = new Date('{{ $contest->start_time }}');
                         const diffMs = submissao - inicio;
@@ -414,7 +421,7 @@
                         row.html(crossHtml);
                         row.data('penality', 0);
                         break
-                        }
+                    }
                     default:
                         row.data('penality', 0);
                         row.data('attempts', attempts + 1);
@@ -450,7 +457,7 @@
             // Aplica a nova ordem com animação
             const $tbody = $('#ranking tbody');
             $tbody.empty();
-            sorted.forEach(function(el,index) {
+            sorted.forEach(function(el, index) {
                 $(el).find('td:first-child').text((index + 1) + '⁰');
                 $tbody.append(el);
             });
@@ -475,9 +482,9 @@
             if (!data.contest) return;
             var row = $('#score-' + data.contest.competitor_id + '-' + data.problem.id);
             console.log(row.data('submission_id'), data)
-            if (row.length == 0 && data.id > row.data('submission_id')
-                || (row.hasClass('scored') && data.result!='Ai detected')
-                || (row.hasClass('preventScore'))) return; // Ignore competidors not here
+            if (row.length == 0 && data.id > row.data('submission_id') ||
+                (row.hasClass('scored') && data.result != 'Ai detected') ||
+                (row.hasClass('preventScore'))) return; // Ignore competidors not here
             if (data.status != 'Judged' && data.status != 'Error') {
                 updateRow(row, data);
             } else {
