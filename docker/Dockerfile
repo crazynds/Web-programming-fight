@@ -41,7 +41,7 @@ RUN git config --global --add safe.directory /var/www/html
 
 FROM php_base AS php_supervisor
 
-RUN apt-get install -y supervisor \
+RUN apt-get update && apt-get install -y supervisor \
     && apt-get -y autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -75,7 +75,7 @@ ENTRYPOINT [ "start-container" ]
 
 FROM php_base AS php_worker
 
-RUN apt-get install -y \
+RUN apt-get update && apt-get install -y \
     nano time wget \
     autoconf \
     bison \

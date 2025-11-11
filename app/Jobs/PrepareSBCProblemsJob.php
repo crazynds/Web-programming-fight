@@ -54,12 +54,19 @@ class PrepareSBCProblemsJob implements ShouldQueue
                 'W 10000',
             ]);
             $text = explode(PHP_EOL, $text, 4)[3];
-            $text = explode('Entrada'.PHP_EOL, $text, 2);
+            $tmp = explode('Entrada'.PHP_EOL, $text, 2);
+            if (count($tmp) == 1) {
+                $tmp = explode('Input'.PHP_EOL, $text, 2);
+            }
+            $text = $tmp;
             $descricao = $text[0];
 
             $tmp = explode('Saı́da'.PHP_EOL, $text[1], 2);
             if (count($tmp) == 1) {
                 $tmp = explode('Saída'.PHP_EOL, $text[1], 2);
+            }
+            if (count($tmp) == 1) {
+                $tmp = explode('Output'.PHP_EOL, $text[1], 2);
             }
             $text = $tmp;
 
