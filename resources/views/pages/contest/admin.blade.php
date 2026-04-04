@@ -1,7 +1,7 @@
 @extends('layouts.base')
 
 @section('head')
-    {!! htmlScriptTagJsApi() !!}
+    {!! RecaptchaV3::initJs() !!}
 @endsection
 
 @section('content')

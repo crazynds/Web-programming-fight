@@ -32,7 +32,7 @@ class StoreDiffRequest extends FormRequest
                 'required',
                 ...LanguagesType::validation($this->input('lang',0)),
             ],
-            recaptchaFieldName() => recaptchaRuleName()
+            'g-recaptcha-response' => 'required|recaptchav3:submit,0.5'
         ];
     }
 }

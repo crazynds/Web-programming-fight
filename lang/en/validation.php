@@ -168,6 +168,9 @@ return [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
+        'g-recaptcha-response' => [
+            'recaptchav3' => 'Captcha error message',
+        ],
     ],
 
     /*

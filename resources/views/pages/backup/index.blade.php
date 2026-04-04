@@ -1,7 +1,7 @@
 @extends('layouts.base')
 
 @section('head')
-    {!! htmlScriptTagJsApi() !!}
+    {!! RecaptchaV3::initJs() !!}
 @endsection
 
 @section('content')
@@ -16,7 +16,7 @@
     <!-- upload of a single file -->
     <div class="row">
         <div class="col">
-            <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data"
+            <form  method="post" enctype="multipart/form-data"
                 action="{{ route('api.backup.upload') }}">
                 @csrf
 
@@ -24,9 +24,8 @@
                 <input type="file" class="form-control" name="backup" required />
                 
                 <p class="mt-3">
-                    {!! htmlFormButton('Submit', [
-                        'class' => 'btn btn-primary',
-                    ]) !!}
+                    {!! RecaptchaV3::field('submit') !!}
+                    <input type="submit" class="btn btn-primary" value="Submit"></input>
                 </p>
             </form>
 

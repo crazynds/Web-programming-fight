@@ -18,19 +18,19 @@ RUN apt-get update \
 RUN add-apt-repository ppa:deadsnakes/ppa 
 
 RUN apt-get update \
-    && apt-get install -y php8.3-cli php8.3-dev \
-    php8.3-gd \
-    php8.3-curl \
-    php8.3-imap php8.3-mysql php8.3-mbstring \
-    php8.3-zip \
-    php8.3-intl php8.3-readline php8.3-fpm \
-    php8.3-ldap \
-    php8.3-xml \
-    php8.3-redis php8.3-swoole \
+    && apt-get install -y php8.4-cli php8.4-dev \
+    php8.4-gd \
+    php8.4-curl \
+    php8.4-imap php8.4-mysql php8.4-mbstring \
+    php8.4-zip \
+    php8.4-intl php8.4-readline php8.4-fpm \
+    php8.4-ldap \
+    php8.4-xml \
+    php8.4-redis php8.4-swoole \
     && curl -sLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
 
 
-RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.3
+RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.4
 
 RUN apt-get install -y dos2unix mariadb-client python3.11 python3-pip
 
@@ -50,7 +50,7 @@ RUN pip install cloudscraper
 
 COPY docker/start-container /usr/local/bin/start-container
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY docker/php.ini /etc/php/8.3/cli/conf.d/99-sail.ini
+COPY docker/php.ini /etc/php/8.4/cli/conf.d/99-sail.ini
 RUN mkdir /var/scripts
 RUN chmod 0777 /var/scripts
 COPY docker/scripts /var/scripts

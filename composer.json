@@ -11,13 +11,12 @@
         "php": "^8.3",
         "alexusmai/laravel-file-manager": "^3.2",
         "bensampo/laravel-enum": "^6.6",
-        "biscolab/laravel-recaptcha": "^6.0",
-        "geowrgetudor/disk-metrics": "^1.3",
         "guzzlehttp/guzzle": "^7.2",
-        "laravel/framework": "^11.0",
+        "josiasmontag/laravel-recaptchav3": "^1.0",
+        "laravel/framework": "^12.0",
         "laravel/octane": "^2.3",
         "laravel/pulse": "^1.2",
-        "laravel/reverb": "@beta",
+        "laravel/reverb": "^1.0",
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.10",
         "laravel/tinker": "^2.8",
@@ -28,8 +27,9 @@
         "paulo-hortelan/requests-graph-pulse": "^1.1",
         "predis/predis": "^2.3",
         "schmeits/pulse-database-table-info": "^1.7",
+        "spatie/fork": "^1.2",
         "spatie/pdf-to-text": "^1.53",
-        "stechstudio/laravel-zipstream": "^4.14",
+        "stechstudio/laravel-zipstream": "^5.10",
         "sysatom/php-bloom-filter": "^1.0"
     },
     "require-dev": {
@@ -38,8 +38,8 @@
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.26",
         "mockery/mockery": "^1.4.4",
-        "nunomaduro/collision": "^8.1",
-        "phpunit/phpunit": "^10.1",
+        "nunomaduro/collision": "^8.0",
+        "phpunit/phpunit": "^11.0",
         "spatie/laravel-ignition": "^2.0"
     },
     "autoload": {
@@ -67,6 +67,10 @@
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
+        ],
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve --host=localhost\" \"php artisan queue:listen --timeout=0 --tries=1 --queue=high,default,email,low\" \"npm run dev\" --names=server,queue,vite"
         ]
     },
     "extra": {

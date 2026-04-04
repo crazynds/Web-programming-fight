@@ -40,7 +40,7 @@ class StoreTeamRequest extends FormRequest
             'institution_acronym' => 'required|string|max:10',
             'country' => 'required|string|max:100',
             'state' => 'nullable|string|max:100',
-            recaptchaFieldName() => recaptchaRuleName(),
+            'g-recaptcha-response' => 'required|recaptchav3:submit,0.5'
         ];
     }
 }

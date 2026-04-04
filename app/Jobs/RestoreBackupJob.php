@@ -98,19 +98,9 @@ class RestoreBackupJob implements ShouldQueue
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         dump('DROPOU TODAS AS TABELAS;');
 
-        // Ler e executar cada comando do SQL
-
-        $command = sprintf(
-            'mysql --host=%s --user=%s --password=%s --port=%s %s < %s',
-            escapeshellarg(config('database.connections.mysql.host')),
-            escapeshellarg(config('database.connections.mysql.username')),
-            escapeshellarg(config('database.connections.mysql.password')),
-            escapeshellarg(config('database.connections.mysql.port')),
-            escapeshellarg(config('database.connections.mysql.database')),
-            escapeshellarg($sqlFile)
-        );
-        dump($command);
-        exec($command);
+        // Ler e executar o SQL via PDO nativo
+        $sql = file_get_contents($sqlFile);
+        DB::connection()->getPdo()->exec($sql);
         dump('Restaurou o banco de dados');
     }
 

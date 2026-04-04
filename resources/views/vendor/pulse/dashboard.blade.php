@@ -18,6 +18,4 @@
 
     <livewire:pulse.table-info cols="4" rows="2" />
 
-    <livewire:disk-metrics cols="4" rows="2" />
-
 </x-pulse>

@@ -1,7 +1,7 @@
 @extends('layouts.base')
 
 @section('head')
-    {!! htmlScriptTagJsApi() !!}
+    {!! RecaptchaV3::initJs() !!}
 @endsection
 
 @section('content')
@@ -108,7 +108,7 @@
                 <hr />
                 <div class="row">
                     <div class="col">
-                        <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data"
+                        <form  method="post" enctype="multipart/form-data"
                             style="justify-content: end;display:flex;"
                             action="{{ route('contest.register', ['contest' => $contest->id]) }}">
                             @csrf
@@ -127,9 +127,8 @@
                                     @endforeach
                                 </select>
                             @endif
-                            {!! htmlFormButton('Register', [
-                                'style' => 'padding: 0px 20px;margin-bottom: 8px;',
-                            ]) !!}
+                            {!! RecaptchaV3::field('submit') !!}
+                            <input type="submit" style="padding: 0px 20px;margin-bottom: 8px;" value="Register"></input>
                         </form>
                     </div>
                 </div>
@@ -137,13 +136,12 @@
                 <hr />
                 <div class="row">
                     <div class="col">
-                        <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data"
+                        <form  method="post" enctype="multipart/form-data"
                             style="justify-content: end;display:flex;"
                             action="{{ route('contest.unregister', ['contest' => $contest->id]) }}">
                             @csrf
-                            {!! htmlFormButton('Cancel Registration', [
-                                'style' => 'padding: 0px 20px;margin-bottom: 8px;',
-                            ]) !!}
+                            {!! RecaptchaV3::field('submit') !!}
+                            <input type="submit" style="padding: 0px 20px;margin-bottom: 8px;" value="Unregister"></input>
                         </form>
                     </div>
                 </div>

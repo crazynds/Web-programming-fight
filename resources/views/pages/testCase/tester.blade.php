@@ -1,7 +1,7 @@
 @extends('layouts.base')
 
 @section('head')
-    {!! htmlScriptTagJsApi() !!}
+    {!! RecaptchaV3::initJs() !!}
 @endsection
 
 
@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <form id="{{ getFormId() }}" method="post" enctype="multipart/form-data"
+    <form  method="post" enctype="multipart/form-data"
         action="{{ route('problem.testCase.store', ['problem' => $problem->id]) }}">
         @csrf
 
@@ -60,9 +60,8 @@
         </div>
 
         <p class="mt-3">
-            {!! htmlFormButton('Submit', [
-                'class' => 'btn btn-primary',
-            ]) !!}
+            {!! RecaptchaV3::field('submit') !!}
+<input type="submit" class="btn btn-primary" value="Submit"></input>
         </p>
     </form>
 @endsection

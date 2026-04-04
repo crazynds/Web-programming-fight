@@ -23,10 +23,10 @@ class StoreTestCaseRequest extends FormRequest
     {
         return [
             'input' => [
-                'array'
+                'array',
             ],
             'output' => [
-                'array'
+                'array',
             ],
             'input[]' => [
                 'file',
@@ -38,7 +38,7 @@ class StoreTestCaseRequest extends FormRequest
                 // 100 MB
                 'max:102400',
             ],
-            recaptchaFieldName() => recaptchaRuleName()
+            'g-recaptcha-response' => 'required|recaptchav3:submit,1.0',
         ];
     }
 }

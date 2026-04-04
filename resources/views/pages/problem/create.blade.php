@@ -13,7 +13,7 @@
         }
     </script>
     <script id="MathJax-script" async src="{{ asset('js/mathjax/tex-chtml.js') }}"></script>
-    {!! htmlScriptTagJsApi() !!}
+    {!! RecaptchaV3::initJs() !!}
 @endsection
 
 @section('content')
@@ -29,7 +29,7 @@
         </div>
     </div>
 
-    <form id="{{ getFormId() }}" method="post"
+    <form  method="post"
         action="@if (isset($problem->id)) {{ route('problem.update', ['problem' => $problem->id]) }}@else{{ route('problem.store') }} @endif">
         @csrf
         @if (isset($problem->id))
@@ -96,9 +96,8 @@
         </div>
 
         <p class="mt-3">
-            {!! htmlFormButton('Submit', [
-                'class' => 'btn btn-primary',
-            ]) !!}
+            {!! RecaptchaV3::field('submit') !!}
+<input type="submit" class="btn btn-primary" value="Submit"></input>
         </p>
     </form>
 @endsection

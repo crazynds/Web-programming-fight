@@ -1,7 +1,7 @@
 @extends('layouts.base')
 
 @section('head')
-    {!! htmlScriptTagJsApi() !!}
+    {!! RecaptchaV3::initJs() !!}
 @endsection
 
 @section('content')
@@ -17,7 +17,7 @@
         </div>
     </div>
 
-    <form id="{{ getFormId() }}" enctype="multipart/form-data" method="post" action="{{ route('problem.upload.sbc') }}">
+    <form  enctype="multipart/form-data" method="post" action="{{ route('problem.upload.sbc') }}">
         @csrf
 
         <div class="row">
@@ -49,9 +49,8 @@
         @endif
 
         <p class="mt-3">
-            {!! htmlFormButton('Submit', [
-                'class' => 'btn btn-primary',
-            ]) !!}
+            {!! RecaptchaV3::field('submit') !!}
+<input type="submit" class="btn btn-primary" value="Submit"></input>
         </p>
     </form>
 @endsection

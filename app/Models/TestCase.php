@@ -9,9 +9,11 @@ class TestCase extends Model
     public $guarded = [];
 
     public $casts = [
-        'public' => 'boolean',
-        'rankeable' => 'boolean',
-        'validated' => 'boolean',
+        'public'             => 'boolean',
+        'rankeable'          => 'boolean',
+        'validated'          => 'boolean',
+        'is_input_compressed'   => 'boolean',
+        'is_output_compressed'  => 'boolean',
     ];
 
     public $timestamps = false;

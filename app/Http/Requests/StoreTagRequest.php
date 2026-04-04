@@ -33,7 +33,7 @@ class StoreTagRequest extends FormRequest
 
             'problems' => 'required|array|min:1',
             'problems.*' => 'required|integer|exists:problems,id',
-            recaptchaFieldName() => recaptchaRuleName(),
+            'g-recaptcha-response' => 'required|recaptchav3:submit,0.5'
         ];
     }
 }
