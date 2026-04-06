@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BrasileiraoAdminController;
+use App\Http\Controllers\BrasileiraoController;
 use App\Http\Controllers\Contest\ClarificationController;
 use App\Http\Controllers\ContestController;
 use App\Http\Controllers\DiffController;
@@ -84,6 +86,25 @@ Route::middleware([PreventAccessDuringContest::class])->group(function () {
 
         Route::resource('contest.clarification', ClarificationController::class)
             ->only(['update', 'destroy']);
+
+        // Brasileirao de Programacao competition routes
+        Route::get('/brasileirao', [BrasileiraoController::class, 'index'])->name('competition.brasileirao');
+        Route::get('/brasileirao/liga/bixos', [BrasileiraoController::class, 'ligaBixos'])->name('competition.liga.bixos');
+        Route::get('/brasileirao/liga/veteranos', [BrasileiraoController::class, 'ligaVeteranos'])->name('competition.liga.veteranos');
+        Route::get('/brasileirao/how-it-works', [BrasileiraoController::class, 'howItWorks'])->name('competition.how-it-works');
+        Route::get('/brasileirao/register', [BrasileiraoController::class, 'showRegister'])->name('competition.register.show');
+        Route::post('/brasileirao/register', [BrasileiraoController::class, 'register'])->name('competition.register');
+        Route::get('/brasileirao/challenge/{challenge}', [BrasileiraoController::class, 'showChallenge'])->name('competition.challenge');
+        Route::get('/brasileirao/institution/{institution}', [BrasileiraoController::class, 'showInstitution'])->name('competition.institution');
+        // Brasileirao admin routes
+        Route::middleware('can:viewPulse')->prefix('brasileirao/admin')->name('competition.admin.')->group(function () {
+            Route::get('/', [BrasileiraoAdminController::class, 'index'])->name('index');
+            Route::get('/create', [BrasileiraoAdminController::class, 'create'])->name('create');
+            Route::post('/', [BrasileiraoAdminController::class, 'store'])->name('store');
+            Route::get('/{challenge}/edit', [BrasileiraoAdminController::class, 'edit'])->name('edit');
+            Route::put('/{challenge}', [BrasileiraoAdminController::class, 'update'])->name('update');
+            Route::delete('/{challenge}', [BrasileiraoAdminController::class, 'destroy'])->name('destroy');
+        });
     });
 
     Route::resource('problem', ProblemController::class);

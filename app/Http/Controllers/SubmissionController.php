@@ -75,8 +75,16 @@ class SubmissionController extends Controller
     {
         $user = $this->user();
         if (RateLimiter::tooManyAttempts('submission:'.$user->id, 30)) {
-            return Redirect::back()->withErrors(['msg' => 'Too many attempts! Wait a moment and try again!']);
+            return Redirect::back()->withInput()->withErrors(['msg' => 'Too many attempts! Wait a moment and try again!']);
         }
+        // Auto detect requires a file (needs extension to detect language)
+        if (
+            $request->file('code_file') === null &&
+            $request->input('lang') == LanguagesType::Auto_detect
+        ) {
+            return Redirect::back()->withInput()->withErrors(['lang' => 'Auto detect is not available for pasted code. Please select a language manually.']);
+        }
+
         $problem = Problem::findOrFail($request->problem);
         // check if problem exists in the contest
         if ($this->contestService->inContest && ! $this->contestService->contest->problems()->where('problems.id', $problem->id)->exists()) {
@@ -87,25 +95,40 @@ class SubmissionController extends Controller
         RateLimiter::hit('submission:'.$user->id, 60 * 60);
         $run = DB::transaction(function () use ($request, $user, $problem) {
 
-            $originalFile = $request->file('code');
+            $originalFile = $request->file('code_file');
+            $codeText     = $request->input('code_text');
+            $isFileUpload = $originalFile !== null;
+
             $run = new Submission;
             $run->language = $request->input('lang');
             $run->problem()->associate($problem);
             $run->user()->associate($user);
 
-            // 4 MB
-            if ($originalFile->getSize() > 1024 * 1024 * 4 || ! mb_check_encoding($originalFile->get(), 'UTF-8')) {
-                $run->status = SubmitStatus::Judged;
-                if ($originalFile->getSize() > 1024 * 1024 * 4) {
-                    $run->result = SubmitResult::FileTooLarge;
+            if ($isFileUpload) {
+                // --- File upload path ---
+                // 4 MB
+                if ($originalFile->getSize() > 1024 * 1024 * 4 || ! mb_check_encoding($originalFile->get(), 'UTF-8')) {
+                    $run->status = SubmitStatus::Judged;
+                    $run->result = $originalFile->getSize() > 1024 * 1024 * 4
+                        ? SubmitResult::FileTooLarge
+                        : SubmitResult::InvalidUtf8File;
                 } else {
-                    $run->result = SubmitResult::InvalidUtf8File;
+                    $file = File::createFile($originalFile, 'users/'.$user->id.'/attempts/'.$request->problem);
+                    $run->file()->associate($file);
+                    $run->status = SubmitStatus::WaitingInLine;
                 }
             } else {
-                $file = File::createFile($originalFile, 'users/'.$user->id.'/attempts'.'/'.$request->problem);
-                $run->file()->associate($file);
-                $run->status = SubmitStatus::WaitingInLine;
+                // --- Paste path ---
+                if (! mb_check_encoding($codeText, 'UTF-8')) {
+                    $run->status = SubmitStatus::Judged;
+                    $run->result = SubmitResult::InvalidUtf8File;
+                } else {
+                    $file = File::createFileByData($codeText, 'users/'.$user->id.'/attempts/'.$request->problem);
+                    $run->file()->associate($file);
+                    $run->status = SubmitStatus::WaitingInLine;
+                }
             }
+
             $run->save();
             if ($this->contestService->started && $this->contestService->inContest) {
                 $run->contest()->associate($this->contestService->contest);
@@ -113,7 +136,8 @@ class SubmissionController extends Controller
             }
             if ($run->status == SubmitStatus::getDescription(SubmitStatus::WaitingInLine)) {
                 if ($run->language == LanguagesType::name(LanguagesType::Auto_detect)) {
-                    switch (strtolower($originalFile->getClientOriginalExtension())) {
+                    $ext = $isFileUpload ? strtolower($originalFile->getClientOriginalExtension()) : '';
+                    switch ($ext) {
                         case 'c':
                             $run->language = LanguagesType::C;
                             break;
@@ -131,8 +155,8 @@ class SubmissionController extends Controller
                         case 'jar':
                             $run->language = LanguagesType::Java_OpenJDK24;
                             break;
-                        case 'kt':
                         default:
+                            // Pasted code with Auto_detect: can't determine language
                             $run->language = LanguagesType::BINARY;
                             $run->result = SubmitResult::LanguageNotSupported;
                             $run->status = SubmitStatus::Judged;

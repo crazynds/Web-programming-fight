@@ -46,6 +46,28 @@
         @php
             $changelogs = [
                 [
+                    'version' => 'v1.3.0',
+                    'title' => 'Brasileirao de Programacao! 🏆',
+                    'date' => '06-04-2026',
+                    'author' => 'Crazynds',
+                    'features' => [
+                        'Added Brasileirao de Programacao competition system.',
+                        'Weekly challenges with multiple ranking criteria: submission time, CPU time, memory peak, and code lines.',
+                        'Automatic problem visibility when a challenge goes live.',
+                        'Submissions now support both file upload and code paste.',
+                        'Code lines metric: counts non-empty lines, treating each semicolon in C++/Java/C as a separate line.',
+                    ],
+                    'changes' => [
+                        'Submit form now always shows both file upload and paste code fields.',
+                        'Language auto-detect is disabled when pasting code (no file extension to detect).',
+                        'Form fields are preserved on redirect back with errors.',
+                        'Recaptcha v3 is now used instead of v2.',
+                    ],
+                    'styles' => [
+                    ],
+                    'fixes' => []
+                ],
+                [
                     'version' => 'v1.2.0',
                     'title' => 'New horizons 🌠',
                     'date' => '10-10-2025',

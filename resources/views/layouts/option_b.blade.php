@@ -38,6 +38,7 @@
                     
                     @if (!$contestService->inContest)
                         <li><a href="{{ route('contest.index') }}" class="{{ request()->routeIs('contest.*') && !$contestService->inContest ? 'active' : '' }}">Contests</a></li>
+                        <li><a href="{{ route('competition.brasileirao') }}" class="{{ request()->routeIs('competition.brasileirao') ? 'active' : '' }}">Brasileirão de Programação</a></li>
                         {{-- <li><a href="{{ route('forum.index') }}" class="{{ request()->routeIs('forum.*') ? 'active' : '' }}">Forum</a></li> --}}
                     @else
                         <li><a href="{{ route('contest.competitor.leaderboard') }}" class="{{ request()->routeIs('contest.competitor.leaderboard') ? 'active' : '' }}">Leaderboard</a></li>
@@ -48,6 +49,7 @@
                     <li><a href="{{ route('tag.index') }}" class="{{ request()->routeIs('tag.*') ? 'active' : '' }}">Tags</a></li>
                     <li><a href="{{ route('submission.global') }}" class="{{ request()->routeIs('submission.global') ? 'active' : '' }}">Global Runs</a></li>
                     <li><a href="{{ route('contest.index') }}" class="{{ request()->routeIs('contest.*') ? 'active' : '' }}">Contests</a></li>
+                    <li><a href="{{ route('competition.brasileirao') }}" class="{{ request()->routeIs('competition.brasileirao') ? 'active' : '' }}">Brasileirão de Programação</a></li>
                 @endauth
             </ul>
 

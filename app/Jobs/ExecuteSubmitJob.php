@@ -194,6 +194,8 @@ class ExecuteSubmitJob implements ShouldBeUnique, ShouldQueue
             $this->submit->output = implode(PHP_EOL, $executor->output);
         }
 
+        $this->submit->code_lines = $this->countCodeLines($file->get(), $this->submit->language);
+
         // If this submit is in a contest, do the things
         if ($this->submit->contest) {
             $contest = $this->submit->contest;
@@ -221,6 +223,29 @@ class ExecuteSubmitJob implements ShouldBeUnique, ShouldQueue
         }
 
         // Log::channel('events')->info('Ending submit ' . $this->submit->id. ' with result ' . $this->submit->result);
+    }
+
+    private function countCodeLines(string $code, string $language): int
+    {
+        $semicolonLanguages = ['C++', 'Java OpenJDK 24', 'C'];
+        $useSemicolons = in_array($language, $semicolonLanguages);
+
+        $lines = explode("\n", $code);
+        $count = 0;
+        foreach ($lines as $line) {
+            $trimmed = trim($line);
+            if ($trimmed === '') {
+                continue;
+            }
+            if ($useSemicolons) {
+                $semicolons = substr_count($trimmed, ';');
+                $count += max(1, $semicolons);
+            } else {
+                $count += 1;
+            }
+        }
+
+        return $count;
     }
 
     public function failed(Throwable $exception): void

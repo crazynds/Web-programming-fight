@@ -23,7 +23,7 @@
                 <select name="problem" class="form-select select2" required>
                     @php($letter = 'A')
                     @foreach ($problems as $problem)
-                        <option value="{{ $problem->id }}" @if (isset($selected) && $problem->id == $selected) selected @endif>
+                        <option value="{{ $problem->id }}" @selected(old('problem', $selected ?? null) == $problem->id)>
                             @if ($contestService->inContest)
                                 {{ $letter++ }} - {{ $problem->title }}
                             @else
@@ -38,17 +38,25 @@
                 <select name="lang" class="form-select select2" required>
                     @foreach (App\Enums\LanguagesType::enabled() as $name => $code)
                         @if (!$contestService->inContest || in_array($code, $contestService->contest->languages))
-                            <option value="{{ $code }}">{{ $name }}</option>
+                            <option value="{{ $code }}" @selected(old('lang') == $code)>{{ $name }}</option>
                         @endif
                     @endforeach
                 </select>
             </div>
         </div>
-        <!-- upload of a single file -->
-        <div class="row">
-            <div class="col">
-                <label for="code" class="form-label">Select code: </label><br />
-                <input type="file" class="form-control" name="code" required />
+        <!-- code input: file upload or paste -->
+        <div class="row mt-3">
+            <div class="col-12">
+                <label class="form-label">Upload file:</label><br />
+                <input type="file" class="form-control" name="code_file" />
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <label class="form-label">Or paste the code:</label><br />
+                <textarea class="form-control" name="code_text" rows="16"
+                          style="font-family:monospace; font-size:0.85em;"
+                          placeholder="Paste your code here...">{{ old('code_text') }}</textarea>
             </div>
         </div>
         @if ($errors->any())
@@ -106,3 +114,4 @@
         </tbody>
     </table>
 @endsection
+

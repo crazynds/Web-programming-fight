@@ -23,17 +23,21 @@ class StoreSubmissionRequest extends FormRequest
      */
     public function rules(): array
     {
+        $hasFile = $this->hasFile('code_file');
+
         return [
             'problem' => 'required|integer|exists:problems,id',
             'lang' => [
                 'required',
                 new EnumValue(LanguagesType::class, false),
             ],
-            'code' => [
-                'required',
-                ...LanguagesType::validation($this->input('lang', 0)),
-            ],
-            'g-recaptcha-response' => 'required|recaptchav3:submit,0.5'
+            'code_file' => $hasFile
+                ? ['nullable', 'file', ...LanguagesType::validation($this->input('lang', 0))]
+                : ['nullable'],
+            'code_text' => $hasFile
+                ? ['nullable', 'string']
+                : ['required', 'string', 'min:1', 'max:' . (1024 * 1024)],
+            'g-recaptcha-response' => 'required|recaptchav3:submit,0.5',
         ];
     }
 }
