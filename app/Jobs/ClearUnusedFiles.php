@@ -83,12 +83,13 @@ class ClearUnusedFiles implements ShouldBeUnique, ShouldQueue
         }
         if ($recovered > 0) {
             Log::channel('leakedfiles')->warning(
-                sprintf('Recuperado em bytes de arquivos inuteis', [
-                    'bytes' => $recovered,
-                    'megabytes' => $recovered / 1024,
-                    'gigabytes' => $recovered / (1024 * 1024),
-                    'files' => $files,
-                ])
+                sprintf(
+                    'Recuperado %d bytes (%.2f MB / %.4f GB) de %d arquivos inuteis',
+                    $recovered,
+                    $recovered / 1024,
+                    $recovered / (1024 * 1024),
+                    $files,
+                )
             );
         }
     }
