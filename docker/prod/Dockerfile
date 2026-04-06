@@ -6,12 +6,17 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC-3
 ENV NODE_VERSION=18
 
-# Install node UBUNTU
-RUN curl -fsSL https://deb.nodesource.com/setup_21.x | bash && \
+# Install dependencies + Node.js (via modern nodesource method, no apt-key)
+RUN chmod 1777 /tmp && \
     apt-get update && \
     apt-get install -y tzdata dos2unix bash supervisor mariadb-client \
-    nano time wget \
-    python3.11 python3-pip && \ 
+    nano time wget gnupg ca-certificates \
+    python3.11 python3-pip && \
+    mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_21.x nodistro main" > /etc/apt/sources.list.d/nodesource.list && \
+    apt-get update && \
+    apt-get install -y nodejs && \
     install-php-extensions redis pdo_mysql pdo_pgsql mbstring exif pcntl curl zip intl sockets xml gd && \
     php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer && \
     cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
