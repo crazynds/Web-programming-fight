@@ -97,7 +97,13 @@ class BrasileiraoAdminController extends Controller
         $body = $request->input('body');
         $previewUser = auth()->user();
 
-        return view('pages.competition.admin.newsletter-preview', compact('subject', 'body', 'previewUser', 'subscriberCount'));
+        $emailHtml = view('emails.brasileirao-newsletter', [
+            'user'         => $previewUser,
+            'body'         => $body,
+            'emailSubject' => $subject,
+        ])->render();
+
+        return view('pages.competition.admin.newsletter-preview', compact('subject', 'body', 'previewUser', 'subscriberCount', 'emailHtml'));
     }
 
     public function sendNewsletter(Request $request)
