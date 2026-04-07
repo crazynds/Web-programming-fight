@@ -15,13 +15,13 @@ class BrasileiraoNewsletter extends Mailable
 
     public function __construct(
         public User $user,
-        public string $subject,
+        public string $emailSubject,
         public string $body,
     ) {}
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: $this->subject);
+        return new Envelope(subject: $this->emailSubject);
     }
 
     public function content(): Content
