@@ -62,7 +62,7 @@
 
         <p class="mt-3">
             {!! RecaptchaV3::field('submit') !!}
-<input type="submit" class="btn btn-primary" value="Submit"></input>
+            <input type="submit" class="btn btn-primary" value="Submit"></input>
         </p>
     </form>
 @endsection

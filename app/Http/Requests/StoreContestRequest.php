@@ -47,7 +47,7 @@ class StoreContestRequest extends FormRequest
 
             'problems' => 'required|array|min:1|max:32',
             'problems.*' => 'required|integer|exists:problems,id',
-            'g-recaptcha-response' => 'required|recaptchav3:submit,0.5'
+            'g-recaptcha-response' => 'required|recaptchav3:submit,0.4',
         ];
     }
 }

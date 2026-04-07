@@ -38,7 +38,7 @@ class StoreTestCaseRequest extends FormRequest
                 // 100 MB
                 'max:102400',
             ],
-            'g-recaptcha-response' => 'required|recaptchav3:submit,1.0',
+            'g-recaptcha-response' => 'required|recaptchav3:submit,0.4',
         ];
     }
 }

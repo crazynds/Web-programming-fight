@@ -26,13 +26,13 @@ class StoreDiffRequest extends FormRequest
         return [
             'lang' => [
                 'required',
-                new EnumValue(LanguagesType::class,false)
+                new EnumValue(LanguagesType::class, false),
             ],
             'code' => [
                 'required',
-                ...LanguagesType::validation($this->input('lang',0)),
+                ...LanguagesType::validation($this->input('lang', 0)),
             ],
-            'g-recaptcha-response' => 'required|recaptchav3:submit,0.5'
+            'g-recaptcha-response' => 'required|recaptchav3:submit,0.4',
         ];
     }
 }

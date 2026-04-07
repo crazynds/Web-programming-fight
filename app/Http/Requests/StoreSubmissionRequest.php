@@ -36,8 +36,8 @@ class StoreSubmissionRequest extends FormRequest
                 : ['nullable'],
             'code_text' => $hasFile
                 ? ['nullable', 'string']
-                : ['required', 'string', 'min:1', 'max:' . (1024 * 1024)],
-            'g-recaptcha-response' => 'required|recaptchav3:submit,0.5',
+                : ['required', 'string', 'min:1', 'max:'.(1024 * 1024)],
+            'g-recaptcha-response' => 'required|recaptchav3:submit,0.4',
         ];
     }
 }

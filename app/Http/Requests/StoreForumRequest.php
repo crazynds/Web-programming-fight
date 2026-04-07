@@ -25,7 +25,7 @@ class StoreForumRequest extends FormRequest
             'name' => 'required|string|max:40',
             'description' => 'required|string',
             'is_public' => 'required|boolean',
-            'g-recaptcha-response' => 'required|recaptchav3:submit,0.5'
+            'g-recaptcha-response' => 'required|recaptchav3:submit,0.4',
         ];
     }
 }
