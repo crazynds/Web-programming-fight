@@ -32,7 +32,7 @@
         <div class="row">
             <div class="col-6">
                 <label for="problem_id" class="form-label">Problem:</label><br />
-                <select class="form-select" id="problem_id" name="problem_id" required>
+                <select class="form-select select2" id="problem_id" name="problem_id" required>
                     <option value="">Select a problem...</option>
                     @foreach($problems as $problem)
                         <option value="{{ $problem->id }}"

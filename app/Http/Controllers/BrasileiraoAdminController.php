@@ -25,7 +25,7 @@ class BrasileiraoAdminController extends Controller
 
     public function create()
     {
-        $problems = Problem::orderBy('title')->get();
+        $problems = Problem::orderBy('id')->get();
 
         return view('pages.competition.admin.form', compact('problems'));
     }
@@ -44,7 +44,7 @@ class BrasileiraoAdminController extends Controller
 
     public function edit(BrasileiraoWeeklyChallenge $challenge)
     {
-        $problems = Problem::orderBy('title')->get();
+        $problems = Problem::orderBy('id')->get();
 
         return view('pages.competition.admin.form', compact('challenge', 'problems'));
     }
