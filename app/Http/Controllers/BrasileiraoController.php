@@ -15,16 +15,18 @@ class BrasileiraoController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth')->except('unsubscribe');
+        $this->middleware('auth')->only(['register']);
     }
 
     public function index()
     {
-        $member = BrasileiraoMember::where('user_id', Auth::id())->with('institution')->first();
+        $member = Auth::check()
+            ? BrasileiraoMember::where('user_id', Auth::id())->with('institution')->first()
+            : null;
 
-        // Unregistered users go straight to leaderboard
+        // Unauthenticated or unregistered users go straight to leaderboard
         if (! $member) {
-            return redirect()->route('competition.liga.bixos')->with('unregistered', true);
+            return redirect()->route('competition.liga.bixos');
         }
 
         $league = $member->role === 'bixo' ? 'bixos' : 'veteranos';
@@ -42,12 +44,9 @@ class BrasileiraoController extends Controller
     {
         $challenge->load('problem');
 
-        // Auto-enable problem visibility when the challenge goes live
-        if ($challenge->isActive() && ! $challenge->problem->visible) {
-            $challenge->problem->update(['visible' => true]);
-        }
-
-        $member = BrasileiraoMember::where('user_id', Auth::id())->with('institution')->first();
+        $member = Auth::check()
+            ? BrasileiraoMember::where('user_id', Auth::id())->with('institution')->first()
+            : null;
 
         $isTestCases = $challenge->ranking_type === 'test_cases';
 
@@ -134,7 +133,9 @@ class BrasileiraoController extends Controller
             ->orderByDesc('bixos_count')
             ->get();
 
-        $member = BrasileiraoMember::where('user_id', Auth::id())->with('institution')->first();
+        $member = Auth::check()
+            ? BrasileiraoMember::where('user_id', Auth::id())->with('institution')->first()
+            : null;
 
         $challenges = BrasileiraoWeeklyChallenge::with('problem')
             ->forLeague('bixos')
@@ -157,7 +158,9 @@ class BrasileiraoController extends Controller
             ->orderByDesc('veterans_count')
             ->get();
 
-        $member = BrasileiraoMember::where('user_id', Auth::id())->with('institution')->first();
+        $member = Auth::check()
+            ? BrasileiraoMember::where('user_id', Auth::id())->with('institution')->first()
+            : null;
 
         $challenges = BrasileiraoWeeklyChallenge::with('problem')
             ->forLeague('veteranos')

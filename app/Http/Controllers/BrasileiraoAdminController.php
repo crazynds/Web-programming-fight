@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreBrasileiraoWeeklyChallengeRequest;
+use App\Jobs\PublishBrasileiraoChallengeProblemsJob;
 use App\Jobs\ScoreBrasileiraoChallengeJob;
 use App\Jobs\SendBrasileiraoNewsletterJob;
 use App\Models\BrasileiraoWeeklyChallenge;
@@ -39,6 +40,7 @@ class BrasileiraoAdminController extends Controller
 
         $challenge = BrasileiraoWeeklyChallenge::create($data);
 
+        PublishBrasileiraoChallengeProblemsJob::dispatch($challenge)->delay($challenge->start_at);
         ScoreBrasileiraoChallengeJob::dispatch($challenge)->delay($challenge->end_at);
 
         return redirect()->route('competition.admin.index')
