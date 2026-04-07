@@ -19,11 +19,14 @@
     </div>
 
     <div style="border: 1px solid #ccc; border-radius: 4px; overflow: hidden;">
-        <iframe srcdoc="{{ htmlspecialchars(view('emails.brasileirao-newsletter', ['user' => $previewUser, 'body' => $body])->render()) }}"
-                style="width: 100%; height: 480px; border: 0;"
-                sandbox="allow-same-origin">
-        </iframe>
+        <iframe id="email-preview" style="width: 100%; height: 480px; border: 0;"></iframe>
     </div>
+
+    <script>
+        const html = @json(view('emails.brasileirao-newsletter', ['user' => $previewUser, 'body' => $body])->render());
+        const iframe = document.getElementById('email-preview');
+        iframe.srcdoc = html;
+    </script>
 
     <div class="hstack gap-2 mt-3">
         <form method="POST" action="{{ route('competition.admin.newsletter.send') }}">
