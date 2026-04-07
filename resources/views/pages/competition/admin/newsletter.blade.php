@@ -48,7 +48,17 @@
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="audience" id="aud_registered" value="registered"
                                {{ old('audience') === 'registered' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="aud_registered">Registered only</label>
+                        <label class="form-check-label" for="aud_registered">All registered members</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="audience" id="aud_bixos" value="bixos"
+                               {{ old('audience') === 'bixos' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="aud_bixos">Liga dos Bixos only</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="audience" id="aud_veteranos" value="veteranos"
+                               {{ old('audience') === 'veteranos' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="aud_veteranos">Liga dos Veteranos only</label>
                     </div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="audience" id="aud_unregistered" value="unregistered"

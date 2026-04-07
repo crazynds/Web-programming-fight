@@ -12,8 +12,10 @@
 
     @php
         $audienceLabel = match($audience) {
-            'registered'   => 'registered members only',
+            'registered'   => 'all registered members',
             'unregistered' => 'non-registered users only',
+            'bixos'        => 'Liga dos Bixos only',
+            'veteranos'    => 'Liga dos Veteranos only',
             default        => 'all subscribers',
         };
     @endphp

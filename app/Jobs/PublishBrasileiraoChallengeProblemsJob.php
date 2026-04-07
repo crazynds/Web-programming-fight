@@ -19,8 +19,6 @@ class PublishBrasileiraoChallengeProblemsJob implements ShouldQueue
     {
         $challenge = $this->challenge->fresh();
 
-        if (! $challenge->problem->visible) {
-            $challenge->problem->update(['visible' => true]);
-        }
+        $challenge->problem->update(['visible' => true]);
     }
 }

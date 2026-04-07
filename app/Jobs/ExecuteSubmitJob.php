@@ -229,16 +229,29 @@ class ExecuteSubmitJob implements ShouldBeUnique, ShouldQueue
     {
         $semicolonLanguages = ['C++', 'Java OpenJDK 24', 'C'];
         $useSemicolons = in_array($language, $semicolonLanguages);
+        $isCFamily = in_array($language, ['C++', 'C']);
 
-        $lines = explode("\n", $code);
+        $lines = $isCFamily
+            ? $this->preprocessCCode($code, $language)
+            : explode("\n", $code);
+
         $count = 0;
         foreach ($lines as $line) {
             $trimmed = trim($line);
             if ($trimmed === '') {
                 continue;
             }
+            // Skip lines that are only braces
+            if ($trimmed === '{' || $trimmed === '}') {
+                continue;
+            }
+            // Skip preprocessor directives (#include, #define, etc.)
+            if (str_starts_with($trimmed, '#')) {
+                continue;
+            }
             if ($useSemicolons) {
-                $semicolons = substr_count($trimmed, ';');
+                $lineForCounting = $this->stripForLoopHeaders($trimmed);
+                $semicolons = substr_count($lineForCounting, ';');
                 $count += max(1, $semicolons);
             } else {
                 $count += 1;
@@ -246,6 +259,94 @@ class ExecuteSubmitJob implements ShouldBeUnique, ShouldQueue
         }
 
         return $count;
+    }
+
+    /**
+     * Preprocess C/C++ code using the compiler's preprocessor (-E flag).
+     * This expands #define macros while filtering out lines from included headers,
+     * keeping only lines that originated from the user's source file.
+     */
+    private function preprocessCCode(string $code, string $language): array
+    {
+        $ext = $language === 'C' ? '.c' : '.cpp';
+        $compiler = $language === 'C' ? 'gcc' : 'g++';
+        $tmpFile = tempnam(sys_get_temp_dir(), 'code_lines_').$ext;
+        file_put_contents($tmpFile, $code);
+
+        // -E: preprocess only (expand macros, includes, etc.)
+        // -w: suppress warnings
+        // Line markers (# linenum "filename") in output let us filter by source file
+        $preprocessed = [];
+        exec("$compiler -E -w ".escapeshellarg($tmpFile).' 2>/dev/null', $preprocessed);
+
+        unlink($tmpFile);
+
+        $result = [];
+        $inOurFile = false;
+        $ourFile = basename($tmpFile);
+
+        foreach ($preprocessed as $line) {
+            // Line marker format: # linenum "filename" [flags]
+            if (preg_match('/^#\s+\d+\s+"([^"]+)"/', $line, $matches)) {
+                $inOurFile = (basename($matches[1]) === $ourFile);
+                continue;
+            }
+            if ($inOurFile) {
+                $result[] = $line;
+            }
+        }
+
+        // If preprocessing produced no output (e.g. compiler not available), fall back
+        return $result ?: explode("\n", $code);
+    }
+
+    /**
+     * Replace for(...) header content with for() to avoid counting semicolons
+     * inside the loop header (e.g. for(int i=0; i<n; i++) has 2 semicolons but
+     * is a single statement header, not two separate lines).
+     */
+    private function stripForLoopHeaders(string $line): string
+    {
+        $result = '';
+        $len = strlen($line);
+        $i = 0;
+        while ($i < $len) {
+            // Detect 'for' keyword (not part of a longer identifier)
+            if (
+                $i + 3 <= $len
+                && substr($line, $i, 3) === 'for'
+                && ($i === 0 || (! ctype_alnum($line[$i - 1]) && $line[$i - 1] !== '_'))
+                && ($i + 3 >= $len || (! ctype_alnum($line[$i + 3]) && $line[$i + 3] !== '_'))
+            ) {
+                $j = $i + 3;
+                while ($j < $len && ctype_space($line[$j])) {
+                    $j++;
+                }
+                if ($j < $len && $line[$j] === '(') {
+                    // Find the matching closing parenthesis
+                    $depth = 0;
+                    while ($j < $len) {
+                        if ($line[$j] === '(') {
+                            $depth++;
+                        } elseif ($line[$j] === ')') {
+                            $depth--;
+                            if ($depth === 0) {
+                                $j++;
+                                break;
+                            }
+                        }
+                        $j++;
+                    }
+                    $result .= 'for()';
+                    $i = $j;
+                    continue;
+                }
+            }
+            $result .= $line[$i];
+            $i++;
+        }
+
+        return $result;
     }
 
     public function failed(Throwable $exception): void

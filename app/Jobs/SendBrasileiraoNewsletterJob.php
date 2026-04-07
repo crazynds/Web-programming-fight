@@ -20,7 +20,7 @@ class SendBrasileiraoNewsletterJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private const BATCH_SIZE = 10;
+    private const BATCH_SIZE = 50;
 
     public function __construct(
         public int $newsletterId,
@@ -47,12 +47,20 @@ class SendBrasileiraoNewsletterJob implements ShouldQueue
 
     private static function audienceQuery(string $audience): Builder
     {
-        $registeredIds = BrasileiraoMember::pluck('user_id');
-
         return User::where('email_opt_out', false)
             ->whereNotNull('email')
-            ->when($audience === 'registered', fn ($q) => $q->whereIn('id', $registeredIds))
-            ->when($audience === 'unregistered', fn ($q) => $q->whereNotIn('id', $registeredIds));
+            ->when($audience === 'registered', fn ($q) => $q->whereIn('id',
+                BrasileiraoMember::pluck('user_id')
+            ))
+            ->when($audience === 'unregistered', fn ($q) => $q->whereNotIn('id',
+                BrasileiraoMember::pluck('user_id')
+            ))
+            ->when($audience === 'bixos', fn ($q) => $q->whereIn('id',
+                BrasileiraoMember::where('role', 'bixo')->pluck('user_id')
+            ))
+            ->when($audience === 'veteranos', fn ($q) => $q->whereIn('id',
+                BrasileiraoMember::where('role', 'veteran')->pluck('user_id')
+            ));
     }
 
     public function handle(): void
@@ -85,6 +93,8 @@ class SendBrasileiraoNewsletterJob implements ShouldQueue
                 );
             }
 
+            $newsletter->update(['status' => 'sending']);
+
             // Re-dispatch to start sending
             self::dispatch($newsletter->id, 0)->onQueue('email');
 
@@ -92,6 +102,7 @@ class SendBrasileiraoNewsletterJob implements ShouldQueue
         }
 
         if ($sends->isEmpty()) {
+            $newsletter->update(['status' => 'completed']);
             return;
         }
 
@@ -108,5 +119,22 @@ class SendBrasileiraoNewsletterJob implements ShouldQueue
 
         self::dispatch($newsletter->id, $sends->last()->user_id)
             ->delay(now()->addMinutes(30));
+    }
+
+    public function failed(Throwable $_e): void
+    {
+        $newsletter = NewsletterModel::find($this->newsletterId);
+
+        if (! $newsletter) {
+            return;
+        }
+
+        $sent    = $newsletter->sends()->where('status', 'sent')->count();
+        $total   = $newsletter->total ?: 1;
+        $percent = (int) round(($sent / $total) * 100);
+
+        $newsletter->update([
+            'status' => "failed at {$percent}%",
+        ]);
     }
 }

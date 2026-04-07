@@ -94,7 +94,7 @@ class BrasileiraoAdminController extends Controller
         $request->validate([
             'subject'  => 'required|string|max:255',
             'body'     => 'required|string',
-            'audience' => 'required|in:all,registered,unregistered',
+            'audience' => 'required|in:all,registered,unregistered,bixos,veteranos',
         ]);
 
         $request->session()->put('newsletter.subject', $request->input('subject'));
@@ -106,8 +106,10 @@ class BrasileiraoAdminController extends Controller
         $body = $request->input('body');
         $previewUser = auth()->user();
         $subscriberCount = User::where('email_opt_out', false)->whereNotNull('email')
-            ->when($audience === 'registered', fn ($q) => $q->whereIn('id', \App\Models\BrasileiraoMember::pluck('user_id')))
+            ->when($audience === 'registered',   fn ($q) => $q->whereIn('id', \App\Models\BrasileiraoMember::pluck('user_id')))
             ->when($audience === 'unregistered', fn ($q) => $q->whereNotIn('id', \App\Models\BrasileiraoMember::pluck('user_id')))
+            ->when($audience === 'bixos',        fn ($q) => $q->whereIn('id', \App\Models\BrasileiraoMember::where('role', 'bixo')->pluck('user_id')))
+            ->when($audience === 'veteranos',    fn ($q) => $q->whereIn('id', \App\Models\BrasileiraoMember::where('role', 'veteran')->pluck('user_id')))
             ->count();
 
         $emailHtml = view('emails.brasileirao-newsletter', [
