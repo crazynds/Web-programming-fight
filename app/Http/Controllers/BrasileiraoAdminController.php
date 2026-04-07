@@ -6,6 +6,8 @@ use App\Http\Requests\StoreBrasileiraoWeeklyChallengeRequest;
 use App\Jobs\PublishBrasileiraoChallengeProblemsJob;
 use App\Jobs\ScoreBrasileiraoChallengeJob;
 use App\Jobs\SendBrasileiraoNewsletterJob;
+use App\Models\BrasileiraoNewsletter;
+use App\Models\BrasileiraoNewsletterSend;
 use App\Models\BrasileiraoWeeklyChallenge;
 use App\Models\Problem;
 use App\Models\User;
@@ -78,24 +80,35 @@ class BrasileiraoAdminController extends Controller
     public function newsletter()
     {
         $subscriberCount = User::where('email_opt_out', false)->whereNotNull('email')->count();
+        $newsletters = BrasileiraoNewsletter::withCount([
+            'sends as sent_count'    => fn ($q) => $q->where('status', 'sent'),
+            'sends as failed_count'  => fn ($q) => $q->where('status', 'failed'),
+            'sends as pending_count' => fn ($q) => $q->where('status', 'pending'),
+        ])->orderByDesc('created_at')->get();
 
-        return view('pages.competition.admin.newsletter', compact('subscriberCount'));
+        return view('pages.competition.admin.newsletter', compact('subscriberCount', 'newsletters'));
     }
 
     public function previewNewsletter(Request $request)
     {
         $request->validate([
-            'subject' => 'required|string|max:255',
-            'body'    => 'required|string',
+            'subject'  => 'required|string|max:255',
+            'body'     => 'required|string',
+            'audience' => 'required|in:all,registered,unregistered',
         ]);
 
         $request->session()->put('newsletter.subject', $request->input('subject'));
         $request->session()->put('newsletter.body', $request->input('body'));
+        $request->session()->put('newsletter.audience', $request->input('audience'));
 
-        $subscriberCount = User::where('email_opt_out', false)->whereNotNull('email')->count();
+        $audience = $request->input('audience');
         $subject = $request->input('subject');
         $body = $request->input('body');
         $previewUser = auth()->user();
+        $subscriberCount = User::where('email_opt_out', false)->whereNotNull('email')
+            ->when($audience === 'registered', fn ($q) => $q->whereIn('id', \App\Models\BrasileiraoMember::pluck('user_id')))
+            ->when($audience === 'unregistered', fn ($q) => $q->whereNotIn('id', \App\Models\BrasileiraoMember::pluck('user_id')))
+            ->count();
 
         $emailHtml = view('emails.brasileirao-newsletter', [
             'user'         => $previewUser,
@@ -103,23 +116,57 @@ class BrasileiraoAdminController extends Controller
             'emailSubject' => $subject,
         ])->render();
 
-        return view('pages.competition.admin.newsletter-preview', compact('subject', 'body', 'previewUser', 'subscriberCount', 'emailHtml'));
+        return view('pages.competition.admin.newsletter-preview', compact('subject', 'body', 'audience', 'previewUser', 'subscriberCount', 'emailHtml'));
     }
 
     public function sendNewsletter(Request $request)
     {
-        $subject = $request->session()->pull('newsletter.subject');
-        $body    = $request->session()->pull('newsletter.body');
+        $subject  = $request->session()->pull('newsletter.subject');
+        $body     = $request->session()->pull('newsletter.body');
+        $audience = $request->session()->pull('newsletter.audience', 'all');
 
         if (!$subject || !$body) {
             return redirect()->route('competition.admin.newsletter')
                 ->with('error', 'Session expired. Please fill in the form again.');
         }
 
-        SendBrasileiraoNewsletterJob::dispatch($subject, $body);
+        SendBrasileiraoNewsletterJob::createAndDispatch($subject, $body, $audience);
 
-        return redirect()->route('competition.admin.index')
+        return redirect()->route('competition.admin.newsletter')
             ->with('success', 'Newsletter enqueued for sending.');
+    }
+
+    public function newsletterShow(BrasileiraoNewsletter $newsletter)
+    {
+        $sends = $newsletter->sends()
+            ->with('user')
+            ->orderBy('status')
+            ->orderBy('user_id')
+            ->paginate(50);
+
+        return view('pages.competition.admin.newsletter-show', compact('newsletter', 'sends'));
+    }
+
+    public function newsletterResend(BrasileiraoNewsletter $newsletter)
+    {
+        $failedCount = $newsletter->sends()->where('status', 'failed')->count();
+
+        if ($failedCount === 0) {
+            return redirect()->route('competition.admin.newsletter.show', $newsletter)
+                ->with('error', 'No failed sends to retry.');
+        }
+
+        // Reset failed to pending
+        $newsletter->sends()->where('status', 'failed')->update([
+            'status'     => 'pending',
+            'error'      => null,
+            'updated_at' => now(),
+        ]);
+
+        SendBrasileiraoNewsletterJob::dispatch($newsletter->id, 0)->onQueue('email');
+
+        return redirect()->route('competition.admin.newsletter.show', $newsletter)
+            ->with('success', "Retrying {$failedCount} failed send(s).");
     }
 
 }

@@ -10,8 +10,15 @@
         </div>
     </div>
 
+    @php
+        $audienceLabel = match($audience) {
+            'registered'   => 'registered members only',
+            'unregistered' => 'non-registered users only',
+            default        => 'all subscribers',
+        };
+    @endphp
     <p class="text-muted">
-        This is how the email will look. It will be sent to <b>{{ $subscriberCount }}</b> subscribed user(s).
+        This is how the email will look. It will be sent to <b>{{ $subscriberCount }}</b> user(s) (<b>{{ $audienceLabel }}</b>).
     </p>
 
     <div class="mb-3">
