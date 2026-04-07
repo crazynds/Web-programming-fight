@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreBrasileiraoWeeklyChallengeRequest;
 use App\Jobs\ScoreBrasileiraoChallengeJob;
+use App\Jobs\SendBrasileiraoNewsletterJob;
 use App\Models\BrasileiraoWeeklyChallenge;
 use App\Models\Problem;
+use App\Models\User;
+use Illuminate\Http\Request;
 
 class BrasileiraoAdminController extends Controller
 {
@@ -68,6 +71,47 @@ class BrasileiraoAdminController extends Controller
 
         return redirect()->route('competition.admin.index')
             ->with('success', 'Weekly challenge deleted.');
+    }
+
+    public function newsletter()
+    {
+        $subscriberCount = User::where('email_opt_out', false)->whereNotNull('email')->count();
+
+        return view('pages.competition.admin.newsletter', compact('subscriberCount'));
+    }
+
+    public function previewNewsletter(Request $request)
+    {
+        $request->validate([
+            'subject' => 'required|string|max:255',
+            'body'    => 'required|string',
+        ]);
+
+        $request->session()->put('newsletter.subject', $request->input('subject'));
+        $request->session()->put('newsletter.body', $request->input('body'));
+
+        $subscriberCount = User::where('email_opt_out', false)->whereNotNull('email')->count();
+        $subject = $request->input('subject');
+        $body = $request->input('body');
+        $previewUser = auth()->user();
+
+        return view('pages.competition.admin.newsletter-preview', compact('subject', 'body', 'previewUser', 'subscriberCount'));
+    }
+
+    public function sendNewsletter(Request $request)
+    {
+        $subject = $request->session()->pull('newsletter.subject');
+        $body    = $request->session()->pull('newsletter.body');
+
+        if (!$subject || !$body) {
+            return redirect()->route('competition.admin.newsletter')
+                ->with('error', 'Session expired. Please fill in the form again.');
+        }
+
+        SendBrasileiraoNewsletterJob::dispatch($subject, $body);
+
+        return redirect()->route('competition.admin.index')
+            ->with('success', 'Newsletter enqueued for sending.');
     }
 
 }

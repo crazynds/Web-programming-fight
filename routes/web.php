@@ -104,7 +104,11 @@ Route::middleware([PreventAccessDuringContest::class])->group(function () {
             Route::get('/{challenge}/edit', [BrasileiraoAdminController::class, 'edit'])->name('edit');
             Route::put('/{challenge}', [BrasileiraoAdminController::class, 'update'])->name('update');
             Route::delete('/{challenge}', [BrasileiraoAdminController::class, 'destroy'])->name('destroy');
+            Route::get('/newsletter', [BrasileiraoAdminController::class, 'newsletter'])->name('newsletter');
+            Route::post('/newsletter/preview', [BrasileiraoAdminController::class, 'previewNewsletter'])->name('newsletter.preview');
+            Route::post('/newsletter/send', [BrasileiraoAdminController::class, 'sendNewsletter'])->name('newsletter.send');
         });
+        Route::get('/brasileirao/unsubscribe', [BrasileiraoController::class, 'unsubscribe'])->name('competition.unsubscribe')->middleware('signed');
     });
 
     Route::resource('problem', ProblemController::class);

@@ -9,6 +9,9 @@
             <a style="float:right" href="{{ route('competition.admin.create') }}">
                 <button>New +</button>
             </a>
+            <a style="float:right; margin-right:5px" href="{{ route('competition.admin.newsletter') }}">
+                <button>Newsletter</button>
+            </a>
             <a style="float:right; margin-right:5px" href="{{ route('competition.brasileirao') }}">
                 <button> Leaderboard</button>
             </a>

@@ -7,6 +7,7 @@ use App\Models\BrasileiraoInstitution;
 use App\Models\BrasileiraoMember;
 use App\Models\BrasileiraoWeeklyChallenge;
 use App\Models\Submission;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,7 +15,7 @@ class BrasileiraoController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth')->except('unsubscribe');
     }
 
     public function index()
@@ -350,5 +351,13 @@ class BrasileiraoController extends Controller
 
         return redirect()->route('competition.brasileirao')
             ->with('success', 'Successfully registered for the Brasileirao de Programacao!');
+    }
+
+    public function unsubscribe(Request $request)
+    {
+        $user = User::findOrFail($request->query('user'));
+        $user->update(['email_opt_out' => true]);
+
+        return view('pages.unsubscribe');
     }
 }
