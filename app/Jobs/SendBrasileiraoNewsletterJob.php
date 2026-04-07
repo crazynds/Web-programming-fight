@@ -39,6 +39,7 @@ class SendBrasileiraoNewsletterJob implements ShouldQueue
         }
 
         foreach ($users as $user) {
+            dump("Sending newsletter to {$user->email} (ID: {$user->id})");
             Mail::to($user->email)->send(new BrasileiraoNewsletter($user, $this->subject, $this->body));
         }
 
