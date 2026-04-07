@@ -47,31 +47,45 @@ class ScoreBrasileiraoChallengeJob implements ShouldQueue
             $eligibleUserIds = BrasileiraoMember::whereIn('role', $eligibleRoles)
                 ->pluck('user_id');
 
+            $isTestCases = $challenge->ranking_type === 'test_cases';
+
             // Metric column for ranking
             $metricColumn = match ($challenge->ranking_type) {
-                'cpu_time' => 'execution_time',
-                'memory_peak' => 'execution_memory',
+                'cpu_time'        => 'execution_time',
+                'memory_peak'     => 'execution_memory',
                 'submission_time' => 'created_at',
-                'code_lines' => 'code_lines',
+                'code_lines'      => 'code_lines',
+                'test_cases'      => 'num_test_cases',
             };
+
+            $aggregate = $isTestCases ? 'MAX' : 'MIN';
 
             // Best submission per eligible user within the challenge window
             $bestPerUser = Submission::where('problem_id', $challenge->problem_id)
-                ->where('result', SubmitResult::Accepted)
                 ->whereBetween('created_at', [$challenge->start_at, $challenge->end_at])
                 ->whereIn('user_id', $eligibleUserIds)
-                ->selectRaw("user_id, MIN({$metricColumn}) as best_value")
+                ->when($isTestCases,
+                    fn ($q) => $q->where('num_test_cases', '>=', 5),
+                    fn ($q) => $q->where('result', SubmitResult::Accepted)
+                )
+                ->selectRaw("user_id, {$aggregate}({$metricColumn}) as best_value")
                 ->groupBy('user_id');
 
             $leaderboard = Submission::where('submissions.problem_id', $challenge->problem_id)
-                ->where('submissions.result', SubmitResult::Accepted)
                 ->whereBetween('submissions.created_at', [$challenge->start_at, $challenge->end_at])
                 ->whereIn('submissions.user_id', $eligibleUserIds)
+                ->when($isTestCases,
+                    fn ($q) => $q->where('submissions.num_test_cases', '>=', 5),
+                    fn ($q) => $q->where('submissions.result', SubmitResult::Accepted)
+                )
                 ->joinSub($bestPerUser, 'best', function ($join) use ($metricColumn) {
                     $join->on('submissions.user_id', '=', 'best.user_id')
                         ->whereColumn("submissions.{$metricColumn}", 'best.best_value');
                 })
-                ->orderBy('best.best_value')
+                ->when($isTestCases,
+                    fn ($q) => $q->orderByDesc('best.best_value'),
+                    fn ($q) => $q->orderBy('best.best_value')
+                )
                 ->orderBy('submissions.id')
                 ->select('submissions.*')
                 ->get()
@@ -100,8 +114,13 @@ class ScoreBrasileiraoChallengeJob implements ShouldQueue
                     ? $submission->created_at->diffInSeconds($challenge->start_at)
                     : $submission->{$metricColumn};
 
-                // Within 5% of 1st place (technical tie); first value is always included
-                if ($firstValue == 0 || abs($value - $firstValue) / $firstValue <= 0.05) {
+                // Higher-is-better (test_cases): within 5% below the max
+                // Lower-is-better (others): within 5% above the min
+                $withinTie = $isTestCases
+                    ? ($firstValue == 0 || ($firstValue - $value) / $firstValue <= 0.05)
+                    : ($firstValue == 0 || abs($value - $firstValue) / $firstValue <= 0.05);
+
+                if ($withinTie) {
                     $instId = $memberMap->get($submission->user_id);
                     if ($instId) {
                         $bonusInstitutionIds->push($instId);

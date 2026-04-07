@@ -77,6 +77,8 @@
                     <th class="text-center px-2"><b>Memory Peak (KB)</b></th>
                 @elseif($challenge->ranking_type === 'code_lines')
                     <th class="text-center px-2"><b>Code Lines</b></th>
+                @elseif($challenge->ranking_type === 'test_cases')
+                    <th class="text-center px-2"><b>Test Cases Passed</b></th>
                 @else
                     <th class="text-center px-2"><b>Submission Time</b></th>
                 @endif
@@ -107,6 +109,8 @@
                         <td class="text-center px-2">{{ $submission->execution_memory ?? '-' }}</td>
                     @elseif($challenge->ranking_type === 'code_lines')
                         <td class="text-center px-2">{{ $submission->code_lines ?? '-' }}</td>
+                    @elseif($challenge->ranking_type === 'test_cases')
+                        <td class="text-center px-2">{{ $submission->num_test_cases ?? '-' }}</td>
                     @else
                         <td class="text-center px-2">
                             +{{ $submission->created_at->diffInSeconds($challenge->start_at) }}s

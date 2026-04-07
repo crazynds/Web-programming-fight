@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreBrasileiraoWeeklyChallengeRequest;
 use App\Jobs\ScoreBrasileiraoChallengeJob;
 use App\Models\BrasileiraoWeeklyChallenge;
 use App\Models\Problem;
-use Illuminate\Http\Request;
 
 class BrasileiraoAdminController extends Controller
 {
@@ -30,17 +30,9 @@ class BrasileiraoAdminController extends Controller
         return view('pages.competition.admin.form', compact('problems'));
     }
 
-    public function store(Request $request)
+    public function store(StoreBrasileiraoWeeklyChallengeRequest $request)
     {
-        $data = $request->validate([
-            'problem_id' => 'required|exists:problems,id',
-            'league' => 'required|in:bixos,veteranos,all',
-            'ranking_type' => 'required|in:cpu_time,memory_peak,submission_time,code_lines',
-            'start_at' => 'required|date',
-            'end_at' => 'required|date|after:start_at',
-        ]);
-
-        $this->checkNoOverlap($data['league'], $data['start_at'], $data['end_at']);
+        $data = $request->validated();
 
         $challenge = BrasileiraoWeeklyChallenge::create($data);
 
@@ -57,17 +49,9 @@ class BrasileiraoAdminController extends Controller
         return view('pages.competition.admin.form', compact('challenge', 'problems'));
     }
 
-    public function update(Request $request, BrasileiraoWeeklyChallenge $challenge)
+    public function update(StoreBrasileiraoWeeklyChallengeRequest $request, BrasileiraoWeeklyChallenge $challenge)
     {
-        $data = $request->validate([
-            'problem_id' => 'required|exists:problems,id',
-            'league' => 'required|in:bixos,veteranos,all',
-            'ranking_type' => 'required|in:cpu_time,memory_peak,submission_time,code_lines',
-            'start_at' => 'required|date',
-            'end_at' => 'required|date|after:start_at',
-        ]);
-
-        $this->checkNoOverlap($data['league'], $data['start_at'], $data['end_at'], $challenge->id);
+        $data = $request->validated();
 
         $challenge->update($data);
 
@@ -86,36 +70,4 @@ class BrasileiraoAdminController extends Controller
             ->with('success', 'Weekly challenge deleted.');
     }
 
-    /**
-     * Ensure no other challenge overlaps in time for the same league.
-     * A league='all' challenge blocks bixos and veteranos, and vice-versa.
-     */
-    private function checkNoOverlap(string $league, string $startAt, string $endAt, ?int $excludeId = null): void
-    {
-        $query = BrasileiraoWeeklyChallenge::where(function ($q) use ($league) {
-            $q->where('league', $league)
-                ->orWhere('league', 'all');
-            if ($league !== 'all') {
-                $q->orWhere('league', $league);
-            } else {
-                // 'all' conflicts with everything
-                $q->orWhere('league', 'bixos')->orWhere('league', 'veteranos');
-            }
-        })
-            ->where(function ($q) use ($startAt, $endAt) {
-                // Overlaps if not (ends before new start OR starts after new end)
-                $q->where('start_at', '<', $endAt)
-                    ->where('end_at', '>', $startAt);
-            });
-
-        if ($excludeId) {
-            $query->where('id', '!=', $excludeId);
-        }
-
-        if ($query->exists()) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
-                'start_at' => 'There is already a challenge active during this period for this league.',
-            ]);
-        }
-    }
 }

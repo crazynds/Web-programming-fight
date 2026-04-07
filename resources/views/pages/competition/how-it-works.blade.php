@@ -48,6 +48,7 @@
                 <li><strong>CPU Time</strong>: the submission with the lowest execution time wins</li>
                 <li><strong>Memory Peak</strong>: the submission with the lowest memory usage wins</li>
                 <li><strong>Code Lines</strong>: the submission with the fewest lines of code wins. Empty lines are ignored. In C++, Java, and C, each <code>;</code> in a line counts as a separate line (e.g. two statements on one line count as two lines)</li>
+                <li><strong>Test Cases Passed</strong>: the submission that passes the most test cases wins — the submission does not need to be fully correct. Only submissions that pass <strong>at least 5 test cases</strong> are considered valid and appear on the leaderboard. For institution scoring, all unique members with at least 5 test cases passed count toward the institution's solutions total</li>
             </ul>
             <p><strong>Fair Play Rules:</strong></p>
             <ul>

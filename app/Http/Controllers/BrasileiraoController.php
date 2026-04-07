@@ -42,29 +42,43 @@ class BrasileiraoController extends Controller
 
         $member = BrasileiraoMember::where('user_id', Auth::id())->with('institution')->first();
 
+        $isTestCases = $challenge->ranking_type === 'test_cases';
+
         $metricColumn = match ($challenge->ranking_type) {
-            'cpu_time' => 'execution_time',
-            'memory_peak' => 'execution_memory',
+            'cpu_time'        => 'execution_time',
+            'memory_peak'     => 'execution_memory',
             'submission_time' => 'created_at',
-            'code_lines' => 'code_lines',
+            'code_lines'      => 'code_lines',
+            'test_cases'      => 'num_test_cases',
         };
+
+        $aggregate = $isTestCases ? 'MAX' : 'MIN';
 
         // Subquery: best metric value per user within the challenge window
         $bestPerUser = Submission::where('problem_id', $challenge->problem_id)
-            ->where('result', SubmitResult::Accepted)
             ->whereBetween('created_at', [$challenge->start_at, $challenge->end_at])
-            ->selectRaw("user_id, MIN({$metricColumn}) as best_value")
+            ->when($isTestCases,
+                fn ($q) => $q->where('num_test_cases', '>=', 5),
+                fn ($q) => $q->where('result', SubmitResult::Accepted)
+            )
+            ->selectRaw("user_id, {$aggregate}({$metricColumn}) as best_value")
             ->groupBy('user_id');
 
         // Join back to get the full submission row for that best value (one row per user)
         $leaderboard = Submission::where('submissions.problem_id', $challenge->problem_id)
-            ->where('submissions.result', SubmitResult::Accepted)
             ->whereBetween('submissions.created_at', [$challenge->start_at, $challenge->end_at])
+            ->when($isTestCases,
+                fn ($q) => $q->where('submissions.num_test_cases', '>=', 5),
+                fn ($q) => $q->where('submissions.result', SubmitResult::Accepted)
+            )
             ->joinSub($bestPerUser, 'best', function ($join) use ($metricColumn) {
                 $join->on('submissions.user_id', '=', 'best.user_id')
                     ->whereColumn("submissions.{$metricColumn}", 'best.best_value');
             })
-            ->orderBy('best.best_value')
+            ->when($isTestCases,
+                fn ($q) => $q->orderByDesc('best.best_value'),
+                fn ($q) => $q->orderBy('best.best_value')
+            )
             ->orderBy('submissions.id') // tiebreak: earlier submission wins
             ->select('submissions.*')
             ->with('user')
@@ -85,7 +99,13 @@ class BrasileiraoController extends Controller
                     ? $submission->created_at->diffInSeconds($challenge->start_at)
                     : $submission->{$metricColumn};
 
-                if ($firstValue == 0 || abs($value - $firstValue) / $firstValue <= 0.05) {
+                // Higher-is-better (test_cases): within 5% below the max
+                // Lower-is-better (others): within 5% above the min
+                $withinTie = $isTestCases
+                    ? ($firstValue == 0 || ($firstValue - $value) / $firstValue <= 0.05)
+                    : ($firstValue == 0 || abs($value - $firstValue) / $firstValue <= 0.05);
+
+                if ($withinTie) {
                     $bonusSubmissionIds->push($submission->id);
                 }
             }
@@ -186,11 +206,14 @@ class BrasileiraoController extends Controller
                 continue;
             }
 
+            $isTestCases = $challenge->ranking_type === 'test_cases';
+
             $metricColumn = match ($challenge->ranking_type) {
-                'cpu_time' => 'execution_time',
-                'memory_peak' => 'execution_memory',
+                'cpu_time'        => 'execution_time',
+                'memory_peak'     => 'execution_memory',
                 'submission_time' => 'created_at',
-                'code_lines' => 'code_lines',
+                'code_lines'      => 'code_lines',
+                'test_cases'      => 'num_test_cases',
             };
 
             $windowSubmissions = Submission::whereBetween('created_at', [$challenge->start_at, $challenge->end_at])
@@ -204,12 +227,17 @@ class BrasileiraoController extends Controller
                 }
             }
 
-            $accepted = $windowSubmissions->where('result', SubmitResult::Accepted);
-            $bestPerUser = $accepted->groupBy('user_id')->map(function ($subs) use ($metricColumn, $challenge) {
-                return $subs->sortBy(function ($s) use ($metricColumn, $challenge) {
-                    return $challenge->ranking_type === 'submission_time'
+            // For test_cases: any submission with ≥5 test cases qualifies; otherwise only Accepted
+            $qualified = $isTestCases
+                ? $windowSubmissions->where('num_test_cases', '>=', 5)
+                : $windowSubmissions->where('result', SubmitResult::Accepted);
+
+            $bestPerUser = $qualified->groupBy('user_id')->map(function ($subs) use ($metricColumn, $challenge, $isTestCases) {
+                return $subs->sortBy(function ($s) use ($metricColumn, $challenge, $isTestCases) {
+                    $v = $challenge->ranking_type === 'submission_time'
                         ? $s->created_at->diffInSeconds($challenge->start_at)
                         : $s->{$metricColumn};
+                    return $isTestCases ? -$v : $v; // negate for higher-is-better
                 })->first();
             });
 
@@ -221,13 +249,20 @@ class BrasileiraoController extends Controller
 
             if ($bestPerUser->isNotEmpty()) {
                 $allEligibleUserIds = BrasileiraoMember::whereIn('role', $eligibleRoles)->pluck('user_id');
+                $aggregate  = $isTestCases ? 'MAX' : 'MIN';
                 $globalBest = Submission::where('problem_id', $challenge->problem_id)
-                    ->where('result', SubmitResult::Accepted)
                     ->whereBetween('created_at', [$challenge->start_at, $challenge->end_at])
                     ->whereIn('user_id', $allEligibleUserIds)
-                    ->selectRaw("user_id, MIN({$metricColumn}) as best_value")
+                    ->when($isTestCases,
+                        fn ($q) => $q->where('num_test_cases', '>=', 5),
+                        fn ($q) => $q->where('result', SubmitResult::Accepted)
+                    )
+                    ->selectRaw("user_id, {$aggregate}({$metricColumn}) as best_value")
                     ->groupBy('user_id')
-                    ->orderBy('best_value')
+                    ->when($isTestCases,
+                        fn ($q) => $q->orderByDesc('best_value'),
+                        fn ($q) => $q->orderBy('best_value')
+                    )
                     ->first();
 
                 if ($globalBest) {
@@ -240,10 +275,12 @@ class BrasileiraoController extends Controller
                             ? $submission->created_at->diffInSeconds($challenge->start_at)
                             : $submission->{$metricColumn};
 
-                        if ($firstValue == 0 || abs($value - $firstValue) / $firstValue <= 0.05) {
-                            if (isset($stats[$uid])) {
-                                $stats[$uid]['bonus']++;
-                            }
+                        $withinTie = $isTestCases
+                            ? ($firstValue == 0 || ($firstValue - $value) / $firstValue <= 0.05)
+                            : ($firstValue == 0 || abs($value - $firstValue) / $firstValue <= 0.05);
+
+                        if ($withinTie && isset($stats[$uid])) {
+                            $stats[$uid]['bonus']++;
                         }
                     }
                 }
