@@ -64,7 +64,7 @@ class SubmissionController extends Controller
 
         return view('pages.run.create', [
             'problems' => $problems,
-            'selected' => $request->get('problem'),
+            'selected' => $request->input('problem'),
         ]);
     }
 
@@ -96,7 +96,7 @@ class SubmissionController extends Controller
         $run = DB::transaction(function () use ($request, $user, $problem) {
 
             $originalFile = $request->file('code_file');
-            $codeText     = $request->input('code_text');
+            $codeText = $request->input('code_text');
             $isFileUpload = $originalFile !== null;
 
             $run = new Submission;

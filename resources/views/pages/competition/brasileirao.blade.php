@@ -33,6 +33,15 @@
         </div>
     </div>
 
+    @if (!$member)
+        <div class="alert alert-warning text-center" style="font-size:1.2rem; padding: 1.5rem;">
+            <strong>Voce ainda nao esta registrado no Brasileirao de Programacao!</strong><br>
+            <a href="{{ route('competition.register.show') }}" class="btn btn-primary mt-2" style="font-size:1.1rem;">
+                Registre-se agora
+            </a>
+        </div>
+    @endif
+
     @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif

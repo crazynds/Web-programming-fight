@@ -21,7 +21,13 @@ class BrasileiraoController extends Controller
     public function index()
     {
         $member = BrasileiraoMember::where('user_id', Auth::id())->with('institution')->first();
-        $league = $member ? ($member->role === 'bixo' ? 'bixos' : 'veteranos') : 'bixos';
+
+        // Unregistered users go straight to leaderboard
+        if (! $member) {
+            return redirect()->route('competition.liga.bixos')->with('unregistered', true);
+        }
+
+        $league = $member->role === 'bixo' ? 'bixos' : 'veteranos';
 
         // If there is an active challenge for this league, redirect to it
         $activeChallenge = BrasileiraoWeeklyChallenge::active()->forLeague($league)->first();
