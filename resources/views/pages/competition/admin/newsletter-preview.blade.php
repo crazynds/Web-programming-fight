@@ -23,7 +23,7 @@
     </div>
 
     <script>
-        const html = @json(view('emails.brasileirao-newsletter', ['user' => $previewUser, 'body' => $body])->render());
+        const html = @json(view('emails.brasileirao-newsletter', ['user' => $previewUser, 'body' => $body, 'emailSubject' => $subject])->render());
         const iframe = document.getElementById('email-preview');
         iframe.srcdoc = html;
     </script>
