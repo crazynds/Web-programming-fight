@@ -22,7 +22,7 @@ if [ "$FUNCTION" == "scheduler" ]; then
 elif [ "$FUNCTION" == "worker" ]; then
     # Start worker
     # unlimited memory and unlimited execution time
-    php -d memory_limit=-1 artisan queue:work --queue=high,contest,submit,rank,low --sleep=2 --tries=2 --backoff=15,30,60 --max-jobs=300 --timeout=0
+    php -d memory_limit=-1 artisan queue:work --queue=high,contest,submit,rank,email,low --sleep=2 --tries=2 --backoff=15,30,60 --max-jobs=300 --timeout=0
 
 elif [ "$FUNCTION" == "pulse" ]; then
 

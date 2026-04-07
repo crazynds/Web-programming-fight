@@ -55,6 +55,11 @@ class User extends Authenticatable
         return $this->hasOne(Submission::class)->latestOfMany();
     }
 
+    public function getAuthPassword(): string
+    {
+        return $this->password ?? '';
+    }
+
     public function teams()
     {
         return $this->belongsToMany(Team::class);
