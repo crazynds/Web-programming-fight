@@ -21,9 +21,15 @@
                 </a>
             @endcan
             @if (!$member)
-                <a style="float:right" href="{{ route('competition.register.show') }}">
-                    <button>Register +</button>
-                </a>
+                @auth
+                    <a style="float:right" href="{{ route('competition.register.show') }}">
+                        <button>Register +</button>
+                    </a>
+                @else
+                    <a style="float:right" href="{{ route('auth.login', ['provider' => 'github']) }}">
+                        <button>Log in to register</button>
+                    </a>
+                @endauth
             @else
                 <span style="float:right" class="text-muted small">
                     Registered at <strong>{{ $member->institution->acronym }}</strong>
@@ -35,10 +41,17 @@
 
     @if (!$member)
         <div class="alert alert-warning text-center" style="font-size:1.2rem; padding: 1.5rem;">
-            <strong>You are not registered for the Brasileirao de Programacao!</strong><br>
-            <a href="{{ route('competition.register.show') }}" class="btn btn-primary mt-2" style="font-size:1.1rem;">
-                Register now
-            </a>
+            @auth
+                <strong>You are not registered for the Brasileirao de Programacao!</strong><br>
+                <a href="{{ route('competition.register.show') }}" class="btn btn-primary mt-2" style="font-size:1.1rem;">
+                    Register now
+                </a>
+            @else
+                <strong>Want to compete? Log in to register for the Brasileirao de Programacao!</strong><br>
+                <a href="{{ route('auth.login', ['provider' => 'github']) }}" class="btn btn-dark mt-2" style="font-size:1.1rem;">
+                    Log in to register
+                </a>
+            @endauth
         </div>
     @endif
 

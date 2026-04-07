@@ -318,6 +318,11 @@ class BrasileiraoController extends Controller
 
     public function showRegister()
     {
+        if (! Auth::check()) {
+            return redirect()->route('auth.login', ['provider' => 'github'])
+                ->with('info', 'Please log in to register for the Brasileirao.');
+        }
+
         if (BrasileiraoMember::where('user_id', Auth::id())->exists()) {
             return redirect()->route('competition.brasileirao')
                 ->with('error', 'You are already registered for the Brasileirao.');
