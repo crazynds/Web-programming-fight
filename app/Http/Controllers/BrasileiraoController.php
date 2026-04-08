@@ -48,6 +48,14 @@ class BrasileiraoController extends Controller
             ? BrasileiraoMember::where('user_id', Auth::id())->with('institution')->first()
             : null;
 
+        // Determine which roles are eligible for this league
+        $eligibleRoles = match ($challenge->league) {
+            'bixos'     => ['bixo'],
+            'veteranos' => ['veteran'],
+            default     => ['bixo', 'veteran'],
+        };
+        $eligibleUserIds = BrasileiraoMember::whereIn('role', $eligibleRoles)->pluck('user_id');
+
         $isTestCases = $challenge->ranking_type === 'test_cases';
 
         $metricColumn = match ($challenge->ranking_type) {
@@ -63,6 +71,7 @@ class BrasileiraoController extends Controller
         // Subquery: best metric value per user within the challenge window
         $bestPerUser = Submission::where('problem_id', $challenge->problem_id)
             ->whereBetween('created_at', [$challenge->start_at, $challenge->end_at])
+            ->whereIn('user_id', $eligibleUserIds)
             ->when($isTestCases,
                 fn ($q) => $q->where('num_test_cases', '>=', 5),
                 fn ($q) => $q->where('result', SubmitResult::Accepted)
@@ -73,6 +82,7 @@ class BrasileiraoController extends Controller
         // Join back to get the full submission row for that best value (one row per user)
         $leaderboard = Submission::where('submissions.problem_id', $challenge->problem_id)
             ->whereBetween('submissions.created_at', [$challenge->start_at, $challenge->end_at])
+            ->whereIn('submissions.user_id', $eligibleUserIds)
             ->when($isTestCases,
                 fn ($q) => $q->where('submissions.num_test_cases', '>=', 5),
                 fn ($q) => $q->where('submissions.result', SubmitResult::Accepted)
