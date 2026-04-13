@@ -139,7 +139,7 @@ class BrasileiraoController extends Controller
     {
         $institutions = BrasileiraoInstitution::withCount(['members', 'bixos', 'veterans', 'coaches'])
             ->having('bixos_count', '>', 0)
-            ->orderByDesc('points')
+            ->orderByDesc('bixos_points')
             ->orderByDesc('bixos_count')
             ->get();
 
@@ -164,7 +164,7 @@ class BrasileiraoController extends Controller
     {
         $institutions = BrasileiraoInstitution::withCount(['members', 'bixos', 'veterans', 'coaches'])
             ->having('veterans_count', '>', 0)
-            ->orderByDesc('points')
+            ->orderByDesc('veterans_points')
             ->orderByDesc('veterans_count')
             ->get();
 
@@ -213,14 +213,14 @@ class BrasileiraoController extends Controller
             ->where('start_at', '<=', now())
             ->get();
 
+        // All user IDs for these roles across the entire brasileirao (for global best comparison)
+        $allRoleUserIds = BrasileiraoMember::whereIn('role', $roles)->pluck('user_id');
+
+        $acceptedDescription = SubmitResult::getDescription(SubmitResult::Accepted);
+
         foreach ($challenges as $challenge) {
-            $eligibleRoles = match ($challenge->league) {
-                'bixos' => ['bixo'],
-                'veteranos' => ['veteran'],
-                default => ['bixo', 'veteran'],
-            };
-            // Only members matching both this league's eligible roles and the requested roles
-            $challengeUserIds = $eligible->whereIn('role', $eligibleRoles)->pluck('user_id');
+            // challengeUserIds: institution members eligible for this specific challenge
+            $challengeUserIds = $eligibleUserIds;
 
             if ($challengeUserIds->isEmpty()) {
                 continue;
@@ -247,10 +247,11 @@ class BrasileiraoController extends Controller
                 }
             }
 
-            // For test_cases: any submission with ≥5 test cases qualifies; otherwise only Accepted
+            // For test_cases: any submission with ≥5 test cases qualifies; otherwise only Accepted.
+            // Must compare against the description string because the model accessor returns a string.
             $qualified = $isTestCases
                 ? $windowSubmissions->where('num_test_cases', '>=', 5)
-                : $windowSubmissions->where('result', SubmitResult::Accepted);
+                : $windowSubmissions->where('result', $acceptedDescription);
 
             $bestPerUser = $qualified->groupBy('user_id')->map(function ($subs) use ($metricColumn, $challenge, $isTestCases) {
                 return $subs->sortBy(function ($s) use ($metricColumn, $challenge, $isTestCases) {
@@ -268,11 +269,12 @@ class BrasileiraoController extends Controller
             }
 
             if ($bestPerUser->isNotEmpty()) {
-                $allEligibleUserIds = BrasileiraoMember::whereIn('role', $eligibleRoles)->pluck('user_id');
+                // Global best is compared within the same league (same roles) so bixos and
+                // veterans are ranked independently, matching the scoring job behaviour.
                 $aggregate  = $isTestCases ? 'MAX' : 'MIN';
                 $globalBest = Submission::where('problem_id', $challenge->problem_id)
                     ->whereBetween('created_at', [$challenge->start_at, $challenge->end_at])
-                    ->whereIn('user_id', $allEligibleUserIds)
+                    ->whereIn('user_id', $allRoleUserIds)
                     ->when($isTestCases,
                         fn ($q) => $q->where('num_test_cases', '>=', 5),
                         fn ($q) => $q->where('result', SubmitResult::Accepted)
@@ -363,8 +365,7 @@ class BrasileiraoController extends Controller
         $acronym = strtoupper(trim($request->institution_acronym));
 
         $institution = BrasileiraoInstitution::firstOrCreate(
-            ['acronym' => $acronym],
-            ['points' => 0]
+            ['acronym' => $acronym]
         );
 
         BrasileiraoMember::create([

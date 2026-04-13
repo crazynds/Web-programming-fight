@@ -107,8 +107,16 @@
                                 @if($league == 'veteranos'){{ $institution->veterans_count }}
                                 @endif
                             </td>
-                            <td class="text-center px-2">{{ $institution->solutions }}</td>
-                            <td class="text-center px-2"><b>{{ $institution->points }}</b></td>
+                            <td class="text-center px-2">
+                                @if($league == 'bixos'){{ $institution->bixos_solutions }}
+                                @elseif($league == 'veteranos'){{ $institution->veterans_solutions }}
+                                @endif
+                            </td>
+                            <td class="text-center px-2">
+                                @if($league == 'bixos')<b>{{ $institution->bixos_points }}</b>
+                                @elseif($league == 'veteranos')<b>{{ $institution->veterans_points }}</b>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>

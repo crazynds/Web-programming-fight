@@ -22,7 +22,12 @@ class RecalculateBrasileiraoScoreJob implements ShouldQueue
     {
         DB::transaction(function () {
             // Reset all institution scores
-            BrasileiraoInstitution::query()->update(['points' => 0, 'solutions' => 0]);
+            BrasileiraoInstitution::query()->update([
+                'bixos_points'      => 0,
+                'bixos_solutions'   => 0,
+                'veterans_points'   => 0,
+                'veterans_solutions' => 0,
+            ]);
 
             // Reset scored_at on all challenges so they can be re-scored
             BrasileiraoWeeklyChallenge::query()->update(['scored_at' => null]);
@@ -42,23 +47,35 @@ class RecalculateBrasileiraoScoreJob implements ShouldQueue
             return;
         }
 
-        $eligibleRoles = match ($challenge->league) {
-            'bixos' => ['bixo'],
-            'veteranos' => ['veteran'],
-            default => ['bixo', 'veteran'],
+        $leaguesToScore = match ($challenge->league) {
+            'bixos'     => ['bixos'],
+            'veteranos' => ['veteranos'],
+            default     => ['bixos', 'veteranos'],
         };
 
-        $eligibleUserIds = BrasileiraoMember::whereIn('role', $eligibleRoles)
-            ->pluck('user_id');
+        foreach ($leaguesToScore as $targetLeague) {
+            $this->scoreLeague($challenge, $targetLeague);
+        }
+
+        $challenge->update(['scored_at' => now()]);
+    }
+
+    private function scoreLeague(BrasileiraoWeeklyChallenge $challenge, string $targetLeague): void
+    {
+        $roles        = $targetLeague === 'bixos' ? ['bixo'] : ['veteran'];
+        $pointsCol    = $targetLeague === 'bixos' ? 'bixos_points'    : 'veterans_points';
+        $solutionsCol = $targetLeague === 'bixos' ? 'bixos_solutions' : 'veterans_solutions';
+
+        $eligibleUserIds = BrasileiraoMember::whereIn('role', $roles)->pluck('user_id');
 
         $isTestCases = $challenge->ranking_type === 'test_cases';
 
         $metricColumn = match ($challenge->ranking_type) {
-            'cpu_time' => 'execution_time',
-            'memory_peak' => 'execution_memory',
+            'cpu_time'        => 'execution_time',
+            'memory_peak'     => 'execution_memory',
             'submission_time' => 'created_at',
-            'code_lines' => 'code_lines',
-            'test_cases' => 'num_test_cases',
+            'code_lines'      => 'code_lines',
+            'test_cases'      => 'num_test_cases',
         };
 
         $aggregate = $isTestCases ? 'MAX' : 'MIN';
@@ -95,8 +112,6 @@ class RecalculateBrasileiraoScoreJob implements ShouldQueue
             ->values();
 
         if ($leaderboard->isEmpty()) {
-            $challenge->update(['scored_at' => now()]);
-
             return;
         }
 
@@ -134,17 +149,15 @@ class RecalculateBrasileiraoScoreJob implements ShouldQueue
                 continue;
             }
 
-            $points = 1;
+            $points    = 1;
             $solutions = $solvers->count();
 
             if ($bonusInstitutionIds->contains($institutionId)) {
                 $points += 1;
             }
 
-            BrasileiraoInstitution::where('id', $institutionId)->increment('points', $points);
-            BrasileiraoInstitution::where('id', $institutionId)->increment('solutions', $solutions);
+            BrasileiraoInstitution::where('id', $institutionId)->increment($pointsCol, $points);
+            BrasileiraoInstitution::where('id', $institutionId)->increment($solutionsCol, $solutions);
         }
-
-        $challenge->update(['scored_at' => now()]);
     }
 }
