@@ -31,7 +31,7 @@ class SyncSubmissionComponent extends Component
 
     private function getQuery()
     {
-        if ($this->global) {
+        if ($this->global || ! Auth::user()) {
             if ($this->contest) {
                 $contest = $this->contest;
                 $query = $contest

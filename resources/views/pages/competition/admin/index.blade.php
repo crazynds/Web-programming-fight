@@ -22,6 +22,14 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
+    <div class="mb-3">
+        <form action="{{ route('competition.admin.recalculate-scores') }}" method="POST"
+              onsubmit="return confirm('Isso vai zerar o score de todas as instituições e recalcular a partir de todos os challenges encerrados. Confirma?')">
+            @csrf
+            <button type="submit" class="btn btn-danger btn-sm">Recalcular todos os scores</button>
+        </form>
+    </div>
+
     <table border="1">
         <thead>
             <tr>

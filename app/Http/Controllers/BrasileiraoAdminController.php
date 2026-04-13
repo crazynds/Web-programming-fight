@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreBrasileiraoWeeklyChallengeRequest;
 use App\Jobs\PublishBrasileiraoChallengeProblemsJob;
+use App\Jobs\RecalculateBrasileiraoScoreJob;
 use App\Jobs\ScoreBrasileiraoChallengeJob;
 use App\Jobs\SendBrasileiraoNewsletterJob;
 use App\Models\BrasileiraoNewsletter;
-use App\Models\BrasileiraoNewsletterSend;
 use App\Models\BrasileiraoWeeklyChallenge;
 use App\Models\Problem;
 use App\Models\User;
@@ -43,7 +43,7 @@ class BrasileiraoAdminController extends Controller
         $challenge = BrasileiraoWeeklyChallenge::create($data);
 
         PublishBrasileiraoChallengeProblemsJob::dispatch($challenge)->delay($challenge->start_at);
-        ScoreBrasileiraoChallengeJob::dispatch($challenge)->delay($challenge->end_at);
+        // ScoreBrasileiraoChallengeJob::dispatch($challenge)->delay($challenge->end_at);
 
         return redirect()->route('competition.admin.index')
             ->with('success', 'Weekly challenge created successfully.');
@@ -63,10 +63,18 @@ class BrasileiraoAdminController extends Controller
         $challenge->update($data);
 
         // Re-dispatch in case end_at changed; the job checks scored_at and end_at before scoring
-        ScoreBrasileiraoChallengeJob::dispatch($challenge)->delay($challenge->end_at);
+        // ScoreBrasileiraoChallengeJob::dispatch($challenge)->delay($challenge->end_at);
 
         return redirect()->route('competition.admin.index')
             ->with('success', 'Weekly challenge updated successfully.');
+    }
+
+    public function recalculateScores()
+    {
+        RecalculateBrasileiraoScoreJob::dispatch();
+
+        return redirect()->route('competition.admin.index')
+            ->with('success', 'Recalculation job dispatched. Scores will be reset and recomputed from all ended challenges.');
     }
 
     public function destroy(BrasileiraoWeeklyChallenge $challenge)
@@ -81,8 +89,8 @@ class BrasileiraoAdminController extends Controller
     {
         $subscriberCount = User::where('email_opt_out', false)->whereNotNull('email')->count();
         $newsletters = BrasileiraoNewsletter::withCount([
-            'sends as sent_count'    => fn ($q) => $q->where('status', 'sent'),
-            'sends as failed_count'  => fn ($q) => $q->where('status', 'failed'),
+            'sends as sent_count' => fn ($q) => $q->where('status', 'sent'),
+            'sends as failed_count' => fn ($q) => $q->where('status', 'failed'),
             'sends as pending_count' => fn ($q) => $q->where('status', 'pending'),
         ])->orderByDesc('created_at')->get();
 
@@ -92,8 +100,8 @@ class BrasileiraoAdminController extends Controller
     public function previewNewsletter(Request $request)
     {
         $request->validate([
-            'subject'  => 'required|string|max:255',
-            'body'     => 'required|string',
+            'subject' => 'required|string|max:255',
+            'body' => 'required|string',
             'audience' => 'required|in:all,registered,unregistered,bixos,veteranos',
         ]);
 
@@ -106,15 +114,15 @@ class BrasileiraoAdminController extends Controller
         $body = $request->input('body');
         $previewUser = auth()->user();
         $subscriberCount = User::where('email_opt_out', false)->whereNotNull('email')
-            ->when($audience === 'registered',   fn ($q) => $q->whereIn('id', \App\Models\BrasileiraoMember::pluck('user_id')))
+            ->when($audience === 'registered', fn ($q) => $q->whereIn('id', \App\Models\BrasileiraoMember::pluck('user_id')))
             ->when($audience === 'unregistered', fn ($q) => $q->whereNotIn('id', \App\Models\BrasileiraoMember::pluck('user_id')))
-            ->when($audience === 'bixos',        fn ($q) => $q->whereIn('id', \App\Models\BrasileiraoMember::where('role', 'bixo')->pluck('user_id')))
-            ->when($audience === 'veteranos',    fn ($q) => $q->whereIn('id', \App\Models\BrasileiraoMember::where('role', 'veteran')->pluck('user_id')))
+            ->when($audience === 'bixos', fn ($q) => $q->whereIn('id', \App\Models\BrasileiraoMember::where('role', 'bixo')->pluck('user_id')))
+            ->when($audience === 'veteranos', fn ($q) => $q->whereIn('id', \App\Models\BrasileiraoMember::where('role', 'veteran')->pluck('user_id')))
             ->count();
 
         $emailHtml = view('emails.brasileirao-newsletter', [
-            'user'         => $previewUser,
-            'body'         => $body,
+            'user' => $previewUser,
+            'body' => $body,
             'emailSubject' => $subject,
         ])->render();
 
@@ -123,11 +131,11 @@ class BrasileiraoAdminController extends Controller
 
     public function sendNewsletter(Request $request)
     {
-        $subject  = $request->session()->pull('newsletter.subject');
-        $body     = $request->session()->pull('newsletter.body');
+        $subject = $request->session()->pull('newsletter.subject');
+        $body = $request->session()->pull('newsletter.body');
         $audience = $request->session()->pull('newsletter.audience', 'all');
 
-        if (!$subject || !$body) {
+        if (! $subject || ! $body) {
             return redirect()->route('competition.admin.newsletter')
                 ->with('error', 'Session expired. Please fill in the form again.');
         }
@@ -160,8 +168,8 @@ class BrasileiraoAdminController extends Controller
 
         // Reset failed to pending
         $newsletter->sends()->where('status', 'failed')->update([
-            'status'     => 'pending',
-            'error'      => null,
+            'status' => 'pending',
+            'error' => null,
             'updated_at' => now(),
         ]);
 
@@ -170,5 +178,4 @@ class BrasileiraoAdminController extends Controller
         return redirect()->route('competition.admin.newsletter.show', $newsletter)
             ->with('success', "Retrying {$failedCount} failed send(s).");
     }
-
 }
