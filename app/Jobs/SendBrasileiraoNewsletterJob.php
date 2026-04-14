@@ -20,7 +20,7 @@ class SendBrasileiraoNewsletterJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private const BATCH_SIZE = 50;
+    private const BATCH_SIZE = 20;
 
     public function __construct(
         public int $newsletterId,
@@ -103,6 +103,7 @@ class SendBrasileiraoNewsletterJob implements ShouldQueue
 
         if ($sends->isEmpty()) {
             $newsletter->update(['status' => 'completed']);
+
             return;
         }
 
@@ -129,8 +130,8 @@ class SendBrasileiraoNewsletterJob implements ShouldQueue
             return;
         }
 
-        $sent    = $newsletter->sends()->where('status', 'sent')->count();
-        $total   = $newsletter->total ?: 1;
+        $sent = $newsletter->sends()->where('status', 'sent')->count();
+        $total = $newsletter->total ?: 1;
         $percent = (int) round(($sent / $total) * 100);
 
         $newsletter->update([

@@ -65,6 +65,8 @@ class RunsTable extends Component
         }
         if (! $user?->isAdmin()) {
             $query->limit(300);
+        } else {
+            $query->limit(1000);
         }
 
         return $query
