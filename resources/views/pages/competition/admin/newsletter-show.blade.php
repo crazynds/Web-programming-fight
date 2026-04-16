@@ -61,7 +61,7 @@
                         @else text-muted @endif">
                         {{ ucfirst($send->status) }}
                     </td>
-                    <td class="px-2">{{ $send->sent_at ? $send->sent_at->format('Y-m-d H:i') : '—' }}</td>
+                    <td class="px-2">{{ $send->sent_at ?? '—' }}</td>
                     <td class="px-2 text-danger small">{{ $send->error ?? '' }}</td>
                 </tr>
             @endforeach
