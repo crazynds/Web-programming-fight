@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\SubmitResult;
+use App\Models\BrasileiraoContest;
 use App\Models\BrasileiraoInstitution;
 use App\Models\BrasileiraoMember;
 use App\Models\BrasileiraoWeeklyChallenge;
@@ -10,6 +11,7 @@ use App\Models\Submission;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class BrasileiraoController extends Controller
 {
@@ -63,6 +65,7 @@ class BrasileiraoController extends Controller
             'memory_peak'     => 'execution_memory',
             'submission_time' => 'created_at',
             'code_lines'      => 'code_lines',
+            'tokens'          => 'num_tokens',
             'test_cases'      => 'num_test_cases',
         };
 
@@ -152,11 +155,19 @@ class BrasileiraoController extends Controller
             ->orderByDesc('start_at')
             ->get();
 
+        $linkedContests = BrasileiraoContest::with('contest')
+            ->whereIn('league', ['bixos', 'all'])
+            ->get();
+
+        $contestScoreMap = $this->buildContestScoreMap($linkedContests, 'bixos');
+
         return view('pages.competition.brasileirao', [
-            'institutions' => $institutions,
-            'member' => $member,
-            'league' => 'bixos',
-            'challenges' => $challenges,
+            'institutions'   => $institutions,
+            'member'         => $member,
+            'league'         => 'bixos',
+            'challenges'     => $challenges,
+            'linkedContests' => $linkedContests,
+            'contestScoreMap' => $contestScoreMap,
         ]);
     }
 
@@ -177,12 +188,114 @@ class BrasileiraoController extends Controller
             ->orderByDesc('start_at')
             ->get();
 
+        $linkedContests = BrasileiraoContest::with('contest')
+            ->whereIn('league', ['veteranos', 'all'])
+            ->get();
+
+        $contestScoreMap = $this->buildContestScoreMap($linkedContests, 'veteranos');
+
         return view('pages.competition.brasileirao', [
-            'institutions' => $institutions,
-            'member' => $member,
-            'league' => 'veteranos',
-            'challenges' => $challenges,
+            'institutions'   => $institutions,
+            'member'         => $member,
+            'league'         => 'veteranos',
+            'challenges'     => $challenges,
+            'linkedContests' => $linkedContests,
+            'contestScoreMap' => $contestScoreMap,
         ]);
+    }
+
+    // Returns: [contest_id => [institution_id => ['problems' => N, 'bonus' => 0|1]]]
+    private function buildContestScoreMap($linkedContests, string $league): array
+    {
+        $roles     = $league === 'bixos' ? ['bixo'] : ['veteran'];
+        $memberMap = BrasileiraoMember::whereIn('role', $roles)->pluck('institution_id', 'user_id');
+
+        $result = [];
+
+        foreach ($linkedContests as $bc) {
+            $contest    = $bc->contest;
+            $contestMap = [];
+
+            $competitors = $contest->competitors()->get();
+
+            // competitor_id → collection of institution_ids (filtered to eligible league)
+            $competitorInstitutions = collect();
+            foreach ($competitors as $competitor) {
+                $instIds = collect();
+                if ($contest->individual && $competitor->user_id) {
+                    $instId = $memberMap->get($competitor->user_id);
+                    if ($instId) {
+                        $instIds->push($instId);
+                    }
+                } elseif ($competitor->team_id) {
+                    $teamUserIds = DB::table('team_user')
+                        ->where('team_id', $competitor->team_id)
+                        ->where('accepted', true)
+                        ->pluck('user_id');
+                    foreach ($teamUserIds as $uid) {
+                        $instId = $memberMap->get($uid);
+                        if ($instId) {
+                            $instIds->push($instId);
+                        }
+                    }
+                    $instIds = $instIds->unique();
+                }
+                if ($instIds->isNotEmpty()) {
+                    $competitorInstitutions->put($competitor->id, $instIds);
+                }
+            }
+
+            if ($competitorInstitutions->isEmpty()) {
+                $result[$bc->id] = [];
+                continue;
+            }
+
+            // Problems solved per institution
+            $solvedRows = DB::table('competitor_problem')
+                ->whereIn('competitor_id', $competitorInstitutions->keys())
+                ->where('score', '>', 0)
+                ->select('competitor_id', 'problem_id')
+                ->get();
+
+            $problemsByInstitution = collect();
+            foreach ($solvedRows as $row) {
+                foreach ($competitorInstitutions->get($row->competitor_id, collect()) as $instId) {
+                    if (! $problemsByInstitution->has($instId)) {
+                        $problemsByInstitution->put($instId, collect());
+                    }
+                    $problemsByInstitution->get($instId)->push($row->problem_id);
+                }
+            }
+
+            // Top 3 institutions for bonus
+            $ranked = $competitors->sortByDesc('score')->sortBy('penality')->values();
+            $bonusInstitutionIds = collect();
+            foreach ($ranked as $competitor) {
+                if ($bonusInstitutionIds->count() >= 3) {
+                    break;
+                }
+                foreach ($competitorInstitutions->get($competitor->id, collect()) as $instId) {
+                    if (! $bonusInstitutionIds->contains($instId)) {
+                        $bonusInstitutionIds->push($instId);
+                    }
+                    if ($bonusInstitutionIds->count() >= 3) {
+                        break;
+                    }
+                }
+            }
+
+            $allIds = $problemsByInstitution->keys()->merge($bonusInstitutionIds)->unique();
+            foreach ($allIds as $instId) {
+                $contestMap[$instId] = [
+                    'problems' => ($problemsByInstitution->get($instId) ?? collect())->unique()->count(),
+                    'bonus'    => $bonusInstitutionIds->contains($instId) ? 1 : 0,
+                ];
+            }
+
+            $result[$bc->id] = $contestMap;
+        }
+
+        return $result;
     }
 
     public function showInstitution(BrasileiraoInstitution $institution)
@@ -233,6 +346,7 @@ class BrasileiraoController extends Controller
                 'memory_peak'     => 'execution_memory',
                 'submission_time' => 'created_at',
                 'code_lines'      => 'code_lines',
+                'tokens'          => 'num_tokens',
                 'test_cases'      => 'num_test_cases',
             };
 

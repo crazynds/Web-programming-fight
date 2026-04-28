@@ -195,6 +195,7 @@ class ExecuteSubmitJob implements ShouldBeUnique, ShouldQueue
         }
 
         $this->submit->code_lines = $this->countCodeLines($file->get(), $this->submit->language);
+        $this->submit->num_tokens = $this->countTokens($file->get(), $this->submit->language);
 
         // If this submit is in a contest, do the things
         if ($this->submit->contest) {
@@ -255,6 +256,89 @@ class ExecuteSubmitJob implements ShouldBeUnique, ShouldQueue
                 $count += max(1, $semicolons);
             } else {
                 $count += 1;
+            }
+        }
+
+        return $count;
+    }
+
+    private function countTokens(string $code, string $language): int
+    {
+        $isPython = str_starts_with($language, 'Python') || str_starts_with($language, 'PyPy');
+        $isCFamily = $language === 'C' || str_starts_with($language, 'C++');
+
+        if ($isPython) {
+            return $this->countPythonTokens($code);
+        }
+
+        if ($isCFamily) {
+            $lines = $this->preprocessCCode($code, $language);
+            $preprocessed = implode("\n", $lines);
+
+            return $this->countCLikeTokens($preprocessed);
+        }
+
+        // Java and others: no preprocessor available
+        return $this->countCLikeTokens($code);
+    }
+
+    private function countPythonTokens(string $code): int
+    {
+        $codeFile = tempnam(sys_get_temp_dir(), 'pytok_').'.py';
+        file_put_contents($codeFile, $code);
+
+        $script = <<<'PYTHON'
+import tokenize, token, sys
+SKIP = {
+    token.COMMENT, token.ENCODING, token.NEWLINE,
+    token.NL, token.INDENT, token.DEDENT, token.ENDMARKER,
+}
+count = 0
+try:
+    with open(sys.argv[1], 'rb') as f:
+        for tok in tokenize.tokenize(f.readline):
+            if tok.type not in SKIP:
+                count += 1
+except tokenize.TokenError:
+    pass
+print(count)
+PYTHON;
+
+        $scriptFile = tempnam(sys_get_temp_dir(), 'pytok_script_').'.py';
+        file_put_contents($scriptFile, $script);
+
+        $output = [];
+        exec('python3 '.escapeshellarg($scriptFile).' '.escapeshellarg($codeFile).' 2>/dev/null', $output, $retval);
+
+        unlink($codeFile);
+        unlink($scriptFile);
+
+        if ($retval === 0 && isset($output[0]) && is_numeric($output[0])) {
+            return (int) $output[0];
+        }
+
+        // Fallback to regex if python3 is unavailable
+        $pattern = '/"""[\s\S]*?"""|\'\'\'[\s\S]*?\'\'\'|"(?:[^"\\\\]|\\\\.)*"|\'(?:[^\'\\\\]|\\\\.)*\'|#[^\n]*|\b\d+(?:\.\d+)?(?:[eE][+\-]?\d+)?\b|[a-zA-Z_]\w*|\*\*|\/\/|<<|>>|->|[+\-*\/%&|^~!<>=@]=?|[{}()\[\];,.:?@]/';
+        preg_match_all($pattern, $code, $matches);
+        $count = 0;
+        foreach ($matches[0] as $tok) {
+            if (! str_starts_with($tok, '#')) {
+                $count++;
+            }
+        }
+
+        return $count;
+    }
+
+    private function countCLikeTokens(string $code): int
+    {
+        $pattern = '/\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:[^"\\\\]|\\\\.)*"|\'(?:[^\'\\\\]|\\\\.)*\'|0[xX][0-9a-fA-F]+|\b\d+(?:\.\d+)?(?:[eE][+\-]?\d+)?\b|[a-zA-Z_]\w*|<<=|>>=|>>>|<<|>>|&&|\|\||::|->|\+\+|--|[+\-*\/%&|^~!<>=]=?|[{}()\[\];,.:?]/';
+        preg_match_all($pattern, $code, $matches);
+
+        $count = 0;
+        foreach ($matches[0] as $tok) {
+            if (! str_starts_with($tok, '//') && ! str_starts_with($tok, '/*')) {
+                $count++;
             }
         }
 

@@ -18,7 +18,7 @@ class StoreBrasileiraoWeeklyChallengeRequest extends FormRequest
         return [
             'problem_id'   => 'required|exists:problems,id',
             'league'       => 'required|in:bixos,veteranos,all',
-            'ranking_type' => 'required|in:cpu_time,memory_peak,submission_time,code_lines,test_cases',
+            'ranking_type' => 'required|in:cpu_time,memory_peak,submission_time,code_lines,tokens,test_cases',
             'start_at'     => 'required|date',
             'end_at'       => 'required|date|after:start_at',
         ];

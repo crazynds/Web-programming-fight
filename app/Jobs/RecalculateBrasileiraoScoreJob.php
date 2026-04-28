@@ -22,26 +22,21 @@ class RecalculateBrasileiraoScoreJob implements ShouldQueue
     public function handle(): void
     {
         DB::transaction(function () {
-            // Reset all institution scores
             BrasileiraoInstitution::query()->update([
-                'bixos_points'      => 0,
-                'bixos_solutions'   => 0,
-                'veterans_points'   => 0,
+                'bixos_points'       => 0,
+                'bixos_solutions'    => 0,
+                'veterans_points'    => 0,
                 'veterans_solutions' => 0,
             ]);
 
-            // Reset scored_at on all challenges so they can be re-scored
             BrasileiraoWeeklyChallenge::query()->update(['scored_at' => null]);
             BrasileiraoContest::query()->update(['scored_at' => null]);
 
-            // Re-score every challenge that has already ended
             $challenges = BrasileiraoWeeklyChallenge::where('end_at', '<=', now())->get();
-
             foreach ($challenges as $challenge) {
                 $this->scoreChallenge($challenge);
             }
 
-            // Re-score every linked contest that has already ended
             $brasilContests = BrasileiraoContest::with('contest')->get();
             foreach ($brasilContests as $bc) {
                 if ($bc->contest && $bc->contest->endTime()->lte(now())) {
@@ -85,6 +80,7 @@ class RecalculateBrasileiraoScoreJob implements ShouldQueue
             'memory_peak'     => 'execution_memory',
             'submission_time' => 'created_at',
             'code_lines'      => 'code_lines',
+            'tokens'          => 'num_tokens',
             'test_cases'      => 'num_test_cases',
         };
 

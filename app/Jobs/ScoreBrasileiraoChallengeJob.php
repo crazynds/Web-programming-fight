@@ -66,6 +66,7 @@ class ScoreBrasileiraoChallengeJob implements ShouldQueue
             'memory_peak'     => 'execution_memory',
             'submission_time' => 'created_at',
             'code_lines'      => 'code_lines',
+            'tokens'          => 'num_tokens',
             'test_cases'      => 'num_test_cases',
         };
 

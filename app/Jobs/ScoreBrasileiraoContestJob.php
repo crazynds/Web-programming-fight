@@ -5,7 +5,6 @@ namespace App\Jobs;
 use App\Models\BrasileiraoContest;
 use App\Models\BrasileiraoInstitution;
 use App\Models\BrasileiraoMember;
-use App\Models\Competitor;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -28,8 +27,6 @@ class ScoreBrasileiraoContestJob implements ShouldQueue
         }
 
         DB::transaction(function () use ($bc) {
-            $contest = $bc->contest;
-
             $leaguesToScore = match ($bc->league) {
                 'bixos'     => ['bixos'],
                 'veteranos' => ['veteranos'],
@@ -51,7 +48,6 @@ class ScoreBrasileiraoContestJob implements ShouldQueue
         $pointsCol    = $targetLeague === 'bixos' ? 'bixos_points'    : 'veterans_points';
         $solutionsCol = $targetLeague === 'bixos' ? 'bixos_solutions' : 'veterans_solutions';
 
-        // Map user_id → institution_id for eligible brasileirao members
         $memberMap = BrasileiraoMember::whereIn('role', $roles)
             ->pluck('institution_id', 'user_id');
 
@@ -59,10 +55,7 @@ class ScoreBrasileiraoContestJob implements ShouldQueue
             return;
         }
 
-        // Resolve competitor → set of institution_ids
-        // For individual contests: competitor.user_id → institution
-        // For team contests: team members → institutions
-        $competitors = $contest->competitors()->with('scores')->get();
+        $competitors = $contest->competitors()->get();
 
         $competitorInstitutions = collect(); // competitor_id → collection of institution_ids
 
@@ -98,16 +91,14 @@ class ScoreBrasileiraoContestJob implements ShouldQueue
             return;
         }
 
-        // --- Problems solved per institution ---
-        // competitor_problem: score > 0 means solved
+        // Problems solved per institution
         $solvedRows = DB::table('competitor_problem')
             ->whereIn('competitor_id', $competitorInstitutions->keys())
             ->where('score', '>', 0)
             ->select('competitor_id', 'problem_id')
             ->get();
 
-        // institution_id → set of problem_ids solved
-        $problemsByInstitution = collect();
+        $problemsByInstitution = collect(); // institution_id → collection of problem_ids
 
         foreach ($solvedRows as $row) {
             $instIds = $competitorInstitutions->get($row->competitor_id, collect());
@@ -119,8 +110,7 @@ class ScoreBrasileiraoContestJob implements ShouldQueue
             }
         }
 
-        // --- Institution ranking (for bonus) ---
-        // Rank competitors by score desc, penality asc; first 3 unique institutions get bonus
+        // Institution ranking for bonus (top 3)
         $rankedCompetitors = $competitors->sortByDesc('score')->sortBy('penality')->values();
 
         $bonusInstitutionIds = collect();
@@ -128,8 +118,7 @@ class ScoreBrasileiraoContestJob implements ShouldQueue
             if ($bonusInstitutionIds->count() >= 3) {
                 break;
             }
-            $instIds = $competitorInstitutions->get($competitor->id, collect());
-            foreach ($instIds as $instId) {
+            foreach ($competitorInstitutions->get($competitor->id, collect()) as $instId) {
                 if (! $bonusInstitutionIds->contains($instId)) {
                     $bonusInstitutionIds->push($instId);
                 }
@@ -139,21 +128,16 @@ class ScoreBrasileiraoContestJob implements ShouldQueue
             }
         }
 
-        // --- Apply points ---
-        foreach ($problemsByInstitution as $instId => $problemIds) {
-            $uniqueProblems = $problemIds->unique()->count();
-            $bonus = $bonusInstitutionIds->contains($instId) ? 1 : 0;
-            $points = $uniqueProblems + $bonus;
+        // Apply points
+        $allInstitutionIds = $problemsByInstitution->keys()->merge($bonusInstitutionIds)->unique();
+
+        foreach ($allInstitutionIds as $instId) {
+            $uniqueProblems = ($problemsByInstitution->get($instId) ?? collect())->unique()->count();
+            $bonus          = $bonusInstitutionIds->contains($instId) ? 1 : 0;
+            $points         = $uniqueProblems + $bonus;
 
             BrasileiraoInstitution::where('id', $instId)->increment($pointsCol, $points);
             BrasileiraoInstitution::where('id', $instId)->increment($solutionsCol, $uniqueProblems);
-        }
-
-        // Bonus for institutions in top 3 that didn't solve any problem (edge case)
-        foreach ($bonusInstitutionIds as $instId) {
-            if (! $problemsByInstitution->has($instId)) {
-                BrasileiraoInstitution::where('id', $instId)->increment($pointsCol, 1);
-            }
         }
     }
 }

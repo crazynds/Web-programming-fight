@@ -35,6 +35,7 @@ class BrasileiraoWeeklyChallenge extends Model
             'memory_peak'     => 'Memory Peak (lower is better)',
             'submission_time' => 'Submission Time (lower is better)',
             'code_lines'      => 'Code Lines (lower is better)',
+            'tokens'          => 'Tokens (lower is better)',
             'test_cases'      => 'Test Cases Passed (higher is better, min. 5)',
         };
     }

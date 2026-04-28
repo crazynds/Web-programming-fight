@@ -91,6 +91,11 @@
                         <th class="text-center px-2"><b>Acronym</b></th>
                         <th class="text-center px-2"><b>Members</b></th>
                         <th class="text-center px-2"><b>Solutions</b></th>
+                        @foreach($linkedContests as $bc)
+                            <th class="text-center px-2" title="{{ $bc->contest->title }}">
+                                <b>{{ Str::limit($bc->contest->title, 20) }}</b>
+                            </th>
+                        @endforeach
                         <th class="text-center px-2"><b>Points</b></th>
                     </tr>
                 </thead>
@@ -103,8 +108,7 @@
                             </td>
                             <td class="text-center px-2">
                                 @if($league == 'bixos'){{ $institution->bixos_count }}
-                                @endif
-                                @if($league == 'veteranos'){{ $institution->veterans_count }}
+                                @elseif($league == 'veteranos'){{ $institution->veterans_count }}
                                 @endif
                             </td>
                             <td class="text-center px-2">
@@ -112,6 +116,18 @@
                                 @elseif($league == 'veteranos'){{ $institution->veterans_solutions }}
                                 @endif
                             </td>
+                            @foreach($linkedContests as $bc)
+                                @php $s = $contestScoreMap[$bc->id][$institution->id] ?? null; @endphp
+                                <td class="text-center px-2">
+                                    @if($s)
+                                        <span title="{{ $s['problems'] }} problema(s) + {{ $s['bonus'] }} bônus">
+                                            {{ $s['problems'] + $s['bonus'] }}
+                                        </span>
+                                    @else
+                                        <span class="text-muted">—</span>
+                                    @endif
+                                </td>
+                            @endforeach
                             <td class="text-center px-2">
                                 @if($league == 'bixos')<b>{{ $institution->bixos_points }}</b>
                                 @elseif($league == 'veteranos')<b>{{ $institution->veterans_points }}</b>
@@ -120,7 +136,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-2 text-center text-muted">No institutions registered yet.</td>
+                            <td colspan="{{ 5 + $linkedContests->count() }}" class="px-2 text-center text-muted">No institutions registered yet.</td>
                         </tr>
                     @endforelse
                 </tbody>

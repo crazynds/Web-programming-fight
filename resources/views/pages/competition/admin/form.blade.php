@@ -59,6 +59,7 @@
                     <option value="cpu_time"        @selected(old('ranking_type', $challenge->ranking_type ?? null) == 'cpu_time')>CPU Time (lower is better)</option>
                     <option value="memory_peak"     @selected(old('ranking_type', $challenge->ranking_type ?? null) == 'memory_peak')>Memory Peak (lower is better)</option>
                     <option value="code_lines"      @selected(old('ranking_type', $challenge->ranking_type ?? null) == 'code_lines')>Code Lines (lower is better)</option>
+                    <option value="tokens"          @selected(old('ranking_type', $challenge->ranking_type ?? null) == 'tokens')>Tokens (lower is better)</option>
                     <option value="test_cases"      @selected(old('ranking_type', $challenge->ranking_type ?? null) == 'test_cases')>Test Cases Passed (higher is better, min. 5)</option>
                 </select>
             </div>
