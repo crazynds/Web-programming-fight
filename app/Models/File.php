@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use STS\ZipStream\ZipStream;
+use STS\ZipStream\Builder;
 
 class File extends Model
 {
@@ -145,7 +145,7 @@ class File extends Model
         }
     }
 
-    public function addToZip(ZipStream $zip, $pathName = null)
+    public function addToZip(Builder $zip, $pathName = null)
     {
         if (is_null($pathName)) {
             $pathName = $this->path;

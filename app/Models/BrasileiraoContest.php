@@ -8,6 +8,10 @@ class BrasileiraoContest extends Model
 {
     public $guarded = [];
 
+    public $casts = [
+        'scored_at' => 'datetime',
+    ];
+
     public function contest()
     {
         return $this->belongsTo(Contest::class);
