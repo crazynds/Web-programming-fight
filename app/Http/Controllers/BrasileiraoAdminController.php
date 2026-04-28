@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreBrasileiraoWeeklyChallengeRequest;
 use App\Jobs\PublishBrasileiraoChallengeProblemsJob;
 use App\Jobs\RecalculateBrasileiraoScoreJob;
-use App\Jobs\ScoreBrasileiraoChallengeJob;
+use App\Jobs\ScoreBrasileiraoContestJob;
 use App\Jobs\SendBrasileiraoNewsletterJob;
+use App\Models\BrasileiraoContest;
 use App\Models\BrasileiraoNewsletter;
 use App\Models\BrasileiraoWeeklyChallenge;
+use App\Models\Contest;
 use App\Models\Problem;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -155,6 +157,53 @@ class BrasileiraoAdminController extends Controller
             ->paginate(50);
 
         return view('pages.competition.admin.newsletter-show', compact('newsletter', 'sends'));
+    }
+
+    public function contests()
+    {
+        $linkedContests = BrasileiraoContest::with('contest')->orderByDesc('id')->get();
+        $allContests = Contest::orderByDesc('start_time')->get();
+
+        return view('pages.competition.admin.contests', compact('linkedContests', 'allContests'));
+    }
+
+    public function attachContest(Request $request)
+    {
+        $request->validate([
+            'contest_id' => 'required|exists:contests,id',
+            'league'     => 'required|in:bixos,veteranos,all',
+        ]);
+
+        $already = BrasileiraoContest::where('contest_id', $request->contest_id)->exists();
+        if ($already) {
+            return redirect()->route('competition.admin.contests')
+                ->with('error', 'Este contest já está vinculado ao Brasileirão.');
+        }
+
+        BrasileiraoContest::create([
+            'contest_id' => $request->contest_id,
+            'league'     => $request->league,
+        ]);
+
+        return redirect()->route('competition.admin.contests')
+            ->with('success', 'Contest vinculado com sucesso.');
+    }
+
+    public function detachContest(BrasileiraoContest $brasileiraoContest)
+    {
+        $brasileiraoContest->delete();
+
+        return redirect()->route('competition.admin.contests')
+            ->with('success', 'Contest desvinculado.');
+    }
+
+    public function scoreContest(BrasileiraoContest $brasileiraoContest)
+    {
+        $brasileiraoContest->update(['scored_at' => null]);
+        ScoreBrasileiraoContestJob::dispatch($brasileiraoContest);
+
+        return redirect()->route('competition.admin.contests')
+            ->with('success', 'Pontuação do contest sendo calculada em background.');
     }
 
     public function newsletterResend(BrasileiraoNewsletter $newsletter)

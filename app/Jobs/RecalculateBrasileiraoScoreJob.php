@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Enums\SubmitResult;
+use App\Models\BrasileiraoContest;
 use App\Models\BrasileiraoInstitution;
 use App\Models\BrasileiraoMember;
 use App\Models\BrasileiraoWeeklyChallenge;
@@ -31,12 +32,21 @@ class RecalculateBrasileiraoScoreJob implements ShouldQueue
 
             // Reset scored_at on all challenges so they can be re-scored
             BrasileiraoWeeklyChallenge::query()->update(['scored_at' => null]);
+            BrasileiraoContest::query()->update(['scored_at' => null]);
 
             // Re-score every challenge that has already ended
             $challenges = BrasileiraoWeeklyChallenge::where('end_at', '<=', now())->get();
 
             foreach ($challenges as $challenge) {
                 $this->scoreChallenge($challenge);
+            }
+
+            // Re-score every linked contest that has already ended
+            $brasilContests = BrasileiraoContest::with('contest')->get();
+            foreach ($brasilContests as $bc) {
+                if ($bc->contest && $bc->contest->endTime()->lte(now())) {
+                    ScoreBrasileiraoContestJob::dispatchSync($bc);
+                }
             }
         });
     }

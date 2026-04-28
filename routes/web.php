@@ -111,6 +111,11 @@ Route::middleware([PreventAccessDuringContest::class])->group(function () {
             Route::post('/newsletter/send', [BrasileiraoAdminController::class, 'sendNewsletter'])->name('newsletter.send');
             Route::get('/newsletter/{newsletter}', [BrasileiraoAdminController::class, 'newsletterShow'])->name('newsletter.show');
             Route::post('/newsletter/{newsletter}/resend', [BrasileiraoAdminController::class, 'newsletterResend'])->name('newsletter.resend');
+            // Contest linking
+            Route::get('/contests', [BrasileiraoAdminController::class, 'contests'])->name('contests');
+            Route::post('/contests', [BrasileiraoAdminController::class, 'attachContest'])->name('contests.attach');
+            Route::delete('/contests/{brasileiraoContest}', [BrasileiraoAdminController::class, 'detachContest'])->name('contests.detach');
+            Route::post('/contests/{brasileiraoContest}/score', [BrasileiraoAdminController::class, 'scoreContest'])->name('contests.score');
         });
         Route::get('/brasileirao/unsubscribe', [BrasileiraoController::class, 'unsubscribe'])->name('competition.unsubscribe')->middleware('signed');
     });
