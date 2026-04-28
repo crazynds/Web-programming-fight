@@ -93,7 +93,7 @@
                         <th class="text-center px-2"><b>Solutions</b></th>
                         @foreach($linkedContests as $bc)
                             <th class="text-center px-2" title="{{ $bc->contest->title }}">
-                                <b>{{ Str::limit($bc->contest->title, 20) }}</b>
+                                <b>{{ $bc->contest->start_time->format('d/m') }}</b>
                             </th>
                         @endforeach
                         <th class="text-center px-2"><b>Points</b></th>
