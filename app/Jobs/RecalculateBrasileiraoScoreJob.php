@@ -124,6 +124,9 @@ class RecalculateBrasileiraoScoreJob implements ShouldQueue
         $memberMap = BrasileiraoMember::whereIn('user_id', $leaderboard->pluck('user_id'))
             ->pluck('institution_id', 'user_id');
 
+        $institutionAcronyms = BrasileiraoInstitution::whereIn('id', $memberMap->values()->unique())
+            ->pluck('acronym', 'id');
+
         $firstSubmission = $leaderboard->first();
         $firstValue = $challenge->ranking_type === 'submission_time'
             ? $firstSubmission->created_at->diffInSeconds($challenge->start_at)
@@ -161,6 +164,10 @@ class RecalculateBrasileiraoScoreJob implements ShouldQueue
             if ($bonusInstitutionIds->contains($institutionId)) {
                 $points += 1;
             }
+
+            $acronym      = $institutionAcronyms->get($institutionId, $institutionId);
+            $problemTitle = $challenge->problem->title ?? $challenge->problem_id;
+            dump("[RecalculateBrasileiraoScore] problem=\"{$problemTitle}\" league={$targetLeague} institution={$acronym} points={$points} solutions={$solutions}");
 
             BrasileiraoInstitution::where('id', $institutionId)->increment($pointsCol, $points);
             BrasileiraoInstitution::where('id', $institutionId)->increment($solutionsCol, $solutions);

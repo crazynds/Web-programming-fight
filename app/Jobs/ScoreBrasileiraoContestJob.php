@@ -51,6 +51,8 @@ class ScoreBrasileiraoContestJob implements ShouldQueue
         $memberMap = BrasileiraoMember::whereIn('role', $roles)
             ->pluck('institution_id', 'user_id');
 
+        $institutionAcronyms = BrasileiraoInstitution::pluck('acronym', 'id');
+
         if ($memberMap->isEmpty()) {
             return;
         }
@@ -135,6 +137,10 @@ class ScoreBrasileiraoContestJob implements ShouldQueue
             $uniqueProblems = ($problemsByInstitution->get($instId) ?? collect())->unique()->count();
             $bonus          = $bonusInstitutionIds->contains($instId) ? 1 : 0;
             $points         = $uniqueProblems + $bonus;
+
+            $acronym      = $institutionAcronyms->get($instId, $instId);
+            $contestTitle = $contest->title ?? $bc->contest_id;
+            dump("[ScoreBrasileiraoContest] contest=\"{$contestTitle}\" league={$targetLeague} institution={$acronym} uniqueProblems={$uniqueProblems} bonus={$bonus} points={$points}");
 
             BrasileiraoInstitution::where('id', $instId)->increment($pointsCol, $points);
             BrasileiraoInstitution::where('id', $instId)->increment($solutionsCol, $uniqueProblems);
