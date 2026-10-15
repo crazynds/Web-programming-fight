@@ -103,14 +103,14 @@ COPY ./docker/scripts /var/scripts
 
 
 # Download and install pypy
-RUN wget https://buildbot.pypy.org/nightly/py3.10/pypy-c-jit-186045-8708da3ee078-linux64.tar.bz2 -P /langs && \
+RUN wget https://buildbot.pypy.org/nightly/py3.10/pypy-c-jit-latest-linux64.tar.bz2 -P /langs && \
     tar -xf /langs/pypy-c-jit-186045-8708da3ee078-linux64.tar.bz2 -C /langs && \
     mv /langs/pypy-c-jit-186045-8708da3ee078-linux64 /langs/pypy3.10 && \
     rm /langs/pypy-c-jit-186045-8708da3ee078-linux64.tar.bz2
 
 
 # Download and install pypy 3.11
-RUN wget https://buildbot.pypy.org/nightly/py3.11/pypy-c-jit-186687-ff94ca720f36-linux64.tar.bz2 -P /langs && \
+RUN wget https://buildbot.pypy.org/nightly/py3.11/pypy-c-jit-latest-linux64.tar.gz -P /langs && \
     tar -xf /langs/pypy-c-jit-186687-ff94ca720f36-linux64.tar.bz2 -C /langs && \
     mv /langs/pypy-c-jit-186687-ff94ca720f36-linux64 /langs/pypy3.11 && \
     rm /langs/pypy-c-jit-186687-ff94ca720f36-linux64.tar.bz2

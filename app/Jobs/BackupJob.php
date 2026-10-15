@@ -60,16 +60,27 @@ class BackupJob implements ShouldQueue, ShouldBeUnique
                 $this->log('Backup - SQL stored');
             }
             
-            /** @var File $file */
-            foreach (File::query()->lazy() as $file) {
-                if(is_null($file->content)){
-                    $tempFile = tempnam(sys_get_temp_dir(), 's3_');
-                    file_put_contents($tempFile,$file->get());
-                    $zip->addFile($tempFile, 's3/' . $file->path);
+            // ZipArchive only reads added files on close(), so temp files must be removed afterwards
+            $tempFiles = [];
+            try {
+                /** @var File $file */
+                foreach (File::query()->lazy() as $file) {
+                    if(is_null($file->content)){
+                        $tempFile = tempnam(sys_get_temp_dir(), 's3_');
+                        $tempFiles[] = $tempFile;
+                        file_put_contents($tempFile,$file->get());
+                        $zip->addFile($tempFile, 's3/' . $file->path);
+                    }
+                }
+                $this->log('Closing backup');
+                $zip->close();
+            } finally {
+                foreach ($tempFiles as $tempFile) {
+                    if (file_exists($tempFile)) {
+                        unlink($tempFile);
+                    }
                 }
             }
-            $this->log('Closing backup');
-            $zip->close();
             $this->log('Backup ended');
             Storage::put('backup.zip', fopen($backupFile, 'r+'));
             unlink($backupFile);
