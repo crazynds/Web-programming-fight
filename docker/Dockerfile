@@ -102,18 +102,18 @@ RUN chmod 0777 /var/scripts
 COPY ./docker/scripts /var/scripts
 
 
-# Download and install pypy
+# Download and install pypy 3.10
 RUN wget https://buildbot.pypy.org/nightly/py3.10/pypy-c-jit-latest-linux64.tar.bz2 -P /langs && \
-    tar -xf /langs/pypy-c-jit-186045-8708da3ee078-linux64.tar.bz2 -C /langs && \
-    mv /langs/pypy-c-jit-186045-8708da3ee078-linux64 /langs/pypy3.10 && \
-    rm /langs/pypy-c-jit-186045-8708da3ee078-linux64.tar.bz2
-
+    mkdir -p /langs/pypy3.10 && \
+    tar -xf /langs/pypy-c-jit-latest-linux64.tar.bz2 -C /langs/pypy3.10 --strip-components=1 && \
+    rm /langs/pypy-c-jit-latest-linux64.tar.bz2
 
 # Download and install pypy 3.11
 RUN wget https://buildbot.pypy.org/nightly/py3.11/pypy-c-jit-latest-linux64.tar.gz -P /langs && \
-    tar -xf /langs/pypy-c-jit-186687-ff94ca720f36-linux64.tar.bz2 -C /langs && \
-    mv /langs/pypy-c-jit-186687-ff94ca720f36-linux64 /langs/pypy3.11 && \
-    rm /langs/pypy-c-jit-186687-ff94ca720f36-linux64.tar.bz2
+    mkdir -p /langs/pypy3.11 && \
+    tar -xf /langs/pypy-c-jit-latest-linux64.tar.gz -C /langs/pypy3.11 --strip-components=1 && \
+    rm /langs/pypy-c-jit-latest-linux64.tar.gz
+
 
 # Download and install Java JDK 24
 RUN wget https://download.java.net/java/GA/jdk24.0.1/24a58e0e276943138bf3e963e6291ac2/9/GPL/openjdk-24.0.1_linux-x64_bin.tar.gz -P /langs && \
