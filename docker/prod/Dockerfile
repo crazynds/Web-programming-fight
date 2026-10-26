@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:1.6-php8.4 AS php_base
+FROM dunglas/frankenphp:1.13-php8.4.27-bookworm AS php_base
 
 LABEL maintainer="Crazynds"
 
